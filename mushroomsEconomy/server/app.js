@@ -1,6 +1,10 @@
 const express = require('express');
 const app = express();
 const CONFIG = require('./config');
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, { cors: { origin: '*' } });
+server.listen();
+
 const Router = require('./application/router/Router');
 const DB = require('./application/modules/db/DB');
 const Mediator = require('./application/modules/mediator/Mediator');
