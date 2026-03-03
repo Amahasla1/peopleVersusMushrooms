@@ -2,8 +2,8 @@ const Example = require("./Example");
 const BaseManager = require('../BaseManager');
 
 class ExampleManager extends BaseManager {
-    constructor(mediator, db) {
-        super(mediator, db);
+    constructor(options) {
+        super(options);
     }
     
     check(token) {
