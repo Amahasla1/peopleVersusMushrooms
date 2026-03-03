@@ -10,7 +10,7 @@ class Mediator {
         });
 
         Object.keys(TRIGGERS).forEach(key => {
-            this.triggers[this.TRIGGERS[key]] = () => {return null;};
+            this.triggers[this.TRIGGERS[key]] = () => { return null; };
         });
     }
 

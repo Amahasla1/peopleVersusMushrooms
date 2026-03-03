@@ -14,6 +14,17 @@ class CONFIG {
         TEST: 'TEST',
         TESTDB: 'TESTDB',
     }
+
+    static ONS = {
+        // test ons
+        TEST: 'test',
+        DISCONNECT: 'disconnect'
+    }
+
+    static EMMITS = {
+        // test emmits
+        CONNECTION_TEST: 'connectionTest'
+    }
 }
 
 module.exports = CONFIG;
