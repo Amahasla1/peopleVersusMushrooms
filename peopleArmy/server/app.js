@@ -4,15 +4,20 @@ const CONFIG = require('./config');
 const Router = require('./application/router/Router');
 const DB = require('./application/modules/db/DB');
 const Mediator = require('./application/modules/mediator/Mediator');
-const ExampleManager = require('./application/modules/exampleModule/ExampleManager')
+const RegistrationManager = require('./application/modules/exampleModule/RegistrationManager')
 const { NAME, PORT, DATABASE } = CONFIG;
 
 const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
 
-const exampleManager = new ExampleManager(mediator, db);
+const registrationManager = new RegistrationManager(mediator, db);
 
-const router = new Router({ exampleManager });
+// Пример: подписка на событие "пользователь зарегистрирован" (логирование, рассылка и т.д.)
+mediator.subscribe(mediator.EVENTS.USER_REGISTERED, (user) => {
+    console.log(`[Mediator] Новый пользователь: ${user.username}`);
+});
+
+const router = new Router({ registrationManager });
 
 app.use(express.static(`${__dirname}/public`));
 app.use('/', router);

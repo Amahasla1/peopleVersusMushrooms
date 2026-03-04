@@ -8,6 +8,13 @@ class DB {
         this.orm = new ORM(this.db);
     }
 
+    getUserByName(username) {
+        return this.orm.get('users', { username });
+    }
+
+    updateToken(id, token) {
+        return this.orm.update('users', ['token'], [token], { id });
+    }
 
     destructor() {
         this.db.close();

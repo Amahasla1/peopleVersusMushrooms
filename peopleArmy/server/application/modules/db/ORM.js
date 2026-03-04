@@ -1,11 +1,11 @@
 class ORM {
     /**
      * Создаёт экземпляр ORM.
-     * @param {object} db — подключение к БД (например, из sqlite3 или better-sqlite3).
+     * @param {object} db — подключение к БД 
      */
-    constructor(db) { //НАСТОЯТЕЛЬНО рекомендуется подредактировать orm так, чтобы передавать нужно было не массив с колонками, а строку
-        this.db = db; //Сейчас: orm.get("users", { id }, ["username", "token", "online"]);
-    }                 //Должно быть: orm.get("users", { id }, "username, token, online");
+    constructor(db) { 
+        this.db = db; 
+    }                
 
     /**
      * Выбирает одну строку из таблицы (SELECT ... LIMIT 1).

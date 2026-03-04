@@ -6,8 +6,8 @@ const {
     notFoundHandler,
 } = require('./handlers');
 
-function Router({ exampleManager }) {
-    router.get('/reg/:username/:password', useRegistrationHandler(exampleManager)); //Методы для примера, замените своими
+function Router({ registrationManager }) {
+    router.get('/reg/:username/:password', useRegistrationHandler(registrationManager));
     router.all('/*path', notFoundHandler);
     return router;
 }

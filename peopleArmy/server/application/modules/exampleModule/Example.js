@@ -1,6 +1,6 @@
 const md5 = require('md5');
 
-class Example { //В данном случае под классом Example подразумевается активная запись
+class Example {
     constructor(db) {
         this.db = db;
 
