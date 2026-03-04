@@ -9,7 +9,7 @@ class Answer {
         9000: 'Неизвестная ошибка',
     };
 
-     bad(code) {
+    bad(code) {
         return {
             result: "error",
             code,
