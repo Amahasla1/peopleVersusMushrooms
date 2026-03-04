@@ -21,12 +21,6 @@ const mediator = new Mediator({ EVENTS, TRIGGERS });
 // Создаем менеджеры
 new TestManager({ mediator, db, io });
 
-// Запуск сервака
-server.listen(SERVER_PORT, () => {
-    console.log(`Server ${SERVER_NAME} running on port ${SERVER_PORT}`);
-});
-
-
 // настройка http запросов
 /*
     app.use((_, res, next) => {
@@ -42,3 +36,8 @@ server.listen(SERVER_PORT, () => {
     const router = new Router(mediator);
     app.use('/', router);
 */
+
+// Запуск сервака
+server.listen(SERVER_PORT, () => {
+    console.log(`Server ${SERVER_NAME} running on port ${SERVER_PORT}`);
+});

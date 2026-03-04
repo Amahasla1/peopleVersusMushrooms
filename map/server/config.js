@@ -17,8 +17,7 @@ class CONFIG {
 
     // сокетные сообщения
     static MESSAGES = {
-        CHECK: 'CHECK',
-        SEND_TO_ALL: 'SEND_TO_ALL'
+        CHECK: 'CHECK'
     }
 }
 

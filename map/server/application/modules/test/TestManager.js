@@ -19,6 +19,7 @@ class TestManager extends BaseManager {
         this.mediator.set(this.TRIGGERS.TESTDB, (params) => this.triggerTestDB(params));
     }
 
+    /*
     async test(params) {
         const { data1, data2 } = params;
 
@@ -36,11 +37,12 @@ class TestManager extends BaseManager {
 
         return user.name;
     }
+    */
 
     socketCheck(data, socket) {
         const { name, text } = data;
         socket.emit(MESSAGES.CHECK, 'ok');
-        this.io.emit(MESSAGES.SEND_TO_ALL, data);
+        this.io.emit('send-to-all', data);
     }
 
     socketDisconnect(socket) {
