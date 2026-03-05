@@ -30,4 +30,4 @@ function deinit() {
 
 app.listen(PORT, () => console.log(`${NAME} started at port ${PORT}`));
 
-process.on('SIGNINT', deinit);
+process.on('SIGINT', deinit);

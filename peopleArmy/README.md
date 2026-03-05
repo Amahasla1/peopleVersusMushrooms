@@ -52,7 +52,7 @@
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `**server/application/modules/BaseManager.js**`                       | Базовый класс менеджеров: принимает `mediator` и `db`, сохраняет ссылки и копии EVENTS/TRIGGERS. От него наследуются доменные менеджеры.                                           |
 | `**server/application/modules/registration/RegistrationManager.js**` | Менеджер регистрации: наследует BaseManager, регистрирует триггер REGISTER и при успешной регистрации вызывает событие USER_REGISTERED. |
-| `**server/application/modules/registration/User.js**`                | Модель текущего пользователя (сессия): поля id, username, token; методы login, checkToken, get, getSelf, init. Используется для логина и проверки токена.                             |
+| `**server/application/modules/user/User.js**`                       | Модель текущего пользователя (сессия): поля id, username, token; методы login, checkToken, get, getSelf, init. Используется для логина и проверки токена.                             |
                                                              
 
 ---
