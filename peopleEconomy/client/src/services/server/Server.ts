@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import CONFIG from '../../config';
+import CONFIG, { EMESSAGES } from '../../config';
 import { TAnswer } from "./types";
 
 const HOST = CONFIG.HOST;
@@ -12,8 +12,8 @@ class Server {
         this.socket = io(HOST);
         this.socket.on('connect', () => console.log('КОНнЕНКШОН!!! id:', this.socket.id));
         this.socket.on("disconnect", () => console.log('дисконнект. id:', this.socket.id));
-        this.socket.on('CHECK', (data: string) => console.log(data));
-        this.socket.on('send-to-all', (data: { name: string, text: string }) => console.log(data));
+        this.socket.on(EMESSAGES.CHECK, (data: string) => console.log(data));
+        this.socket.on(EMESSAGES.SEND_TO_ALL, (data: { name: string, text: string }) => console.log(data));
     }
 
     private async request<T>(method: string, params: { [key: string]: string | number } = {}): Promise<T | null> {
@@ -41,7 +41,7 @@ class Server {
     }
 
     check(name: string, text: string): void {
-        this.socket.emit('CHECK', { name, text });
+        this.socket.emit(EMESSAGES.CHECK, { name, text });
     }
 }
 
