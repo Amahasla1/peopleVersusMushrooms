@@ -1,5 +1,5 @@
 const CONFIG = {
-    NAME: 'Server',
+    NAME: 'PeoplesArmy',
     PORT: 3007, //Порт соостветсвующий серверу вашего сервиса
 
     DATABASE: {

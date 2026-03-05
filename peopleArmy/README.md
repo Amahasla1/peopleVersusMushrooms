@@ -51,41 +51,9 @@
 | Файл                                                                  | Назначение                                                                                                                                                                         |
 | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `**server/application/modules/BaseManager.js**`                       | Базовый класс менеджеров: принимает `mediator` и `db`, сохраняет ссылки и копии EVENTS/TRIGGERS. От него наследуются доменные менеджеры.                                           |
-| `**server/application/modules/exampleModule/RegistrationManager.js**` | Менеджер регистрации: наследует BaseManager, регистрирует триггер REGISTER и при успешной регистрации вызывает событие USER_REGISTERED. Работа с таблицей users через this.db.orm. |
-| `**server/application/modules/exampleModule/Example.js**`             | Модель «активной записи» (пользователь/сессия): поля id, username, token; методы login, checkToken, get, getSelf, init. Может использоваться для логина и проверки токена.         |
-
-
-### Вспомогательное
-
-
-| Файл                                              | Назначение                                                                                    |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `**server/application/Answer.js**`                | Формирование единого формата ответов (ошибки, успех с данными). Можно подключать в хендлерах. |
-| `**server/application/modules/common/Common.js**` | Общие утилиты (например guid).                                                                |
-
-
-### Связи между частями
-
-```
-config.js ─────────────────────────────────────────────────────────┐
-    │                                                               │
-    ▼                                                               ▼
-app.js ──► DB ──► ORM (внутри DB)                    Mediator (EVENTS, TRIGGERS из config)
-    │         │                                                               │
-    │         └── data.db (файл БД)                                            │
-    │                                                                          │
-    ├──► RegistrationManager(mediator, db) ◄── подписывается на триггер REGISTER,
-    │         │                                 вызывает событие USER_REGISTERED
-    │         └── использует db.orm для users                                    │
-    │                                                                          │
-    ├──► Router(registrationManager) ──► useRegistrationHandler(registrationManager)
-    │                                         │                                  │
-    │                                         └── GET /reg/:username/:password   │
-    │                                                                          │
-    └──► mediator.subscribe(USER_REGISTERED, ...) ◄───────────────────────────────┘
-```
-
-Итог: **config** задаёт настройки; **app.js** собирает DB, Mediator, менеджеры и Router; **Router** связывает URL и хендлеры; хендлеры вызывают менеджеров; менеджеры используют **DB/ORM** и **Mediator** (события и триггеры).
+| `**server/application/modules/registration/RegistrationManager.js**` | Менеджер регистрации: наследует BaseManager, регистрирует триггер REGISTER и при успешной регистрации вызывает событие USER_REGISTERED. |
+| `**server/application/modules/registration/User.js**`                | Модель текущего пользователя (сессия): поля id, username, token; методы login, checkToken, get, getSelf, init. Используется для логина и проверки токена.                             |
+                                                             
 
 ---
 
