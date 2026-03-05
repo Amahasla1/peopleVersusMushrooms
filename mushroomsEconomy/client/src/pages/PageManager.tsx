@@ -5,6 +5,9 @@ import Login from './Login/Login';
 import Chat from './Chat/Chat'
 import Store from '../services/Store/Store';
 
+import Mediator from '../services/Mediator/Mediator';
+import CONFIG from '../config';
+
 
 export enum PAGES {
     LOGIN,
@@ -21,7 +24,8 @@ export interface IBasePage {
 const PageManager: React.FC = () => {
     const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
     const store = new Store();
-    const server = new Server(store);
+    const mediator = new Mediator(CONFIG.MEDIATOR);
+    const server = new Server({store,mediator});
 
     const props = {
         setPage,

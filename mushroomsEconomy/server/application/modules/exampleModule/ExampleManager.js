@@ -6,6 +6,8 @@ class ExampleManager extends BaseManager {
     constructor(options) {
         super(options);
 
+        this.messages = [];
+
         if (!this.io) return;
 
         this.io.on('connection', (socket) => {
@@ -23,6 +25,7 @@ class ExampleManager extends BaseManager {
 			this.messages.push({ name, text });
 			socket.emit(CONFIG.SOCKET.CLIENT.SEND_MESSAGE, 'ok');
 			this.io.emit(CONFIG.SOCKET.SERVER.NEW_MESSAGE, this.messages); // выслать сообщение всем активным абонентам
+            console.log(this.messages);
 		}
 	}
 
