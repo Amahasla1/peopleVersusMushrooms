@@ -6,12 +6,11 @@ class GameManager extends BaseManager {
     constructor(mediator, db, answer, easystar) {
         super(mediator, db);
 
-        this.units = [];
+        this.units = new Map();
         this.mushrooms = [];
         this.answer = answer;
         this.easystar = easystar;
 
-        this.nextUnitId = 1;
         this.nextMushroomId = 1;
 
         this.matrix = [];
@@ -32,32 +31,19 @@ class GameManager extends BaseManager {
     }
 
     getAllUnits() {
-        const unitsList = [];
-
-        this.units.forEach((unit, id) => {
-            if (unit && unit !== -1) {
-                unitsList.push({
-                    id: id,
-                    x: unit.x,
-                    y: unit.y
-                });
-            }
-        });
-
-        return this.answer.good(unitsList);
+        return this.answer.good(this.units);
     }
 
     createUnit(unitData) {
         const unit = new Unit(this.db, this.easystar);
-        const unitId = this.nextUnitId++;
 
         unit.init({
-            id: unitId, 
+            id: unitData.id, 
             x: unitData.x, 
             y: unitData.y
         });
 
-        this.units.push(unit);
+        this.units.set(unitData.id, unit);
 
         return this.answer.good({
             id: unit.id,
@@ -69,11 +55,11 @@ class GameManager extends BaseManager {
     updateUnit(id, unitData) {
         const numberId = parseInt(id);
 
-        if (!this.units[numberId] || this.units[numberId] === -1) {
+        if (!this.units.has(numberId)) {
             return this.answer.bad(14);
         }
 
-        const unit = this.units[numberId];
+        const unit = this.units.get(numberId);
         
         unit.init({
             id: numberId, 
@@ -91,29 +77,17 @@ class GameManager extends BaseManager {
     deleteUnit(id) {
         const numberId = parseInt(id);
 
-        if (!this.units[numberId] || this.units[numberId] === -1) {
+        if (!this.units.has(numberId)) {
             return this.answer.bad(14);
         }
 
-        this.units[numberId] = -1;
+        this.units.delete(numberId);
 
         return this.answer.good(`Unit deleted: ${numberId}`);
     }
 
     getAllMushrooms() {
-        const mushroomsList = [];
-
-        this.mushrooms.forEach((mushroom, id) => {
-            if (mushroom && mushroom !== -1) {
-                mushroomsList.push({
-                    id: id,
-                    x: mushroom.x,
-                    y: mushroom.y
-                });
-            }
-        });
-
-        return this.answer.good(mushroomsList);
+        return this.answer.good(this.mushrooms);
     }
 
     createMushroom(mushroomData) {
@@ -133,7 +107,7 @@ class GameManager extends BaseManager {
     updateMushroom(id, mushroomData) {
         const numberId = parseInt(id);
 
-        if (!this.mushrooms[numberId] || this.mushrooms[numberId] === -1) {
+        if (!this.mushrooms[numberId]) {
             return this.answer.bad(12);
         }
 
@@ -150,11 +124,11 @@ class GameManager extends BaseManager {
     deleteMushroom(id) {
         const numberId = parseInt(id);
 
-        if (!this.mushrooms[numberId] || this.mushrooms[numberId] === -1) {
+        if (!this.mushrooms[numberId]) {
             return this.answer.bad(12);
         }
 
-        this.mushrooms[numberId] = -1;
+        this.mushrooms.splice(numberId, 1);
 
         return this.answer.good(`Mushroom deleted: ${numberId}`);
     }
