@@ -19,19 +19,23 @@ function App() {
 
 
   const pressMeHandler = () => mediator.get(
-    CONFIG.MEDIATOR.TRIGGERS.SEND_MESSAGE_SOCKET,
+    CONFIG.MEDIATOR.TRIGGERS.MESSAGE,
     { name: 'Vasya', text: 'something' }
   );
 
+  const props = {
+        mediator,
+        server,
+        store,
+    }
+
   return (
-    <MediatorContext.Provider value={mediator}>
       <div className="App">
         <button onClick={pressMeHandler}>Press Me</button>
         <div className='app'>
-          <PageManager />
+          <PageManager {...props}/>
         </div>
       </div>
-    </MediatorContext.Provider>
   );
 }
 

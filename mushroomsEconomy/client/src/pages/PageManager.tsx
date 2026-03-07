@@ -19,18 +19,22 @@ export interface IBasePage {
     setPage: (name: PAGES) => void;
     server: Server,
     store: Store,
+    mediator: Mediator
 }
 
-const PageManager: React.FC = () => {
+export interface IPageManager {
+    server: Server,
+    store: Store,
+    mediator: Mediator
+}
+
+const PageManager: React.FC<IPageManager> = (propsManager: IPageManager) => {
     const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
-    const store = new Store();
-    const mediator = new Mediator(CONFIG.MEDIATOR);
-    const server = new Server({store,mediator});
+    const { store, mediator, server } = propsManager;
 
     const props = {
         setPage,
-        server,
-        store,
+        ...propsManager
     }
 
     return (

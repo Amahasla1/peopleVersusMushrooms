@@ -33,13 +33,13 @@ class Server {
         });
 
         this.mediator.set(
-            CONFIG.MEDIATOR.TRIGGERS.SEND_MESSAGE_SOCKET,
+            CONFIG.MEDIATOR.TRIGGERS.MESSAGE,
             (data: { name: string; text: string }) => this.chatMessage(data.name, data.text)
         )
     }
 
     private chatMessage(name: string, text: string): void {
-        this.socket.emit(CONFIG.SOCKET.CLIENT.SEND_MESSAGE, { name, text });
+        this.socket.emit(CONFIG.SOCKET.MESSAGE, { name, text });
     }
 
     private async request<T>(
