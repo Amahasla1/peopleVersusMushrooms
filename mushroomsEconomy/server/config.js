@@ -14,6 +14,11 @@ const CONFIG = {
             EXAMPLE_TRIGGER: "EXAMPLE_TRIGGER",
         },
     },
+
+    SOCKET: {
+        MESSAGE: 'message',  // шлет сообщение
+        TYPING: 'typing',           // печатает
+    }
 }
 
 module.exports = CONFIG;
