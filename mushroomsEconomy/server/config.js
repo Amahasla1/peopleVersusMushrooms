@@ -1,5 +1,5 @@
 const CONFIG = {
-    NAME: 'Server',
+    NAME: 'Mushroom economy server',
     PORT: 3005, //Порт соостветсвующий серверу вашего сервиса
 
     DATABASE: {
@@ -13,6 +13,9 @@ const CONFIG = {
         TRIGGERS: {
             EXAMPLE_TRIGGER: "EXAMPLE_TRIGGER",
         },
+    },
+    CORS: {
+        origin: "http://localhost:3004",
     },
 }
 
