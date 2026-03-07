@@ -16,14 +16,8 @@ const CONFIG = {
     },
 
     SOCKET: {
-        CLIENT: {
-            SEND_MESSAGE: 'client:message',  // клиент шлет сообщение
-            TYPING: 'client:typing'           // клиент печатает
-        },
-        SERVER: {
-            NEW_MESSAGE: 'server:new:message', // сервер разослал сообщение
-            USER_TYPING: 'server:user:typing'  // сервер сообщает, что кто-то печатает
-        }
+        MESSAGE: 'message',  // шлет сообщение
+        TYPING: 'typing',           // печатает
     }
 }
 

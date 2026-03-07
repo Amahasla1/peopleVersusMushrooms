@@ -12,7 +12,7 @@ class ExampleManager extends BaseManager {
 
         this.io.on('connection', (socket) => {
 
-            socket.on(CONFIG.SOCKET.CLIENT.SEND_MESSAGE, (data) => this.socketChatMessage(data, socket));
+            socket.on(CONFIG.SOCKET.MESSAGE, (data) => this.socketChatMessage(data, socket));
 
             socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
@@ -23,8 +23,8 @@ class ExampleManager extends BaseManager {
 		const { name, text } = data;
 		if (name && text) {
 			this.messages.push({ name, text });
-			socket.emit(CONFIG.SOCKET.CLIENT.SEND_MESSAGE, 'ok');
-			this.io.emit(CONFIG.SOCKET.SERVER.NEW_MESSAGE, this.messages); // выслать сообщение всем активным абонентам
+			socket.emit(CONFIG.SOCKET.MESSAGE, 'ok');
+			this.io.emit(CONFIG.SOCKET.MESSAGE, this.messages); // выслать сообщение всем активным абонентам
             console.log(this.messages);
 		}
 	}
