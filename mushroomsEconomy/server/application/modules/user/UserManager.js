@@ -1,8 +1,7 @@
-//const crypto = require('crypto');
 const crypto = require('node:crypto');
 const BaseManager = require('../BaseManager');
 
-class UserManager {
+class UserManager extends BaseManager {
     constructor(options) {
         this.db = options.db;
         this.answer = options.answer;
@@ -29,8 +28,8 @@ class UserManager {
         return this.answer.good(user);
     }
 
-    login(login, password) {
-        const user = this.db.getUserByLogin(login);
+    async login(login, password) {
+        const user = await this.db.getUserByLogin(login);
         if (!user) {
             return this.answer.bad(100);
         }
@@ -40,7 +39,7 @@ class UserManager {
 
         if (user.password === passwordHash) {
             const token = this.generateToken();
-            this.db.updateToken(user.id, token);
+            await this.db.updateToken(user.id, token);
 
             return this.answer.good(true);
         }
