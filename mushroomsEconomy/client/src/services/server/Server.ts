@@ -1,17 +1,45 @@
 import CONFIG from '../../config';
+
+import Mediator from '../Mediator/Mediator';
+
 import Store from "../Store/Store";
 import { TUser } from "./types";
 
+import { io, Socket } from "socket.io-client";
+
 const HOST = CONFIG.HOST;
+
+type Tprops = {
+    store: Store;
+    mediator: Mediator;
+}
 
 class Server {
     HOST = HOST;
     store: Store;
+    mediator: Mediator;
     chatInterval: NodeJS.Timer | null = null;
-    showErrorCb: (text: string) => void = function() {};
+    socket: Socket;
+    showErrorCb: (text: string) => void = function () { };
 
-    constructor(store: Store) {
-        this.store = store;
+    constructor(props: Tprops) {
+        
+        this.mediator = props.mediator;
+        this.store = props.store;
+        this.socket = io(HOST);
+
+        this.socket.on("connect", () => {
+            console.log('connect');
+        });
+
+        this.mediator.set(
+            CONFIG.MEDIATOR.TRIGGERS.MESSAGE,
+            (data: { name: string; text: string }) => this.chatMessage(data.name, data.text)
+        )
+    }
+
+    private chatMessage(name: string, text: string): void {
+        this.socket.emit(CONFIG.SOCKET.MESSAGE, { name, text });
     }
 
     private async request<T>(

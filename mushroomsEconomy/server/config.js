@@ -17,6 +17,11 @@ const CONFIG = {
     CORS: {
         origin: "http://localhost:3004",
     },
+
+    SOCKET: {
+        MESSAGE: 'message',  // шлет сообщение
+        TYPING: 'typing',           // печатает
+    }
 }
 
 module.exports = CONFIG;

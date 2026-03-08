@@ -23,7 +23,7 @@ app.use('/', new Router(mediator));
 
 function deinit() {
     db.destrucor();
-    setTimeout(() =>process.exit(), 500);
+    setTimeout(() => process.exit(), 500);
 }
 
 server.listen(PORT, () => console.log(`${NAME} started at port ${PORT}`));
