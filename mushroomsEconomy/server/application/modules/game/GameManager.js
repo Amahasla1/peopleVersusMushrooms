@@ -3,13 +3,13 @@ const Mushroom = require("./Mushroom");
 const Unit = require("./Unit");
 
 class GameManager extends BaseManager {
-    constructor(mediator, db, answer, easystar) {
-        super(mediator, db);
+    constructor(options) {
+        super(options);
 
         this.units = new Map();
         this.mushrooms = [];
-        this.answer = answer;
-        this.easystar = easystar;
+        this.answer = options.answer;
+        this.easystar = options.easystar;
 
         this.nextMushroomId = 1;
 

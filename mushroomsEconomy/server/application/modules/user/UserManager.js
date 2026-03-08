@@ -3,9 +3,9 @@ const crypto = require('node:crypto');
 const BaseManager = require('../BaseManager');
 
 class UserManager {
-    constructor(db, answer) {
-        this.db = db;
-        this.answer = answer;
+    constructor(options) {
+        this.db = options.db;
+        this.answer = options.answer;
     }
 
     hashPassword(password) {
@@ -58,3 +58,5 @@ class UserManager {
         return this.answer.bad(100);
     }
 }
+
+module.exports = UserManager;

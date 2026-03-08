@@ -15,6 +15,8 @@ const Answer = require('./application/Answer');
 const ExampleManager = require('./application/modules/exampleModule/ExampleManager');
 const GameManager = require('./application/modules/game/GameManager');
 const UserManager = require('./application/modules/user/UserManager');
+const easystar = require('easystarjs');
+
 const { NAME, PORT, DATABASE } = CONFIG;
 
 const db = new DB({ DATABASE });
@@ -28,7 +30,8 @@ const exampleManager = new ExampleManager({
 const gameManager = new GameManager({
     mediator: mediator, 
     db: db, 
-    answer: answer
+    answer: answer,
+    easystar: easystar
 });
 const userManager = new UserManager({
     mediator: mediator, 
