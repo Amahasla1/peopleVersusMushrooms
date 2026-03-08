@@ -11,18 +11,31 @@ const CONFIG = require('./config');
 const Router = require('./application/router/Router');
 const DB = require('./application/modules/db/DB');
 const Mediator = require('./application/modules/mediator/Mediator');
+const Answer = require('./application/Answer');
 const ExampleManager = require('./application/modules/exampleModule/ExampleManager');
 const GameManager = require('./application/modules/game/GameManager');
+const UserManager = require('./application/modules/user/UserManager');
 const { NAME, PORT, DATABASE } = CONFIG;
 
 const db = new DB({ DATABASE });
 const mediator = new Mediator(CONFIG.MEDIATOR);
 const answer = new Answer();
 
-const exampleManager = new ExampleManager(mediator, db);
-const gameManager = new GameManager(mediator, db, answer);
+const exampleManager = new ExampleManager({
+    mediator: mediator, 
+    db: db
+});
+const gameManager = new GameManager({
+    mediator: mediator, 
+    db: db, 
+    answer: answer
+});
+const userManager = new UserManager({
+    mediator: mediator, 
+    db: db
+});
 
-const router = new Router({ exampleManager, gameManager, answer });
+const router = new Router({ exampleManager, gameManager, answer, userManager });
 
 app.use(express.static(`${__dirname}/public`));
 app.use('/', router);

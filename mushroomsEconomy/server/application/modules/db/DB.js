@@ -9,6 +9,21 @@ class DB {
         this.orm = new ORM(this.db);
     }
 
+    async getUserByLogin(login) {
+        return this.orm.get('users', { login });
+    }
+
+    async getUserByToken(token) {
+        return this.orm.get('users', { token });
+    }
+
+    async registration(login, passwordHash, username, token) {
+        return this.orm.insert('users', ['login', 'password', 'username', 'token'], [login, passwordHash, username, token]);
+    }
+
+    async updateToken(id, token) {
+        return this.orm.update('users', ['token'], [token], { id });
+    }
 
     destructor() {
         this.db.close();

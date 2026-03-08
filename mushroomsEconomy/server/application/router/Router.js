@@ -13,10 +13,18 @@ const {
     updateUnitHandler,
     deleteUnitHandler,
     updateMatrixHandler,
+    registrationHandler,
+    loginHandler,
+    logoutHandler
 } = require('./handlers');
 
-function Router({ exampleManager, gameManager, answer }) {
+function Router({ exampleManager, gameManager, answer, userManager }) {
     router.get('/reg/:username/:password', useRegistrationHandler(exampleManager)); //Методы для примера, замените своими
+
+    //Методы для работы с пользователем
+    router.post('/registration/:login/:password/:username', registrationHandler(userManager, answer));
+    router.get('/login/:login/:password', loginHandler(userManager, answer));
+    router.patch('/logout/:token', logoutHandler(userManager, answer));
 
     //Методы для работы с mushroom
     router.get('/mushroom/getAll', getAllMushroomsHandler(gameManager, answer));
