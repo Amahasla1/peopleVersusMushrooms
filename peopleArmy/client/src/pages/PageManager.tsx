@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Server from '../services/server/Server';
 import Registration from './Registration/Registration';
 import Login from './Login/Login';
-import Chat from './Chat/Chat'
+import Chat from './Chat/Chat';
 import Store from '../services/Store/Store';
 
 
