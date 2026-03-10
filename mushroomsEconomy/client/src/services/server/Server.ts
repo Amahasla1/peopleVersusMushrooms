@@ -131,7 +131,7 @@ class Server {
     }
 
     private handleLogin(response: any) {
-        console.log('Registration response: ', response);
+        console.log('Login response: ', response);
 
         if (response) {
             this.store.setUser({

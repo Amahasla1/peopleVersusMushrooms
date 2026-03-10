@@ -50,12 +50,6 @@ class User {
             this.passwordHash = userData.passwordHash;
             this.token = userData.token;
 
-            console.log('id: ', this.id);
-            console.log('guid: ', this.guid);
-            console.log('name: ', this.name);
-            console.log('passwordHash: ', passwordHash);
-            console.log('token: ', this.token);
-
             return this;
         }
 
@@ -79,11 +73,6 @@ class User {
             this.name = userData.name;
             this.passwordHash = userData.passwordHash;
             this.token = userData.token;
-            console.log('id: ', this.id);
-            console.log('guid: ', this.guid);
-            console.log('name: ', this.name);
-            console.log('passwordHash: ', passwordHash);
-            console.log('token: ', this.token);
         }
 
         return this;
