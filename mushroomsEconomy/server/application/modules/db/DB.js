@@ -9,16 +9,16 @@ class DB {
         this.orm = new ORM(this.db);
     }
 
-    async getUserByLogin(login) {
-        return await this.orm.get('users', { login });
+    async getUserByName(name) {
+        return await this.orm.get('users', { name });
     }
 
     async getUserByToken(token) {
         return await this.orm.get('users', { token });
     }
 
-    async registration(login, passwordHash, username, token) {
-        return await this.orm.insert('users', ['login', 'password', 'username', 'token'], [login, passwordHash, username, token]);
+    async registration(name, passwordHash, token) {
+        return await this.orm.insert('users', ['name', 'password', 'token'], [name, passwordHash, token]);
     }
 
     async updateToken(id, token) {

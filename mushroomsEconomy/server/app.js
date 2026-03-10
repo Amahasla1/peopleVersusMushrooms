@@ -38,6 +38,8 @@ const gameManager = new GameManager({
 const userManager = new UserManager({
     mediator: mediator, 
     db: db,
+    answer: answer,
+    io: io
 });
 
 const router = new Router({ exampleManager, gameManager, answer, userManager, io });

@@ -1,60 +1,74 @@
 const crypto = require('node:crypto');
 const BaseManager = require('../BaseManager');
+const CONFIG = require('../../../config');
+const User = require('./User');
 
 class UserManager extends BaseManager {
     constructor(options) {
         super(options);
         this.answer = options.answer;
+        this.users = new Map(); // Ключ guid значение new User
+
+        if (!this.io) return;
+
+        this.io = options.io;
+        this.io.on('connection', (socket) => {
+
+            socket.on(CONFIG.SOCKET.REGISTRATION, (data) => this.socketRegistration(data, socket));
+            socket.on(CONFIG.SOCKET.LOGIN, (data) => this.socketLogin(data, socket));
+            socket.on(CONFIG.SOCKET.LOGOUT, (data) => this.socketLogin(data, socket));
+
+            socket.on('disconnect', () => console.log('disconnect', socket.id));
+        });
     }
 
-    hashPassword(password) {
-        return crypto('sha256').update(password).digest('hex');
-    }
-
-    generateToken() {
-        return crypto.randomBytes(32).toString('hex');
-    }
-
-    async registration(login, password, username) {
-        if (await this.db.getUserByLogin(login)) {
-            return this.answer.bad(100);
+    socketRegistration(data = {}, socket) {
+        const { name, password } = data;
+        if (!name || !password) {
+            socket.emit(CONFIG.SOCKET.REGISTRATION, this.answer.bad(13));
         }
 
-        const passwordHash = this.hashPassword(password);
-        console.log(passwordHash);
-        const token = this.generateToken();
-        const user = await this.db.registration(login, passwordHash, username, token);
+        if (this.db.getUserByName(name)) {
+            socket.emit(CONFIG.SOCKET.REGISTRATION, this.answer.bad(17));
+        }
 
-        return this.answer.good(user);
+        const user = new User({db: this.db, socketId: socket.id});
+        user.registration(name, password);
+        this.users.set(user.guid, user);
+
+        socket.emit(CONFIG.SOCKET.REGISTRATION, this.answer.good(true));
     }
 
-    async login(login, password) {
-        const user = await this.db.getUserByLogin(login);
+    socketLogin(data = {}, socket) {
+        const { name, password } = data;
+        if (!name || !password) {
+            socket.emit(CONFIG.SOCKET.LOGIN, this.answer.bad(13));
+        }
+
+        const user = new User({ db: this.db, socketId: socket.id });
+        user.login(name, password);
+
         if (!user) {
-            return this.answer.bad(100);
+            socket.emit(CONFIG.SOCKET.LOGIN, this.answer.bad(16));
         }
 
-        const passwordHash = this.hashPassword(password);
-        console.log(passwordHash);
+        this.users.set(user.guid, user);
 
-        if (user.password === passwordHash) {
-            const token = this.generateToken();
-            await this.db.updateToken(user.id, token);
-
-            return this.answer.good(true);
-        }
-
-        this.answer.bad(11);
+        socket.emit(CONFIG.SOCKET.LOGIN, this.answer.good(true));
     }
 
-    async logout(token) {
-        const user = await this.db.getUserByToken(token);
-        if (user) {
-            await this.db.updateToken(user.id, null);
-            return this.answer.good(true);
+    socketLogout(data = {}, socket) {
+        const { token } = data;
+
+        if (!token) {
+            socket.emit(CONFIG.SOCKET.LOGOUT, this.answer.bad(13));
         }
 
-        return this.answer.bad(100);
+        const user = this.users.get(guid);
+        user.logout();
+        this.users.delete(user.guid);
+
+        socket.emit(CONFIG.SOCKET.LOGOUT, this.answer.good(true));
     }
 }
 
