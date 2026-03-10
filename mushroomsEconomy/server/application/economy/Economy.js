@@ -37,15 +37,18 @@ class Economy {
         } else {
             console.log('Карта не передана при создании экономики! Используется заглушка!');
             this.map = Array(this.n).fill().map(() => Array(this.m).fill(0));
-            this.map[12][12] = 1;
-            this.map[13][13] = 1;
-            this.map[14][14] = 1;
-            this.map[14][12] = 1;
-            this.map[12][14] = 1;
-            this.map[12][13] = 1;
-            this.map[12][14] = 1;
-            this.map[11][12] = 1;
-            this.map[12][7] = 1;
+            this.map[39][25] = 1;
+            this.map[40][25] = 1;
+            this.map[41][25] = 1;
+            this.map[42][25]= 1;
+            this.map[43][25]= 1;
+            this.map[44][25]= 1;
+            this.map[45][25]= 1;
+            this.map[46][25]= 1;
+            this.map[47][25]= 1;
+            this.map[48][25]= 1;
+            this.map[49][25]= 1;
+            this.map[5][25] = 1;
         }
     }
 
@@ -95,6 +98,7 @@ class Economy {
     }
 
     printMap() {
+        console.clear();
         console.log(`\n===========================`);
         this.map.forEach(row => {
             console.log(row.join(' '));
@@ -104,7 +108,6 @@ class Economy {
 
     update() {
         this.mycelium.forEach(mycelium => mycelium.update());
-        console.clear();
         this.printMap();
         //...
     }
