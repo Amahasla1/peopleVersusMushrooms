@@ -20,6 +20,30 @@ class Server {
         this.socket.on(EMESSAGES.LOGOUT, (data: TAnswer<TUser>) => console.log(data));
     }
 
+    private async request<T>(method: string, params: { [key: string]: string | number } = {}): Promise<T | null> {
+        try {
+            params.method = method;
+            const token = 'default token'; //this.store.getToken();
+            if (token) {
+                params.token = token;
+            }
+            const response = await fetch(`${HOST}/?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`);
+            const answer: TAnswer<T> = await response.json();
+            if (answer.result === 'ok' && answer.data) {
+                return answer.data;
+            }
+            //answer.error && this.setError(answer.error);
+            return null;
+        } catch (e) {
+            console.log(e);
+            /*this.setError({
+                code: 9000,
+                text: 'Unknown error',
+            });*/
+            return null;
+        }
+    }
+
     check(name: string, text: string): void {
         this.socket.emit(EMESSAGES.CHECK, { name, text });
     }
