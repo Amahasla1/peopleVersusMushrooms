@@ -5,10 +5,22 @@ interface SocketEvents {
     MESSAGE_TO_CLIENTS: string;
 }
 
+interface MediatorEvents {
+      TEST_EVENT: string;
+}
+
+interface MediatorTriggers {
+    TEST_TRIGGER: string;
+}
+
 interface Config {
     SERVER_URL: string;
     SOCKET: {
         EVENTS: SocketEvents;
+    };
+    MEDIATOR: {
+        EVENTS: MediatorEvents;
+        TRIGGERS: MediatorTriggers;
     };
 }
 
@@ -23,6 +35,14 @@ const CONFIG: Config = {
             MESSAGE_TO_CLIENTS: 'message_to_clients',
         },
     },
-}
+    MEDIATOR: {
+        EVENTS: {
+            TEST_EVENT: 'TEST_EVENT',
+        },
+        TRIGGERS: {
+            TEST_TRIGGER: 'TEST_TRIGGER',
+        },
+    },
+};
 
 export default CONFIG;
