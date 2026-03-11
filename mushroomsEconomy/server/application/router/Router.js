@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const CONFIG = require('../../config');
+
+const SOCKET = CONFIG.SOCKET;
 
 const {
-    useRegistrationHandler,
     notFoundHandler,
     getAllMushroomsHandler,
     createMushroomHandler,
@@ -15,14 +17,12 @@ const {
     updateMatrixHandler,
 } = require('./handlers');
 
-function Router(mediator, answer) {
-    //router.get('/reg/:username/:password', useRegistrationHandler(mediator));
-
-    // Mushrooms
-    router.get('/mushroom/getAll', getAllMushroomsHandler(mediator, answer));
-    router.get('/mushroom/create', createMushroomHandler(mediator, answer));
-    router.get('/mushroom/update', updateMushroomHandler(mediator, answer));
-    router.get('/mushroom/delete', deleteMushroomHandler(mediator, answer));
+function Router({ gameManager, answer }) {
+    //Методы для работы с mushroom
+    router.get('/mushroom/getAll', getAllMushroomsHandler(gameManager, answer));
+    router.post('/mushroom/create', createMushroomHandler(gameManager, answer));
+    router.post('/mushroom/update', updateMushroomHandler(gameManager, answer));
+    router.delete('/mushroom/delete', deleteMushroomHandler(gameManager, answer));
 
     // Units
     router.get('/unit/getAll', getAllUnitsHandler(mediator, answer));

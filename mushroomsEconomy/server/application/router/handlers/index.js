@@ -21,5 +21,5 @@ module.exports = {
     createUnitHandler,
     updateUnitHandler,
     deleteUnitHandler,
-    updateMatrixHandler
+    updateMatrixHandler,
 };
