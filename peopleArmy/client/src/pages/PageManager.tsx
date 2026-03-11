@@ -4,7 +4,8 @@ import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat';
 import Store from '../services/Store/Store';
-
+import mediatorInstance from '../services/Mediator/mediatorInstance';
+import Mediator from '../services/Mediator/Mediator';
 
 export enum PAGES {
     LOGIN,
@@ -16,6 +17,7 @@ export interface IBasePage {
     setPage: (name: PAGES) => void;
     server: Server,
     store: Store,
+    mediator: Mediator,
 }
 
 const PageManager: React.FC = () => {
@@ -27,6 +29,7 @@ const PageManager: React.FC = () => {
         setPage,
         server,
         store,
+        mediator: mediatorInstance,
     }
 
     return (

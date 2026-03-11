@@ -1,3 +1,5 @@
+import { TNamesArray } from "./services/Mediator/Mediator";
+
 interface SocketEvents {
     CONNECTION: string;
     DISCONNECT: string;
@@ -19,8 +21,8 @@ interface Config {
         EVENTS: SocketEvents;
     };
     MEDIATOR: {
-        EVENTS: MediatorEvents;
-        TRIGGERS: MediatorTriggers;
+        EVENTS: TNamesArray;
+        TRIGGERS: TNamesArray;
     };
 }
 
