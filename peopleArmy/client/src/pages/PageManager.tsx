@@ -25,10 +25,10 @@ const PageManager: React.FC = () => {
     const store = new Store();
     const server = new Server(store);
 
-    const mediator = new Mediator({
+    const [mediator] = useState(() => new Mediator({
         EVENTS: CONFIG.MEDIATOR.EVENTS,
         TRIGGERS: CONFIG.MEDIATOR.TRIGGERS,
-    });
+    }));
 
     const props = {
         setPage,
