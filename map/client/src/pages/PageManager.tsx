@@ -17,7 +17,7 @@ const PageManager: React.FC = () => {
     const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
 
     const props = {
-        setPage,
+        setPage
     }
 
     return (
