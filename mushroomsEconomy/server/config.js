@@ -1,6 +1,9 @@
 const CONFIG = {
     NAME: 'Mushroom economy server',
     PORT: 3005,
+    CORS: {
+        origin: "*",
+    },
 
     DATABASE: {
         NAME: 'data.db',
@@ -30,16 +33,16 @@ const CONFIG = {
         },
     },
 
-    CORS: {
-        origin: "*",
-    },
 
     SOCKET: {
-        LOGIN: 'login',
-        MESSAGE: 'message',
-        TYPING: 'typing',
+        MESSAGE: 'message',  // шлет сообщение
+        TYPING: 'typing',           // печатает
 
-        CREATE_ROOM: 'create_room',
+        REGISTRATION: 'registration',
+        LOGIN: 'login',
+        LOGOUT: 'logout',
+
+         CREATE_ROOM: 'create_room',
         DELETE_ROOM: 'delete_room',
         JOIN_ROOM: 'join_room',
         LEAVE_ROOM: 'leave_room',
@@ -47,8 +50,20 @@ const CONFIG = {
         
         ROOM_LIST: 'room_list',      
         ROOM_UPDATE: 'room_update',
-        ERROR: 'error', 
+        ERROR: 'error',
     },
+    
+    ECONOMY: {
+        INTERVAL: 200, //ms
+
+        MYCELIUM: {
+            HP: 1,
+            GROW_SPEED: 100,
+            GROW_LEVEL_UP: 2,
+            MAX_LEVEL: 3,
+            POWER: 3,
+        }
+    }
 };
 
 module.exports = CONFIG;
