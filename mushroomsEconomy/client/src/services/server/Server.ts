@@ -1,31 +1,18 @@
-import CONFIG from '../../config';
-
-import Mediator from '../Mediator/Mediator';
-
-import Store from "../Store/Store";
-import { TUser } from "./types";
-
 import { io, Socket } from "socket.io-client";
+import CONFIG from '../../config';
+import Mediator from '../Mediator/Mediator';
+import { TResponse, TUser } from "./types";
 
-const HOST = CONFIG.HOST;
-
-type Tprops = {
-    store: Store;
-    mediator: Mediator;
-}
+const { HOST } = CONFIG;
 
 class Server {
-    HOST = HOST;
-    store: Store;
     mediator: Mediator;
     chatInterval: NodeJS.Timer | null = null;
     socket: Socket;
     showErrorCb: (text: string) => void = function () { };
 
-    constructor(props: Tprops) {
-        
-        this.mediator = props.mediator;
-        this.store = props.store;
+    constructor(mediator: Mediator) {
+        this.mediator = mediator;
         this.socket = io(HOST);
 
         this.socket.on("connect", () => {
@@ -35,11 +22,6 @@ class Server {
         this.socket.on(CONFIG.SOCKET.REGISTRATION, (data) => this.handleRegistration(data));
         this.socket.on(CONFIG.SOCKET.LOGIN, (data) => this.handleLogin(data));
         this.socket.on(CONFIG.SOCKET.LOGOUT, (data) => this.handleLogout(data));
-
-        this.mediator.set(
-            CONFIG.MEDIATOR.TRIGGERS.MESSAGE,
-            (data: { name: string; text: string }) => this.chatMessage(data.name, data.text)
-        )
     }
 
     private chatMessage(name: string, text: string): void {
@@ -52,12 +34,15 @@ class Server {
         queryParams: { [key: string]: string } = {}
     ): Promise<T | null> {
         try {
-            const token = this.store.getToken();
-            let url = `${this.HOST}/${method}`;
+            const { GET_STORE } = this.mediator.getTriggerTypes();
+            const token = this.mediator.get(GET_STORE, 'token');
+            
+            let url = `${HOST}/${method}`;
             const paramValues = Object.values(params);
             if (paramValues.length > 0) {
                 url += "/" + paramValues.join("/");
             }
+            
             const queryParts: string[] = [];
             if (token) {
                 queryParts.push("token=" + token);
@@ -69,13 +54,11 @@ class Server {
                 url += "?" + queryParts.join("&");
             }
 
-            console.log("Request URL:", url);
             const response = await fetch(url);
             const body = await response.json();
 
             if (body && body.error) {
                 this.setError(body.error);
-                console.error("Server error:", body.error);
                 return null;
             }
             return body as T;
@@ -94,22 +77,13 @@ class Server {
         this.showErrorCb = cb;
     }
 
-    // async register(username: string, password: string): Promise<boolean> { //Функцию выпилить! Она для примера
-    //     const user = await this.request<TUser & { username?: string; name?: string; id?: number }>("reg", { username, password });
-    //     if (!user) return false;
-    //     const name = user.username ? user.username : user.name;
-    //     this.store.setUser({ token: user.token, name: name, id: user.id });
-    //     return true;
-    // }
-
     async register(name: string, password: string): Promise<boolean> {
         this.socket.emit(CONFIG.SOCKET.REGISTRATION, { name, password });
         return true;
     }
 
-    async login(name: string, password: string): Promise<boolean> {
+    login(name: string, password: string): void {
         this.socket.emit(CONFIG.SOCKET.LOGIN, { name, password });
-        return true;
     }
 
     async logout(name: string, password: string): Promise<boolean> {
@@ -121,9 +95,13 @@ class Server {
         console.log('Registration response: ', response);
 
         if (response) {
-            this.store.setUser({
-                name: response.data.name,
-                token: response.data.token
+            const { SET_STORE } = this.mediator.getTriggerTypes();
+            this.mediator.get(SET_STORE, {
+                name: 'user',
+                value: {
+                    name: response.data.name,
+                    token: response.data.token
+                }
             });
         } else {
             this.setError('Ошибка регистрации');
@@ -133,19 +111,26 @@ class Server {
     private handleLogin(response: any) {
         console.log('Login response: ', response);
 
-        if (response) {
-            this.store.setUser({
-                name: response.data.name,
-                token: response.data.token
+        if (response?.result === 'ok' && response.data) {
+            const { name, token } = response.data;
+            const { SET_STORE } = this.mediator.getTriggerTypes();
+            const { LOGIN } = this.mediator.getEventTypes();
+            
+            this.mediator.get(SET_STORE, {
+                name: 'user',
+                value: { name, token }
             });
+            
+            this.mediator.call(LOGIN); 
         } else {
-            this.setError('Ошибка регистрации');
+            this.setError('Ошибка авторизации');
         }
     }
 
     private handleLogout(response: any) {
         if (response) {
-            this.store.clearUser();
+            const { CLEAR_STORE } = this.mediator.getTriggerTypes();
+            this.mediator.get(CLEAR_STORE, 'user');
         }
     }
 }

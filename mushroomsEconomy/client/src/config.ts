@@ -3,10 +3,14 @@ const CONFIG = {
 
     MEDIATOR: {
         EVENTS: {
-
+            LOGIN: 'login',
         },
         TRIGGERS: {
-            MESSAGE: 'message:socket'
+            MESSAGE: 'message:socket',
+
+            SET_STORE: 'set_store',
+            GET_STORE: 'get_store',
+            CLEAR_STORE: 'clear_store',
         }
     },
 

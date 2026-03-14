@@ -4,4 +4,13 @@ export type TUser = {
     id?: number;
 }
 
+export type TResponse<T> = {
+    result: 'ok' | 'error';
+    data?: T;
+    error?: {
+        code: number;
+        text: string;
+    }
+}
+
 
