@@ -45,7 +45,7 @@ const Popup: React.FC = () => {
             <div className={'popup-wrapper'}>
                 <div className='popup-text-block'>
                     <div className="popup-title">{title}</div>
-                    <div className="popup--info-text">{text}</div>
+                    <div className="popup-info-text">{text}</div>
                 </div>
                 <div className='buttons-block'>
                     {buttons.map((data, index) => {

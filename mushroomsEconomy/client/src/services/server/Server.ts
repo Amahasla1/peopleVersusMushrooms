@@ -42,8 +42,8 @@ class Server {
         )
 
         this.mediator.set(
-            CONFIG.MEDIATOR.TRIGGERS.MESSAGE,
-            (data: { name: string; text: string }) => this.chatMessage(data.name, data.text)
+            CONFIG.MEDIATOR.TRIGGERS.ERROR,
+            (error:TError) => this.setError(error)
         )
     }
 

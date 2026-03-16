@@ -25,12 +25,18 @@ const App: React.FC = () => {
     store,
   }//Удалить в будущем, реализовать все через контексты
 
+  const pressErrorHandler = () => mediator.get(
+    CONFIG.MEDIATOR.TRIGGERS.ERROR,
+    { code: 'Номер', text: 'текст' }
+  )
+
   return (
     <div className="App">
       <MediatorContext.Provider value={mediator}>
         <ServerContext.Provider value={server}>
           <StorageContext.Provider value={store}>
             <div className='app'>
+              <button onClick={pressErrorHandler}>КнопкаТестОшибки</button>
               <Popup />
               <PageManager {...props} />
             </div>
