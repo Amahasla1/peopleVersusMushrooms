@@ -15,7 +15,7 @@ class Lobby {
     }
 
     //получить информацию о комнате 
-    getInfo() {
+    get() {
         return {
             guid: this.guid,
             name: this.name,
@@ -32,8 +32,8 @@ class Lobby {
         };
     }
 
-    //получить детальную информацию (для тех, кто в комнате) --- под вопросом(а надо ли?)
-    getDetailedInfo() {
+    //получить детальную информацию (для тех, кто в комнате) - ???
+    getSelf() {
         return {
             guid: this.guid,
             name: this.name,

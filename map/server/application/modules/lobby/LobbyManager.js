@@ -88,7 +88,7 @@ class LobbyManager extends BaseManager {
 
         console.log(`Сокет ${socket.id} создал комнату ${lobby.guid}`);
         
-        socket.emit(MESSAGES.CREATE_ROOM, this.Answer.good(lobby.getDetailedInfo()));
+        socket.emit(MESSAGES.CREATE_ROOM, this.Answer.good(lobby.getSelf()));
         this._notifyRoomsListUpdated();
     }
 
@@ -151,7 +151,7 @@ class LobbyManager extends BaseManager {
 
         console.log(`Сокет ${socket.id} присоединился к комнате ${roomGuid}`);
         
-        socket.emit(MESSAGES.JOIN_TO_ROOM, this.Answer.good(lobby.getDetailedInfo()));
+        socket.emit(MESSAGES.JOIN_TO_ROOM, this.Answer.good(lobby.getSelf()));
         this._notifyRoomUpdate(roomGuid);
         this._notifyRoomsListUpdated();
     }
@@ -269,7 +269,7 @@ class LobbyManager extends BaseManager {
 
         console.log(`Сокет ${socket.id} выгнал игрока ${target.guid} из комнаты ${roomGuid}`);
 
-        socket.emit(MESSAGES.DROP_FROM_ROOM, this.Answer.good(lobby.getDetailedInfo()));
+        socket.emit(MESSAGES.DROP_FROM_ROOM, this.Answer.good(lobby.getSelf()));
         this._notifyRoomUpdate(roomGuid);
         this._notifyRoomsListUpdated();
     }
@@ -340,7 +340,7 @@ class LobbyManager extends BaseManager {
 
         console.log(`Сокет ${socket.id} начал игру в комнате ${roomGuid}`);
 
-        socket.emit(MESSAGES.START_GAME, this.Answer.good(lobby.getDetailedInfo()));
+        socket.emit(MESSAGES.START_GAME, this.Answer.good(lobby.getSelf()));
         this._notifyRoomUpdate(roomGuid);
         this._notifyRoomsListUpdated();
     }
@@ -363,7 +363,7 @@ class LobbyManager extends BaseManager {
         const rooms = [];
         for (const lobby of this.lobbies.values()) {
             if (lobby.status === 'open' || lobby.status === 'closed') {
-                rooms.push(lobby.getInfo());
+                rooms.push(lobby.get());
             }
         }
 
@@ -430,7 +430,7 @@ class LobbyManager extends BaseManager {
         const lobby = this.lobbies.get(roomGuid);
         if (!lobby) return;
 
-        const roomInfo = lobby.getDetailedInfo();
+        const roomInfo = lobby.getSelf();
         
         //оповещаем всех в комнате
         for (const player of lobby.players) {
@@ -449,7 +449,7 @@ class LobbyManager extends BaseManager {
         const rooms = [];
         for (const lobby of this.lobbies.values()) {
             if (lobby.status === 'open' || lobby.status === 'closed') {
-                rooms.push(lobby.getInfo());
+                rooms.push(lobby.get());
             }
         }
         //оповещаем всех о новом списке комнат
