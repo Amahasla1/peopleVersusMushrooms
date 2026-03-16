@@ -1,7 +1,8 @@
 class User {
-    constructor(db, common) {
+    constructor({ db, common, socketId }) {
         this.db = db;
         this.common = common;
+        this.socketId = socketId;
 
         this.id = null;
         this.login = null;
@@ -13,8 +14,8 @@ class User {
     get() {
         return {
             guid: this.guid,
-            nickname:this.nickname,
-        }
+            nickname: this.nickname,
+        };
     }
 
     getSelf() {
@@ -22,7 +23,7 @@ class User {
             guid: this.guid,
             nickname: this.nickname,
             token: this.token,
-        }
+        };
     }
 
     _fillData(userData, token) {
@@ -33,49 +34,39 @@ class User {
         this.token = token;
     }
 
-    async loginUser(login, passwordHash) {
-        //проверка на пользака
-        const userData = await this.db.getUserByLogin(login);
-        if (!userData) {
-            return {error: 1002};
-        }
-        //проверка на пароль
-        if (passwordHash !== userData.password) {
-            return {error: 1002};
-        }
-
-        const token = this.common.md5(`${Math.random()}`);
-
-        await this.db.updateToken(userData.guid, token);
-        this._fillData(userData, token);
-        return true;
+    isLogin() {
+        return this.socketId && this.token;
     }
 
-     async registration(login, passwordHash, nickname) {
-        //проверка, существует ли уже пользак
-        const user = await this.db.getUserByLogin(login);
-        if (user) {
-            return { error: 1003 }; 
-        }
+    async loginUser(login, passwordHash) {
+        const userData = await this.db.getUserByLogin(login);
+        if (!userData) return null;
+
+        if (passwordHash !== userData.password) return null;
+
+        const token = this.common.md5(`${Math.random()}`);
+        await this.db.updateToken(userData.guid, token);
+        this._fillData(userData, token);
+        
+        return this;
+    }
+
+    async registration(login, passwordHash, nickname) {
+        const existingUser = await this.db.getUserByLogin(login);
+        if (existingUser) return null;
 
         const guid = this.common.guid();
-        const token = this.common.md5(`${Math.random()}`); 
+        const token = this.common.md5(`${Math.random()}`);
 
-        //создаем пользака
         await this.db.createUser(login, passwordHash, nickname, guid, token);
 
         const userData = await this.db.getUserByGuid(guid);
         this._fillData(userData, token);
         
-        return true;
+        return this;
     }
 
-    async logout(token) {
-        //проверка на пользака
-        if (this.token !== token) {
-            return { error: 1001 };
-        }
-
+    async logout() {
         await this.db.clearToken(this.guid);
         this.id = null;
         this.login = null;
