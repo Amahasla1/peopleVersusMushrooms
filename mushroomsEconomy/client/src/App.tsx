@@ -17,7 +17,7 @@ const App: React.FC = () => {
 
   const store = new Store();
   const mediator = new Mediator(CONFIG.MEDIATOR);
-  const server = new Server({ store, mediator });
+  const server = new Server(mediator);
 
   const props = {
     mediator,
