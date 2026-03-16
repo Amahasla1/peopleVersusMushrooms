@@ -3,24 +3,24 @@ const CONFIG = {
 
     MEDIATOR: {
         EVENTS: {
-            LOGIN: 'login',
+            LOGIN: 'LOGIN',
         },
         TRIGGERS: {
-            MESSAGE: 'message:socket',
+            MESSAGE: 'MESSAGE:SOCKET',
 
-            SET_STORE: 'set_store',
-            GET_STORE: 'get_store',
-            CLEAR_STORE: 'clear_store',
+            SET_STORE: 'SET_STORE',
+            GET_STORE: 'GET_STORE',
+            CLEAR_STORE: 'CLEAR_STORE',
         }
     },
 
     SOCKET: {
-        MESSAGE: 'message',  // шлет сообщение
-        TYPING: 'typing',           // печатает
+        MESSAGE: 'MESSAGE',  // шлет сообщение
+        TYPING: 'TYPING',    // печатает
 
-        REGISTRATION: 'registration',
-        LOGIN: 'login',
-        LOGOUT: 'logout',
+        REGISTRATION: 'REGISTRATION',
+        LOGIN: 'LOGIN',
+        LOGOUT: 'LOGOUT',
     }
 };
 
