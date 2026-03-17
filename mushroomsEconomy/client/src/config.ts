@@ -4,7 +4,6 @@ const CONFIG = {
     MEDIATOR: {
         EVENTS: {
             LOGIN: 'LOGIN',
-            LOGIN: 'LOGIN',
         },
         TRIGGERS: {
             MESSAGE: 'MESSAGE:SOCKET',
@@ -13,7 +12,7 @@ const CONFIG = {
             GET_STORE: 'GET_STORE',
             CLEAR_STORE: 'CLEAR_STORE',
 
-            ERROR: "error",
+            ERROR: "ERROR",
         }
     },
 
