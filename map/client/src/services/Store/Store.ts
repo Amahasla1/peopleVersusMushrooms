@@ -14,21 +14,21 @@ class Store {
     }
 
     private initMediator(): void {
-        this.mediator.subscribe(EMESSAGES.LOGIN, this.handleLogin.bind(this));
-        this.mediator.subscribe(EMESSAGES.REGISTRATION, this.handleRegistration.bind(this));
-        this.mediator.subscribe(EMESSAGES.LOGOUT, this.handleLogout.bind(this));
-        this.mediator.set(EMESSAGES.GET_TOKEN, () => this.getToken());
+        this.mediator.subscribe(EMESSAGES.LOGIN, this.handleLogin);
+        this.mediator.subscribe(EMESSAGES.REGISTRATION, this.handleRegistration);
+        this.mediator.subscribe(EMESSAGES.LOGOUT, this.handleLogout);
+        this.mediator.set(EMESSAGES.GET_TOKEN, this.getToken);
     }
 
-    private handleLogin(data: TUser): void {
+    handleLogin(data: TUser): void {
         console.log(data);
     }
 
-    private handleRegistration(data: TUser): void {
+    handleRegistration(data: TUser): void {
         console.log(data);
     }
 
-    private handleLogout(data: TUser): void {
+    handleLogout(data: TUser): void {
         console.log(data);
     }
 
