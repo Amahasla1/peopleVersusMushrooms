@@ -5,202 +5,148 @@ const User = require("./User");
 class UserManager extends BaseManager {
     constructor(options) {
         super(options);
-        this.users = {};
-        this.socketToUser = {};
+        
+        this.users = new Map();
+        this.socketToUser = new Map();
 
         if (!this.io) return;
-        // Устанавливаем обработчик socket.io запросов
-        this.io.on('connection', socket => {
-            console.log(`Пользователь подключился с id ${socket.id}`);
 
-            socket.on(MESSAGES.LOGIN, data => this.socketLogin(data, socket));
-            socket.on(MESSAGES.REGISTRATION, data => this.socketRegistration(data, socket));
+        this.io.on('connection', (socket) => {
+            console.log(`Пользователь подключился к UserManager с id ${socket.id}`);
+
+            socket.on(MESSAGES.REGISTRATION, (data) => this.socketRegistration(data, socket));
+            socket.on(MESSAGES.LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(MESSAGES.LOGOUT, () => this.socketLogout(socket));
-            socket.on(MESSAGES.CHECK, data => this.socketCheck(data, socket));
+            socket.on(MESSAGES.CHECK, (data) => this.socketCheck(data, socket));
             socket.on('disconnect', () => this.socketDisconnect(socket));
         });
-
-        // Устанавливаем обработчики для триггеров
-        this.mediator.set(this.TRIGGERS.LOGIN, (params) => this.login(params));
-        this.mediator.set(this.TRIGGERS.REGISTRATION, (params) => this.registration(params));
-        this.mediator.set(this.TRIGGERS.LOGOUT, (params) => this.logout(params));
     }
 
-    /*
-    async getUserByToken(token) {
-        for (let key in this.users) {
-            const user = this.users[key];
-            if (user.checkToken(token)) {
+    // ============ ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ============
+    
+    getUserByToken(token) {
+        for (const user of this.users.values()) {
+            if (user.token === token) {
                 return user;
             }
         }
         return null;
     }
-    */
 
-     // ============ HTTP METHODS ============
-    async login(params) {
-        const { login, passwordHash } = params;
-
-        const user = new User(this.db, this.common);
-        const result = await user.loginUser(login, passwordHash);
-        if (result && result.error) {
-            return { error: result.error };
-        }
-        this.users[user.guid] = user;
-        return user.getSelf();
+    getUserByGuid(guid) {
+        return this.users.get(guid) || null;
     }
 
-    async registration(params) {
-        const { login, passwordHash, nickname } = params;
-
-        const user = new User(this.db, this.common);
-        const result = await user.registration(login, passwordHash, nickname);
-        if (result && result.error) {
-            return { error: result.error };
-        }
-        this.users[user.guid] = user;
-        return user.getSelf();
+    getUserBySocketId(socketId) {
+        const guid = this.socketToUser.get(socketId);
+        return guid ? this.users.get(guid) : null;
     }
 
-    async logout(params) {
-        const { token } = params;
-        
-        //поиска пользака в оперативе
-        const user = Object.values(this.users).find(u => u.token === token);
-        if (!user) {
-            return { error: 1001 };
-        }
+    // ============ СОКЕТ МЕТОДЫ ============
 
-        const result = await user.logout(token);
+    async socketRegistration(data = {}, socket) {
+        const { login, passwordHash, nickname } = data;
         
-        if (result && result.error) {
-            return { error: result.error };
-        }
-
-        delete this.users[user.guid];
-        
-        return true;
-    }
-
-     // ============ SOCKET METHODS ============
-
-    async socketLogin(data, socket) {
-        const { login, passwordHash } = data || {};
-        
+        // валидация
         if (!login || !passwordHash) {
-            return socket.emit(MESSAGES.LOGIN, { 
-                result: "error", 
-                code: 242 
-            });
+            return socket.emit(MESSAGES.REGISTRATION, this.Answer.bad(242));
         }
 
-        const result = await this.login({ login, passwordHash });
-        
-        if (result.error) {
-            console.log(`Ошибка авторизации через сокет ${socket.id}`);
-            return socket.emit(MESSAGES.LOGIN, { 
-                result: "error", 
-                code: result.error 
-            });
+        // проверка на существование
+        const existingUser = await this.db.getUserByLogin(login);
+        if (existingUser) {
+            return socket.emit(MESSAGES.REGISTRATION, this.Answer.bad(1003));
         }
 
-        //сохрание связи сокета с пользаком
-        this.socketToUser[socket.id] = result.guid;
-        console.log(`Сокет ${socket.id} авторизован как пользак ${result.guid}`);
-        socket.emit(MESSAGES.LOGIN, { 
-            result: "ok", 
-            data: result 
+        // создаем пользователя
+        const user = new User({ 
+            db: this.db, 
+            common: this.common, 
+            socketId: socket.id 
         });
+        
+        await user.registration(login, passwordHash, nickname);
+        
+        // сохраняем
+        this.users.set(user.guid, user);
+        this.socketToUser.set(socket.id, user.guid);
+
+        console.log(`Сокет ${socket.id} зарегистрировался как пользак ${user.guid}`);
+        socket.emit(MESSAGES.REGISTRATION, this.Answer.good(user.getSelf()));
     }
 
-    async socketRegistration(data, socket) {
-        const { login, passwordHash, nickname } = data || {};
+    async socketLogin(data = {}, socket) {
+        const { login, passwordHash } = data;
         
+        // валидация
         if (!login || !passwordHash) {
-            return socket.emit(MESSAGES.REGISTRATION, { 
-                result: "error", 
-                code: 242 
-            });
+            return socket.emit(MESSAGES.LOGIN, this.Answer.bad(242));
         }
 
-        const result = await this.registration({ login, passwordHash, nickname });
-        
-        if (result.error) {
-            console.log(`Ошибка регистрации через сокет ${socket.id}`);
-            return socket.emit(MESSAGES.REGISTRATION, { 
-                result: "error", 
-                code: result.error 
-            });
-        }
-
-        //сохрание связи сокета с пользаком
-        this.socketToUser[socket.id] = result.guid;
-        console.log(`Сокет ${socket.id} зарегистрировался как пользак ${result.guid}`);
-        socket.emit(MESSAGES.REGISTRATION, { 
-            result: "ok", 
-            data: result 
+        // создаем временного пользователя для логина
+        const user = new User({ 
+            db: this.db, 
+            common: this.common, 
+            socketId: socket.id 
         });
+        
+        const loggedInUser = await user.loginUser(login, passwordHash);
+        
+        if (!loggedInUser) {
+            return socket.emit(MESSAGES.LOGIN, this.Answer.bad(1002));
+        }
+
+        // сохраняем
+        this.users.set(user.guid, user);
+        this.socketToUser.set(socket.id, user.guid);
+
+        console.log(`Сокет ${socket.id} авторизован как пользак ${user.guid}`);
+        socket.emit(MESSAGES.LOGIN, this.Answer.good(user.getSelf()));
     }
 
     async socketLogout(socket) {
-        const userGuid = this.socketToUser[socket.id];
+        const user = this.getUserBySocketId(socket.id);
         
-        if (!userGuid) {
-            console.log(`Увы! Неудачная попытка логаута неавторизованного сокета ${socket.id}`);
-            return socket.emit(MESSAGES.LOGOUT, { 
-                result: "error", 
-                code: 1001 
-            });
-        }
-
-        const user = this.users[userGuid];
         if (!user) {
-            delete this.socketToUser[socket.id];
-             console.log(`Логаут: пользак ${userGuid} не найден в памяти, сокет ${socket.id} очищен`);
-            return socket.emit(MESSAGES.LOGOUT, { 
-                result: "error", 
-                code: 1001 
-            });
+            console.log(`Увы! Неудачная попытка логаута неавторизованного сокета ${socket.id}`);
+            return socket.emit(MESSAGES.LOGOUT, this.Answer.bad(1001));
         }
 
-        const result = await user.logout(user.token);
+        await user.logout();
         
-        if (result && result.error) {
-            console.log(`Ошибка логаута пользака ${userGuid}`);
-            return socket.emit(MESSAGES.LOGOUT, { 
-                result: "error", 
-                code: result.error 
-            });
-        }
+        // удаляем из всех хранилищ
+        this.users.delete(user.guid);
+        this.socketToUser.delete(socket.id);
 
-        delete this.users[userGuid];
-        delete this.socketToUser[socket.id];
-        
-        console.log(`Пользак ${userGuid} отключился от сокета ${socket.id}`);
-        socket.emit(MESSAGES.LOGOUT, { result: "ok" });
+        console.log(`Пользак ${user.guid} вышел (сокет ${socket.id})`);
+        socket.emit(MESSAGES.LOGOUT, this.Answer.good(true));
     }
 
-    socketCheck(data, socket) {
-        const { name, text } = data || {};
+    socketCheck(data = {}, socket) {
+        const { name, text } = data;
         
-        //ок
-        socket.emit(MESSAGES.CHECK, 'ok');
+        // ок
+        socket.emit(MESSAGES.CHECK, this.Answer.good('ok'));
         
-        //рассылка всем
-        this.io.emit(MESSAGES.SEND_TO_ALL, { 
-            name: name,
-            text: text,
-            timestamp: Date.now()
-        });
+        // рассылка всем
+        this.io.emit(MESSAGES.SEND_TO_ALL, this.Answer.good({ 
+            name: name || 'anonymous',
+            text: text || '',
+            timestamp: Date.now(),
+            fromSocket: socket.id
+        }));
     }
 
     socketDisconnect(socket) {
-        const userGuid = this.socketToUser[socket.id];
-        console.log(`Пользак ${userGuid} отключился от сокета ${socket.id})`);
-        delete this.socketToUser[socket.id];
+        const user = this.getUserBySocketId(socket.id);
+        
+        if (user) {
+            console.log(`Пользак ${user.guid} отключился от сокета ${socket.id}`);
+            this.socketToUser.delete(socket.id);
+        } else {
+            console.log(`Анонимус отключился от сокета ${socket.id}`);
+        }
     }
-
 }
 
 module.exports = UserManager;

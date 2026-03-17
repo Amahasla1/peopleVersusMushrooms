@@ -4,26 +4,41 @@ class CONFIG {
 
     static SQLITE_PATH = './application/modules/db/map.db'; // Путь к базе
 
+    static ROOM_SIZE = { // размеры комнаты
+        MIN: 1,
+        MAX: 2,
+    }
     //ивенты
     static EVENTS = {
+        //map events
     }
 
     //триггеры
     static TRIGGERS = {
-        //user trigger
-        LOGIN: 'LOGIN',
-        REGISTRATION: 'REGISTRATION',
-        LOGOUT: 'LOGOUT',
+        //map triggers
     }
 
     // сокетные сообщения
-    static MESSAGES = {
+   static MESSAGES = {
         CHECK: 'CHECK',
         SEND_TO_ALL: 'SEND_TO_ALL',
-        //user sockets
+        
+        // user sockets
         LOGIN: 'LOGIN',
         REGISTRATION: 'REGISTRATION',
         LOGOUT: 'LOGOUT',
+        
+        // lobby sockets
+        CREATE_ROOM: 'CREATE_ROOM',
+        JOIN_TO_ROOM: 'JOIN_ROOM',
+        LEAVE_ROOM: 'LEAVE_ROOM',
+        DROP_FROM_ROOM: 'DROP_FROM_ROOM',
+        START_GAME: 'START_GAME',
+        GET_ROOMS: 'GET_ROOMS',
+        ROOM_UPDATED: 'ROOM_UPDATED',
+        ROOMS_LIST_UPDATED: 'ROOMS_LIST_UPDATED',
+
+        //map sockets
     }
 }
 

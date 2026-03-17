@@ -12,6 +12,7 @@ const DB = require('./application/modules/db/DB.js');
 const Mediator = require('./application/modules/Mediator.js');
 const Common = require('./application/modules/common/Common.js');
 const UserManager = require('./application/modules/user/UserManager.js');
+const LobbyManager = require('./application/modules/lobby/LobbyManager.js');
 const { EVENTS, TRIGGERS, SERVER_PORT, SERVER_NAME } = require('./config.js');
 
 /*
@@ -31,11 +32,13 @@ const db = new DB();
 const mediator = new Mediator({ EVENTS, TRIGGERS });
 const common = new Common();
 // Создаем менеджеры
-new UserManager({ mediator, db, common, io });
+const userManager = new UserManager({ mediator, db, common, io });
+const lobbyManager = new LobbyManager({ mediator, db, common, io, userManager });
 
-/*//для тестов
+
+//для тестов
 app.use(express.static('public'));
-*/
+
 
 // Создаем роутер
 const router = new Router(mediator);
