@@ -1,7 +1,7 @@
 import md5 from 'md5';
 import { io, Socket } from 'socket.io-client';
 import CONFIG, { EMESSAGES } from '../../config';
-import { TAnswer, TUser } from "./types";
+import { TAnswer, TError, TUser } from "./types";
 import Mediator from '../Mediator/Mediator';
 
 const HOST = CONFIG.HOST;
@@ -27,14 +27,26 @@ class Server {
         });
 
         this.socket.on(EMESSAGES.LOGIN, (data: TAnswer<TUser>) => {
+            if (data.result === 'error') {
+                this.mediator.call(EMESSAGES.SHOW_ERROR, data.error?.message);
+                return;
+            }
             this.mediator.call(EMESSAGES.LOGIN, data);
         });
 
         this.socket.on(EMESSAGES.REGISTRATION, (data: TAnswer<TUser>) => {
+            if (data.result === 'error') {
+                this.mediator.call(EMESSAGES.SHOW_ERROR, data.error?.message);
+                return;
+            }
             this.mediator.call(EMESSAGES.REGISTRATION, data);
         });
 
         this.socket.on(EMESSAGES.LOGOUT, (data: TAnswer<TUser>) => {
+            if (data.result === 'error') {
+                this.mediator.call(EMESSAGES.SHOW_ERROR, data.error?.message);
+                return;
+            }
             this.mediator.call(EMESSAGES.LOGOUT, data);
         });
     }

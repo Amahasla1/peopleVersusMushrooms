@@ -17,6 +17,8 @@ class Store {
         this.mediator.subscribe(EMESSAGES.LOGIN, (data) => this.handleLogin(data));
         this.mediator.subscribe(EMESSAGES.REGISTRATION, (data) => this.handleRegistration(data));
         this.mediator.subscribe(EMESSAGES.LOGOUT, (data) => this.handleLogout(data));
+        this.mediator.subscribe(EMESSAGES.SHOW_ERROR, (message: string) => this.handleError(message));
+
         this.mediator.set(EMESSAGES.GET_TOKEN, () => this.getToken());
     }
 
@@ -30,6 +32,10 @@ class Store {
 
     handleLogout(data: TUser): void {
         console.log(data);
+    }
+
+    handleError(message: string): void {
+        console.log(message);
     }
 
     getToken(): string | null {
