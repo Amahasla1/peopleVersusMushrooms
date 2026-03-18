@@ -10,12 +10,18 @@ function App() {
   const store = new Store(mediator);
   const server = new Server(mediator);
 
+  const props = {
+    mediator,
+    server,
+    store,
+  }
+
   server.check('ВАСИЛИЙ', 'Я на такое не подписывался!');
 
   return (
     <div className="App">
       <div className='app'>
-        <PageManager />
+        <PageManager {...props} />
       </div>
     </div>
   );

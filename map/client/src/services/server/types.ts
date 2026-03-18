@@ -1,6 +1,6 @@
 export type TError = {
     code: number;
-    text: string;
+    message: string;
 }
 
 export type TAnswer<T> = {
