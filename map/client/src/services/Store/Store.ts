@@ -14,10 +14,10 @@ class Store {
     }
 
     private initMediator(): void {
-        this.mediator.subscribe(EMESSAGES.LOGIN, this.handleLogin);
-        this.mediator.subscribe(EMESSAGES.REGISTRATION, this.handleRegistration);
-        this.mediator.subscribe(EMESSAGES.LOGOUT, this.handleLogout);
-        this.mediator.set(EMESSAGES.GET_TOKEN, this.getToken);
+        this.mediator.subscribe(EMESSAGES.LOGIN, (data) => this.handleLogin(data));
+        this.mediator.subscribe(EMESSAGES.REGISTRATION, (data) => this.handleRegistration(data));
+        this.mediator.subscribe(EMESSAGES.LOGOUT, (data) => this.handleLogout(data));
+        this.mediator.set(EMESSAGES.GET_TOKEN, () => this.getToken());
     }
 
     handleLogin(data: TUser): void {
