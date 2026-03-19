@@ -13,7 +13,6 @@ class MapManager extends BaseManager {
 
         this.io.on('connection', (socket) => {
             socket.on(MESSAGES.GENERATE_MAP, (data) => this.socketGenerateMap(data, socket));
-            socket.on('disconnect', () => this.socketDisconnect(socket));
         });
     }
 
@@ -22,8 +21,8 @@ class MapManager extends BaseManager {
         const map = new Map(width, height);
         map.generateRelief(water, mountains, seed);
         map.generateFields(iron, oil);
-        socket.emit(MESSAGES.GENERATE_MAP, this.answer.good(map));
         this.maps.push(map);
+        socket.emit(MESSAGES.GENERATE_MAP, this.answer.good(map.get()));    
     }
 }
 
