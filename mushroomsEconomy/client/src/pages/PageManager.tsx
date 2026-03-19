@@ -3,6 +3,7 @@ import Server from '../services/Server/Server';
 import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat'
+import Game from './Game/Game';
 import Store from '../services/Store/Store';
 
 import Mediator from '../services/Mediator/Mediator';
@@ -13,6 +14,7 @@ export enum PAGES {
     LOGIN,
     REGISTRATION,
     CHAT,
+    GAME,
 }
 
 export interface IBasePage {
@@ -42,6 +44,7 @@ const PageManager: React.FC<IPageManager> = (propsManager: IPageManager) => {
             {page === PAGES.REGISTRATION && <Registration {...props} />}
             {page === PAGES.LOGIN && <Login {...props} />}
             {page === PAGES.CHAT && <Chat {...props} />}
+            {page === PAGES.GAME && <Game {...props} />}
         </>
     );
 }
