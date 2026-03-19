@@ -39,6 +39,7 @@ class CONFIG {
         ROOMS_LIST_UPDATED: 'ROOMS_LIST_UPDATED',
 
         //map sockets
+        GENERATE_MAP: 'GENERATE_MAP',
     }
 }
 
