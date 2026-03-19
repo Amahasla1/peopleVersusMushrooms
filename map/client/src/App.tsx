@@ -2,11 +2,12 @@ import Store from './services/Store/Store';
 import Server from './services/server/Server';
 import PageManager from './pages/PageManager';
 import Mediator from './services/Mediator/Mediator';
+import { MEDIATOR } from './config';
 import './App.css';
 
 function App() {
   // mediator
-  const mediator = new Mediator({ EVENTS: {}, TRIGGERS: {} });
+  const mediator = new Mediator({ EVENTS: MEDIATOR.EVENTS, TRIGGERS: MEDIATOR.TRIGGERS });
   const store = new Store(mediator);
   const server = new Server(mediator);
 
