@@ -14,6 +14,8 @@ class Server {
 
     constructor(mediator: Mediator) {
         this.mediator = mediator;
+        const { SHOW_ERROR } = this.mediator.getEventTypes();
+        this.mediator.subscribe(SHOW_ERROR,(data)=> this.handle)
         this.socket = io(HOST);
 
         this.socket.on("connect", () => {
@@ -53,13 +55,13 @@ class Server {
         try {
             const { GET_STORE } = this.mediator.getTriggerTypes();
             const token = this.mediator.get(GET_STORE, 'token');
-            
+
             let url = `${HOST}/${method}`;
             const paramValues = Object.values(params);
             if (paramValues.length > 0) {
                 url += "/" + paramValues.join("/");
             }
-            
+
             const queryParts: string[] = [];
             if (token) {
                 queryParts.push("token=" + token);
@@ -87,14 +89,6 @@ class Server {
             });
             return null;
         }
-    }
-
-    private setError(error: TError): void {
-        this.showErrorCb(error);
-    }
-
-    showError(cb: (error: TError) => void) {
-        this.showErrorCb = cb;
     }
 
     async register(name: string, password: string): Promise<boolean> {
@@ -135,15 +129,15 @@ class Server {
             const { name, token } = response.data;
             const { SET_STORE } = this.mediator.getTriggerTypes();
             const { LOGIN } = this.mediator.getEventTypes();
-            
+
             this.mediator.get(SET_STORE, {
                 name: 'user',
                 value: { name, token }
             });
-            
-            this.mediator.call(LOGIN); 
+
+            this.mediator.call(LOGIN);
         } else {
-            this.setError({code: 11, text: "Ошибка авторизации"});
+            this.setError({ code: 11, text: "Ошибка авторизации" });
         }
     }
 
