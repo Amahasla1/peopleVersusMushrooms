@@ -3,6 +3,7 @@ import { TUser, TMessages, TMessage } from "../Server/types";
 type TData = {
     token: string | null;
     user: TUser | null;
+    messages: TMessages;
     [key: string]: any;
 }
 
@@ -12,7 +13,8 @@ class Store {
 
     private data: TData = {
         token: null,
-        user: null
+        user: null,
+        messages: []
     }
 
     set(name: string, value: any) {
@@ -27,26 +29,8 @@ class Store {
         this.data[name] = null;
     }
 
-    addMessage(message: TMessage): void {
-        this.messages = [...this.messages, message];
-    }
-
-    addMessages(messages: TMessages): void {
-        if (messages?.length) {
-            this.messages = messages;
-        }
-    }
-
     getMessages(): TMessages {
         return this.messages;
-    }
-
-    getChatHash(): string {
-        return this.chatHash;
-    }
-
-    setChatHash(hash: string): void {
-        this.chatHash = hash;
     }
 }
 

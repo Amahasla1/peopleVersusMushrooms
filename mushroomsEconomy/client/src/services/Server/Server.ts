@@ -156,8 +156,8 @@ class Server {
 
     private handleSendMessage(response: any) {
         if (response?.result === 'ok' && response.data) {
-            const { MESSAGE_SENT } = this.mediator.getTriggerTypes();
-            this.mediator.call(MESSAGE_SENT, response.data.message);
+            const { MESSAGE_SEND } = this.mediator.getEventTypes();
+            this.mediator.call(MESSAGE_SEND, response.data.message);
         } else {
             this.setError(response.error);
         }
@@ -169,8 +169,9 @@ class Server {
             const { MESSAGE_LOADED } = this.mediator.getEventTypes();
 
             const messages = response.data.messages;
+
             this.mediator.get(SET_STORE, {
-                name: 'message',
+                name: 'messages',
                 value: messages
             });
 
@@ -186,11 +187,11 @@ class Server {
             const { NEW_MESSAGE } = this.mediator.getEventTypes();
 
             this.mediator.get(SET_STORE, {
-                name: 'message',
+                name: 'newMessage',
                 value: response.data
             });
 
-            this.mediator.call(NEW_MESSAGE, response.data.message);
+            this.mediator.call(NEW_MESSAGE, response.data);
         } else {
             this.setError(response.error);
         }

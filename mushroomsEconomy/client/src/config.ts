@@ -7,7 +7,7 @@ const CONFIG = {
             LOGIN: 'LOGIN',
             NEW_MESSAGE: 'NEW_MESSAGE',
             MESSAGE_LOADED: 'MESSAGE_LOADED',
-            MESSAGE_SENT: 'MESSAGE_SENT',
+            MESSAGE_SENT: 'MESSAGE_SEND',
         },
         TRIGGERS: {
             MESSAGE: 'MESSAGE:SOCKET',

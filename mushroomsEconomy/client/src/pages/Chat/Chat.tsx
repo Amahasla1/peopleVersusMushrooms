@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useMemo, KeyboardEvent } from "reac
 import { IBasePage } from '../PageManager';
 import { TUser, TMessage, TMessages } from "../../services/Server/types";
 import CONFIG from "../../config";
+import Button from "../../components/Button/Button";
+import './Chat.css';
 
 const Chat: React.FC<IBasePage> = (props: IBasePage) => {
     const { setPage, server, store, mediator } = props;
@@ -12,12 +14,8 @@ const Chat: React.FC<IBasePage> = (props: IBasePage) => {
 
     useEffect(() => {
         const messages = store.getMessages();
-        if (messages?.length) {
-            setMessages(messages);
-        }
-    
-        server.getMessages();
-    }, [store, server]);
+        setMessages(messages);
+    }, [store]);
 
     useEffect(() => {
         if (!mediator) return;
@@ -25,19 +23,17 @@ const Chat: React.FC<IBasePage> = (props: IBasePage) => {
         const eventTypes = mediator.getEventTypes();
 
         const handleNewMessage = (message: TMessage) => {
-            store.addMessage(message);
             setMessages(prev => [...prev, message]);
         };
 
         const handleMessagesLoaded = (messages: TMessages) => {
-            if (messages?.length) {
-                store.addMessages(messages);
-                setMessages(messages);
-            }
+            setMessages(messages);
         };
 
         mediator.subscribe(eventTypes.NEW_MESSAGE, handleNewMessage);
         mediator.subscribe(eventTypes.MESSAGES_LOADED, handleMessagesLoaded);
+
+        server.getMessages();
 
         return () => {
             mediator.unsubscribe(eventTypes.NEW_MESSAGE, handleNewMessage);
@@ -138,12 +134,12 @@ const Chat: React.FC<IBasePage> = (props: IBasePage) => {
                     onKeyUp={handleKeyUp}
                     placeholder='Сообщение'
                 />
-                <button 
+                <Button 
                     onClick={handleSend} 
+                    text="Отправить"
                     className='button button-primary'
                     id='testSendButton'
-                >Отправить
-                </button>
+                />
             </div>
         </div>
 }
