@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import Server from '../services/Server/Server';
+import React, { useContext, useState } from 'react';
 import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat'
 import Game from './Game/Game';
-import Store from '../services/Store/Store';
 
-import Mediator from '../services/Mediator/Mediator';
 import CONFIG from '../config';
 
 
@@ -19,24 +16,13 @@ export enum PAGES {
 
 export interface IBasePage {
     setPage: (name: PAGES) => void;
-    server: Server,
-    store: Store,
-    mediator: Mediator
 }
 
-export interface IPageManager {
-    server: Server,
-    store: Store,
-    mediator: Mediator
-}
-
-const PageManager: React.FC<IPageManager> = (propsManager: IPageManager) => {
+const PageManager: React.FC = () => {
     const [page, setPage] = useState<PAGES>(PAGES.GAME);
-    const { store, mediator, server } = propsManager;
 
     const props = {
         setPage,
-        ...propsManager
     }
 
     return (
