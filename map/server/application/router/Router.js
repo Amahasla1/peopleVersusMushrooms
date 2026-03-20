@@ -1,27 +1,23 @@
 const express = require('express');
-const Answer = require('./Answer.js');
-const answer = new Answer();
+const router = express.Router();
 const {
- 
+    getVisibilityHandler
 } = require('./handlers');
 
-function Router(mediator) {
-    const router = express.Router();
-
+function Router(mediator, answer) {
     // ============ LOBBY ROUTES ============
-    // для http методов из LobbyManager - а надо ли? скорее да, чем нет
+    // для http методов из LobbyManager
 
     // ============ MAP ROUTES ============
     // для http методов из MapManager
+    router.get('/getVisibility/:mapGuid/:userGuid', getVisibilityHandler(mediator, answer));
+    //еще 4
 
     // ============ NOT FOUND ============
-    router.get('/*path', (_, res) => {
+    router.all('/*path', (_, res) => {
         res.json(answer.bad(404));
     });
 
-    router.post('/*path', (_, res) => {
-        res.json(answer.bad(404));
-    });
 
     return router;
 }
