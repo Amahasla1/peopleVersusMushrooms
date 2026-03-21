@@ -52,6 +52,7 @@ class Unit {
             const next = this.path[0];
             if (map[next.y][next.x] !== 0) {
                 this.path = [];
+                console.log('Юнит столкнулся с препятствием');
                 return;
             }
             this.x = next.x;
