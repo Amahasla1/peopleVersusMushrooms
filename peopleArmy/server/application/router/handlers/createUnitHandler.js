@@ -16,6 +16,7 @@ module.exports = (mediator) => {
             }
             return res.status(400).json(Answer.bad(400));
         }
+        console.log('createUnitHandler', guid, x, y, type);
         res.json(Answer.good(result.data));
     };
 };

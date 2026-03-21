@@ -20,21 +20,26 @@ class ArmyManager extends BaseManager {
 
     /**
      * mediator.get(SET_UNIT_TARGET, { guid, targetX, targetY }) — alias: unitGuid, x, y
-     * @returns {{ ok: true } | { ok: false, error: string }}
+     * @returns {{ ok: true, data: object } | { ok: false, error: string }}
      */
     setUnitTarget(data) {
         const guid = data?.guid ?? data?.unitGuid;
-        const tx = data?.targetX ?? data?.x;
-        const ty = data?.targetY ?? data?.y;
-        if (guid === undefined || guid === null || tx === undefined || ty === null) {
+        const rawTx = data?.targetX ?? data?.x;
+        const rawTy = data?.targetY ?? data?.y;
+        if (guid === undefined || guid === null || rawTx === undefined || rawTy === null) {
+            return { ok: false, error: 'BAD_PAYLOAD' };
+        }
+        const tx = Number(rawTx);
+        const ty = Number(rawTy);
+        if (!Number.isFinite(tx) || !Number.isFinite(ty)) {
             return { ok: false, error: 'BAD_PAYLOAD' };
         }
         const unit = this.army.units.find((u) => String(u.guid) === String(guid));
         if (!unit) {
             return { ok: false, error: 'UNIT_NOT_FOUND' };
         }
-        unit.setTarget(Number(tx), Number(ty));
-        return { ok: true };
+        unit.setTarget(tx, ty);
+        return { ok: true, data: unit.get() };
     }
 
     /**
@@ -59,6 +64,8 @@ class ArmyManager extends BaseManager {
         const options = { guid, x, y };
         const unit = type === 'bmp' ? new BMP(options) : new Soldier(options);
         this.army.units.push(unit);
+        console.log('Юнит создан:', unit.get());
+        console.log('Армия:', this.army.units);
         return { ok: true, data: unit.get() };
     }
 

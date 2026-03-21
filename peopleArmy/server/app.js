@@ -27,7 +27,7 @@ const mediator = new Mediator(CONFIG.MEDIATOR);
 // Менеджеры создаём здесь, чтобы они зарегистрировали триггеры в медиаторе
 new RegistrationManager({mediator, db, io, common});
 new ChatManager({mediator, db, io, common});
-const ArmyManager = new ArmyManager({ mediator, db, io, common });
+new ArmyManager({ mediator, db, io, common });
 
 // Пример: подписка на событие "пользователь зарегистрирован"
 mediator.subscribe(mediator.EVENTS.USER_REGISTERED, (user) => {

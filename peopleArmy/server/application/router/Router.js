@@ -4,12 +4,14 @@ const router = express.Router();
 const {
     useRegistrationHandler,
     createUnitHandler,
+    setUnitTargetHandler,
     notFoundHandler,
 } = require('./handlers');
 
 function Router(mediator) {
     router.get('/reg/:username/:password', useRegistrationHandler(mediator));
     router.get('/unit/create/:guid/:x/:y', createUnitHandler(mediator));
+    router.get('/unit/target/:guid/:targetX/:targetY', setUnitTargetHandler(mediator));
     router.all('/*path', notFoundHandler);
     return router;
 }

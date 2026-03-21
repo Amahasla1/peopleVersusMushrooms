@@ -39,23 +39,23 @@ class Army {
     findPath(x0, y0, x1, y1) {
         this.updateMap();
         let result;
-        let settled = false;
+        let calculated = false;
         try {
             this.easyStar.findPath(x0, y0, x1, y1, (path) => {
                 result = path;
-                settled = true;
+                calculated = true;
             });
         } catch {
             return null;
         }
-        if (settled) {
+        if (calculated) {
             return result;
         }
         const limit = this.n * this.m * 4;
-        for (let i = 0; i < limit && !settled; i++) {
+        for (let i = 0; i < limit && !calculated; i++) {
             this.easyStar.calculate();
         }
-        return settled ? result : null;
+        return calculated ? result : null;
     }
 
     /** Если у юнита есть цель, но ещё нет waypoints — считаем путь здесь. */
@@ -77,6 +77,7 @@ class Army {
 
     mapInit(map) { // Временный метод для заглушки
         if (map) {
+            console.log('Карта передана при создании армии! Используется переданная карта!');
             this.map = map;
         } else {
             console.log('Карта не передана при создании армии! Используется заглушка!');
@@ -93,6 +94,12 @@ class Army {
             this.map[48][25] = 1;
             this.map[49][25] = 1;
             this.map[5][25] = 1;
+
+            console.log(`\n===========================`);
+            this.map.forEach(row => {
+                console.log(row.join(' '));
+            });
+            console.log('===========================\n');
         }
     }
 
@@ -118,8 +125,9 @@ class Army {
         this.units.forEach((unit) => {
             this.calculateUnitPath(unit);
             unit.move(this.map);
+            console.log('Координаты юнита: ', unit.x, unit.y);
         });
-        this.printMap();
+        // this.printMap();
     }
 }
 
