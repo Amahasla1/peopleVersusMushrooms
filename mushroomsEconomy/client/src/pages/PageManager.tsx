@@ -3,6 +3,8 @@ import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat'
 import Game from './Game/Game';
+// import Chat from './Chat/Chat'
+import Store from '../services/Store/Store';
 
 import CONFIG from '../config';
 
