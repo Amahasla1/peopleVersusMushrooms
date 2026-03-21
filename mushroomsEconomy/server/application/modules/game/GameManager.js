@@ -31,7 +31,8 @@ class GameManager extends BaseManager {
     }
 
     getMap() {
-        socket //Дописать отправку карты
+        //socket 
+        //Дописать отправку карты
     }
 
 }
