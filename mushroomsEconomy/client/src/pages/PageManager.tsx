@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import Server from '../services/server/Server';
+import Server from '../services/Server/Server';
 import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat'
 import Store from '../services/Store/Store';
+
+import Mediator from '../services/Mediator/Mediator';
+import CONFIG from '../config';
 
 
 export enum PAGES {
@@ -16,17 +19,22 @@ export interface IBasePage {
     setPage: (name: PAGES) => void;
     server: Server,
     store: Store,
+    mediator: Mediator
 }
 
-const PageManager: React.FC = () => {
+export interface IPageManager {
+    server: Server,
+    store: Store,
+    mediator: Mediator
+}
+
+const PageManager: React.FC<IPageManager> = (propsManager: IPageManager) => {
     const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
-    const store = new Store();
-    const server = new Server(store);
+    const { store, mediator, server } = propsManager;
 
     const props = {
         setPage,
-        server,
-        store,
+        ...propsManager
     }
 
     return (
