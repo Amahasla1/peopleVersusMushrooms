@@ -25,6 +25,7 @@ const Login: React.FC<IBasePage> = ({ setPage }) => {
 
             <form onSubmit={handleLogin}>
                 <input
+                    id="testing-login-username"
                     type="text"
                     placeholder="Введите логин"
                     value={login}
@@ -33,6 +34,7 @@ const Login: React.FC<IBasePage> = ({ setPage }) => {
                 />
 
                 <input
+                    id="testing-login-password"
                     type="password"
                     placeholder="Введите пароль"
                     value={password}
@@ -40,12 +42,12 @@ const Login: React.FC<IBasePage> = ({ setPage }) => {
                     required
                 />
 
-                <button type="submit">
+                <button id="testing-login-submit" type="submit">
                     Войти
                 </button>
             </form>
 
-            <p className="login-switch" onClick={goToRegister}>
+            <p id="testing-login-switch-to-register" className="login-switch" onClick={goToRegister}>
                 Нет аккаунта? Зарегистрироваться
             </p>
         </div>
