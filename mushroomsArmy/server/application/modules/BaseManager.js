@@ -6,8 +6,6 @@ class BaseManager {
         this.EVENTS = this.mediator.getEventTypes();
         this.TRIGGERS = this.mediator.getTriggerTypes();
     }
-
-
 }
 
 module.exports = BaseManager;

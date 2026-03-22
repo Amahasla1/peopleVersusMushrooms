@@ -1,6 +1,6 @@
 const CONFIG = {
     NAME: 'Server',
-    PORT: 3003, //Порт соостветсвующий серверу вашего сервиса
+    PORT: 3003,
 
     DATABASE: {
         NAME: 'mushroomsArmy.db',
