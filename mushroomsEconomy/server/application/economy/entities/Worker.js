@@ -1,23 +1,13 @@
+const Unit = require("./Unit");
+
 const { HP, SPEED } = CONFIG.ECONOMY.WORKER;
 
-class Worker {
-    constructor({ x, y, guid, callbacks, easystar}) {
-        this.x = x;
-        this.y = y;
-        this.guid = guid;
-        this.callbacks = callbacks;
+class Worker extends Unit {
+    constructor(options) {
+        super(options);
         this.hp = HP;
         this.speed = SPEED;
-        this.easystar = easystar;
 
-    }
-
-    get() {
-        return {
-            x: this.x,
-            y: this.y,
-            hp: this.hp
-        }
     }
 }
 
