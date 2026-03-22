@@ -2,8 +2,8 @@ const CONFIG = require('./config');
 
 const express = require('express');
 const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server, CONFIG.CORS);
+const server = require('http').createServer();
+const io = require('socket.io')(server, {cors: CONFIG.CORS});
 
 const Router = require('./application/router/Router');
 const DB = require('./application/modules/db/DB');

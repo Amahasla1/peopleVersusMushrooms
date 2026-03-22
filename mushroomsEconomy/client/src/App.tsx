@@ -1,42 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
+import CONFIG from './config';
+import Server from './services/Server/Server';
+import Store from './services/Store/Store';
+import useStore from './services/Store/useStore';
+import Mediator from './services/Mediator/Mediator';
+import useMediator from './services/Mediator/useMediator';
+
 import PageManager from './pages/PageManager';
 
-import Server from './services/server/Server';
-import Store from './services/Store/Store';
-
 import './App.css';
-import Mediator from './services/Mediator/Mediator';
-import CONFIG from './config';
 
 export const MediatorContext = React.createContext<Mediator>(null!);
+export const ServerContext = React.createContext<Server>(null!);
 
-function App() {
+const { MEDIATOR } = CONFIG;
 
-  const store = new Store();
-  const mediator = new Mediator(CONFIG.MEDIATOR);
-  const server = new Server({store, mediator});
+const App: React.FC = () => {
+    const mediator = useMediator();
+    useStore(mediator);
+    const server = new Server(mediator);
 
+    const pressMeHandler = () => mediator.get(
+        MEDIATOR.TRIGGERS.MESSAGE,
+        { name: 'Vasya', text: 'something' }
+    );
 
-  const pressMeHandler = () => mediator.get(
-    CONFIG.MEDIATOR.TRIGGERS.MESSAGE,
-    { name: 'Vasya', text: 'something' }
-  );
-
-  const props = {
-        mediator,
-        server,
-        store,
-    }
-
-  return (
-      <div className="App">
-        <button onClick={pressMeHandler}>Press Me</button>
-        <div className='app'>
-          <PageManager {...props}/>
-        </div>
-      </div>
-  );
+    return (
+        <MediatorContext value={mediator}>
+            <ServerContext value={server}>
+            <div className="App">
+                <button onClick={pressMeHandler}>Press Me</button>
+                <div className='app'>
+                    <PageManager />
+                </div>
+            </div>
+            </ServerContext>
+        </MediatorContext>
+    );
 }
 
 export default App;

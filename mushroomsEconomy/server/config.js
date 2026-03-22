@@ -51,6 +51,7 @@ const CONFIG = {
         GET_ROOMS: 'GET_ROOMS',
  
         ERROR: 'ERROR',
+        GET_MAP: 'GET_MAP',
     },
     
     ECONOMY: {
