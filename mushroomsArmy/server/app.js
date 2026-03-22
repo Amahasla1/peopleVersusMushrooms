@@ -18,10 +18,10 @@ app.use(express.static(`${__dirname}/public`));
 app.use('/', router);
 
 function deinit() {
-    db.destrucor();
-    setTimeout(() =>process.exit(), 500);
+    db.destructor();
+    setTimeout(() => process.exit(), 500);
 }
 
 app.listen(PORT, () => console.log(`${NAME} started at port ${PORT}`));
 
-process.on('SIGNINT', deinit);
+process.on('SIGINT', deinit);
