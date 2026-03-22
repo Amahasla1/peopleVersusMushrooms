@@ -47,9 +47,9 @@ const CONFIG = {
         JOIN_ROOM: 'JOIN_ROOM',
         LEAVE_ROOM: 'LEAVE_ROOM',
         KICK_USER: 'KICK_USER',
-        
-        ROOM_LIST: 'ROOM_LIST',      
-        ROOM_UPDATE: 'ROOM_UPDATE',
+        DROP_FROM_ROOM: 'DROP_FROM_ROOM',
+        GET_ROOMS: 'GET_ROOMS',
+ 
         ERROR: 'ERROR',
     },
     

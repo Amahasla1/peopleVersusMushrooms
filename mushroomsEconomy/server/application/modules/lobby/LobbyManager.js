@@ -1,10 +1,14 @@
 const CONFIG = require('../../../config');
-const BaseManager = require('../BaseManager')
+const BaseManager = require('../BaseManager');
+const Lobby = require('./Lobby');
 
 class LobbyManager extends BaseManager {
     constructor(options) {
         super(options);
-        this.users = {}; 
+
+        this.users = {};
+        this.lobbies = {}; 
+        this.userToRoom = {}; 
 
         this.init();
     }
@@ -15,18 +19,19 @@ class LobbyManager extends BaseManager {
 
     handleConnection(io) {
         io.on('connection', (socket) => {
-            console.log(`Client connected: ${socket.id}`);
+            console.log(`LobbyManager: Client connected: ${socket.id}`);
 
             socket.on(CONFIG.SOCKET.LOGIN, (data) => this.handleLogin(socket, data));
             socket.on(CONFIG.SOCKET.CREATE_ROOM, (data) => this.handleCreateRoom(socket, data));
-            socket.on(CONFIG.SOCKET.DELETE_ROOM, (data) => this.handleDeleteRoom(socket, data));
             socket.on(CONFIG.SOCKET.JOIN_ROOM, (data) => this.handleJoinRoom(socket, data));
-            socket.on(CONFIG.SOCKET.KICK_USER, (data) => this.handleKickUser(socket, data));
+            socket.on(CONFIG.SOCKET.LEAVE_ROOM, (data) => this.handleLeaveRoom(socket, data));
+            socket.on(CONFIG.SOCKET.DROP_FROM_ROOM, (data) => this.handleKickUser(socket, data));
+            socket.on(CONFIG.SOCKET.GET_ROOMS, (data) => this.handleGetRooms(socket, data));
             
             socket.on('disconnect', () => this.handleDisconnect(socket));
         });
     }
-
+    
     sendError(socket, code) {
         const message = this.answer.bad(code);
         socket.emit(CONFIG.SOCKET.ERROR, { code, message });
@@ -36,13 +41,13 @@ class LobbyManager extends BaseManager {
         return this.users[socket.id];
     }
 
-    async handleLogin(socket, data) {
+    handleLogin(socket, data) {
         if (!data || !data.name) return this.sendError(socket, 16);
         
-        const user = { id: this.common.guid(), name: data.name };
+        const user = { id: this.common.guid(), name: data.name, socketId: socket.id };
         this.users[socket.id] = user;
 
-        const rooms = await this.db.getAllRooms();
+        const rooms = this._getPublicRooms();
         
         socket.emit('login_success', { 
             user, 
@@ -50,68 +55,137 @@ class LobbyManager extends BaseManager {
         });
     }
 
-    async handleCreateRoom(socket, data) {
+    handleCreateRoom(socket, data) {
         const user = this.getUser(socket);
         if (!user) return this.sendError(socket, 17);
-
         if (!data || !data.name) return this.sendError(socket, 18);
 
-        const room = await this.db.createRoom(data.name, user.id);
-        
-        socket.emit('room_created', room);
-        socket.broadcast.emit('room_created', room);
-    }
-
-    async handleDeleteRoom(socket, data) {
-        const user = this.getUser(socket);
-        if (!user) return this.sendError(socket, 17);
-
-        const room = await this.db.getRoomById(data.roomId);
-        if (!room) return this.sendError(socket, 19);
-
-        if (room.ownerId !== user.id) return this.sendError(socket, 20);
-
-        await this.db.deleteRoom(room.id);
-
-        socket.broadcast.emit('room_deleted', { roomId: room.id });
-        socket.emit('room_deleted', { roomId: room.id });
-    }
-
-    async handleJoinRoom(socket, data) {
-        const user = this.getUser(socket);
-        if (!user) return this.sendError(socket, 17);
-
-        const room = await this.db.getRoomById(data.roomId);
-        if (!room) return this.sendError(socket, 19);
-
-        if (!room.participants.includes(user.id)) {
-            room.participants.push(user.id);
-            await this.db.saveRoom(room);
+        if (this.userToRoom[user.id]) {
+            this._leaveRoom(user.id, socket);
         }
 
-        socket.emit('room_updated', room);
-        socket.broadcast.emit('room_updated', room);
+        const lobby = new Lobby({ 
+            creatorGuid: user.id, 
+            roomName: data.name, 
+            common: this.common 
+        });
+
+        this.lobbies[lobby.guid] = lobby;
+        this.userToRoom[user.id] = lobby.guid;
+
+        socket.join(lobby.guid);
+
+        socket.emit('room_created', lobby.get());
+        this._notifyRoomsListUpdated();
     }
 
-    async handleKickUser(socket, data) {
+    handleJoinRoom(socket, data) {
+        const user = this.getUser(socket);
+        if (!user) return this.sendError(socket, 17);
+        
+        const { roomId } = data;
+        const lobby = this.lobbies[roomId];
+        
+        if (!lobby) return this.sendError(socket, 19);
+
+        if (lobby.isGuidInRoom(user.id)) return;
+
+        if (this.userToRoom[user.id]) {
+            this._leaveRoom(user.id, socket);
+        }
+
+        if (lobby.addPlayer(user.id)) {
+            this.userToRoom[user.id] = lobby.guid;
+            
+            socket.join(lobby.guid);
+
+            this._notifyRoomUpdate(lobby.guid);
+            this._notifyRoomsListUpdated();
+        }
+    }
+
+    handleLeaveRoom(socket, data) {
         const user = this.getUser(socket);
         if (!user) return this.sendError(socket, 17);
 
-        const room = await this.db.getRoomById(data.roomId);
-        if (!room) return this.sendError(socket, 19);
+        this._leaveRoom(user.id);
+        socket.emit('room_updated', { status: 'left' });
+    }
 
-        if (room.ownerId !== user.id) return this.sendError(socket, 20);
+    handleKickUser(socket, data) {
+        const admin = this.getUser(socket);
+        if (!admin) return this.sendError(socket, 17);
 
-        room.participants = room.participants.filter(id => id !== data.userId);
-        
-        await this.db.saveRoom(room);
+        const { targetGuid, roomId, userID } = data;
+        const lobby = this.lobbies[roomId];
 
-        socket.emit('room_updated', room);
-        socket.broadcast.emit('room_updated', room);
+        if (!lobby) return this.sendError(socket, 19);
+        if (lobby.creatorGuid !== admin.id) return this.sendError(socket, 20);
+
+        if (lobby.removePlayer(targetGuid)) {
+            delete this.userToRoom[targetGuid];
+            this._notifyRoomUpdate(lobby.guid);
+        }
+    }
+
+    handleGetRooms(socket, data) {
+        const rooms = this._getPublicRooms();
+        socket.emit('rooms_list', rooms);
     }
 
     handleDisconnect(socket) {
-        delete this.users[socket.id];
+        const user = this.getUser(socket);
+        if (user) {
+            this._leaveRoom(user.id, socket);
+            delete this.users[socket.id];
+        }
+    }
+
+    _leaveRoom(userGuid, socket) {
+        const roomGuid = this.userToRoom[userGuid];
+        if (!roomGuid) return;
+
+        const lobby = this.lobbies[roomGuid];
+        if (!lobby) {
+            delete this.userToRoom[userGuid];
+            return;
+        }
+
+        lobby.removePlayer(userGuid);
+        delete this.userToRoom[userGuid];
+
+        if (socket) {
+            socket.leave(roomGuid);
+        }
+
+        if (userGuid === lobby.creatorGuid || lobby.players.size === 0) {
+            this._destroyLobby(lobby);
+        } else {
+            this._notifyRoomUpdate(roomGuid);
+        }
+    }
+
+    _destroyLobby(lobby) {
+        delete this.lobbies[lobby.guid];
+        this._notifyRoomsListUpdated();
+    }
+
+    _getPublicRooms() {
+        return Object.values(this.lobbies).map(l => l.get());
+    }
+
+    _notifyRoomUpdate(roomGuid) {
+        const lobby = this.lobbies[roomGuid];
+        if (!lobby) return;
+
+        const data = lobby.get();
+        
+        this.io.to(roomGuid).emit('room_updated', data);
+    }
+
+    _notifyRoomsListUpdated() {
+        const rooms = this._getPublicRooms();
+        this.io.emit('rooms_list_updated', rooms);
     }
 }
 
