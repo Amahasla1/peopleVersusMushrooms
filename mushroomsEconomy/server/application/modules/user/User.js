@@ -24,7 +24,7 @@ class User {
         return {
             db: this.db,
             common: this.common,
-            socketId: this.socketId = socketId,
+            socketId: this.socketId,
             id: this.id,
             guid: this.guid,
             name: this.name,
