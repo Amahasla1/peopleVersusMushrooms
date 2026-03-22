@@ -1,4 +1,5 @@
 const BaseManager = require("../BaseManager");
+const Message = require("./Message");
 const CONFIG = require("../../../config");
 
 const { MESSAGE, MESSAGES, NEW_MESSAGE } = CONFIG.SOCKET;

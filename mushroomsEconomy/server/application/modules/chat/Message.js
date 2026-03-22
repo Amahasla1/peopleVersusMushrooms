@@ -27,3 +27,5 @@ class Message {
         return this.author && this.message;
     }
 }
+
+module.exports = Message;
