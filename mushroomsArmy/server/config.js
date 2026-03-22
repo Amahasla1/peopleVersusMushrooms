@@ -1,14 +1,16 @@
 const CONFIG = {
     NAME: 'Server',
-    PORT: 300x, //Порт соостветсвующий серверу вашего сервиса
+    PORT: 3003, //Порт соостветсвующий серверу вашего сервиса
 
     DATABASE: {
-        NAME: 'data.db',
+        NAME: 'mushroomsArmy.db',
     },
 
     MEDIATOR: {
         EVENTS: {
-            EXAMPLE_EVENT: "EXAMPLE_EVENT",
+            REGISTRATION: "REGISTRATION",
+            LOGIN: "LOGIN",
+            LOGOUT: "LOGOUT"
         },
         TRIGGERS: {
             EXAMPLE_TRIGGER: "EXAMPLE_TRIGGER",
