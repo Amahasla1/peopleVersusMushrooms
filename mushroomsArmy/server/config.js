@@ -1,6 +1,9 @@
 const CONFIG = {
-    NAME: 'Server',
+    NAME: 'Mushroom Army server',
     PORT: 3003,
+    CORS: {
+        origin: "*",
+    },
 
     DATABASE: {
         NAME: 'mushroomsArmy.db',
