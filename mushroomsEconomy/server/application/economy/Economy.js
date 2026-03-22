@@ -6,7 +6,7 @@ const Mycelium = require('./entities/Mycelium');
 const { INTERVAL } = CONFIG.ECONOMY;
 
 class Economy {
-    constructor({ db, common, callbacks: { }, map = null, guid }) {
+    constructor({ db, common, callbacks: { }, map, guid }) {
         this.easyStar = new EasyStar.js();
 
         this.guid = guid; // совпадает с guid игрока
@@ -21,7 +21,7 @@ class Economy {
         this.resourceMap; // массив известных ресурсов [{x, y, value}]
         this.buildings = []; // здания
         this.mycelium = []; // грибница
-        this.addMycelium(50, 49);
+        this.addMycelium(25, 25);
         this.workers = []; // рабочие
         this.larvae = []; // массив личинок
 

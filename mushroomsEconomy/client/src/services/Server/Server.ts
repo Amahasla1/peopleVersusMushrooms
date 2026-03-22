@@ -6,6 +6,8 @@ import { TError } from "../Server/types";
 
 const { HOST } = CONFIG;
 
+//СДЕЛАТЬ ТИПЫ НОРМАЛЬНЫМИ ВЕЗДЕ
+
 class Server {
     mediator: Mediator;
     chatInterval: NodeJS.Timer | null = null;

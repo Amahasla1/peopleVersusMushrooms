@@ -9,7 +9,7 @@ class GameManager extends BaseManager {
 
         this.io.on('connection', (socket) => {
 
-            socket.on(GET_MAP, (data) => this.socketGetMap(data, socket));
+            //socket.on(GET_MAP, (data) => this.socketGetMap(data, socket));
 
         });
 
@@ -17,8 +17,8 @@ class GameManager extends BaseManager {
         this.createEconomy();
     }
 
-    createEconomy({ map = null }) {
-        guid = this.common.guid();
+    createEconomy({ map } = {}) {
+        const guid = this.common.guid();
         this.economies[guid] = new Economy({
             db: this.db,
             common: this.common,
