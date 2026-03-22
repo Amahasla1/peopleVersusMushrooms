@@ -5,12 +5,12 @@ class GameManager extends BaseManager {
     constructor(options) {
         super(options);
 
+        const { GET_MAP } = CONFIG.SOCKET;
+
         if (!this.io) return;
 
         this.io.on('connection', (socket) => {
-
-            //socket.on(GET_MAP, (data) => this.socketGetMap(data, socket));
-
+            socket.on(GET_MAP, (data) => this.socketGetMap(data, socket));
         });
 
         this.economies = {};
@@ -28,11 +28,6 @@ class GameManager extends BaseManager {
         });
 
         return this.economies[guid];
-    }
-
-    getMap() {
-        //socket 
-        //Дописать отправку карты
     }
 
 }

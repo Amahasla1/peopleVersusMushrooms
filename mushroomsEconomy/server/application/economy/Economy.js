@@ -95,22 +95,13 @@ class Economy {
     }
 
     get() {
-    }
-
-    printMap() {
-        console.clear();
-        console.log(`\n===========================`);
-        this.map.forEach(row => {
-            console.log(row.join(' '));
-        });
-        console.log('===========================\n');
+        return {
+            map: this.map,
+        }
     }
 
     update() {
-        //this.mycelium.forEach(mycelium => mycelium.update());
-        // this.printMap(); 
-        // Включатать только по надобности!
-        //...
+        this.mycelium.forEach(mycelium => mycelium.update());
     }
 }
 
