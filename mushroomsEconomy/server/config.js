@@ -36,11 +36,21 @@ const CONFIG = {
 
     SOCKET: {
         MESSAGE: 'MESSAGE',  // шлет сообщение
+        TYPING: 'TYPING',           // печатает
 
         REGISTRATION: 'REGISTRATION',
         LOGIN: 'LOGIN',
         LOGOUT: 'LOGOUT',
 
+        CREATE_ROOM: 'CREATE_ROOM',
+        DELETE_ROOM: 'DELETE_ROOM',
+        JOIN_ROOM: 'JOIN_ROOM',
+        LEAVE_ROOM: 'LEAVE_ROOM',
+        KICK_USER: 'KICK_USER',
+        DROP_FROM_ROOM: 'DROP_FROM_ROOM',
+        GET_ROOMS: 'GET_ROOMS',
+ 
+        ERROR: 'ERROR',
         GET_MAP: 'GET_MAP',
     },
     
