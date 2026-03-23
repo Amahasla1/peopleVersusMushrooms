@@ -33,14 +33,6 @@ class Server {
         this.socket.on(CONFIG.SOCKET.GET_MAP, (data) => this.handleGetMap(data));
     }
 
-    requestMap(): void {
-        this.socket.emit(CONFIG.SOCKET.GET_MAP);
-    }
-
-    onGetMap(handler: (map: number[]) => void): void {
-        this.socket.on(CONFIG.SOCKET.GET_MAP, handler);
-    }
-
     sendMessage(message: string): void {
         const { GET_STORE } = this.mediator.getTriggerTypes();
         const user = this.mediator.get<{ name: string; token: string } | null>(GET_STORE, 'user');
@@ -216,10 +208,16 @@ class Server {
         }
     }
 
+    getMap(guid: string) {
+        const { GET_MAP } = CONFIG.SOCKET;
+        this.socket.emit(GET_MAP, { guid: guid });
+    }
+
     handleGetMap(response: TResponse<TMap>) {
-        if (response?.result === 'ok') {
-            const { SET_MAP } = this.mediator.getTriggerTypes()
-            this.mediator.call(SET_MAP, response);
+        console.log(response);
+        if (response?.result === 'ok' && response.data) {
+            const { SET_MAP } = this.mediator.getTriggerTypes();
+            this.mediator.get(SET_MAP, response.data);
         }
         else {
             const { SHOW_ERROR } = this.mediator.getEventTypes();

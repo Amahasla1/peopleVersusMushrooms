@@ -2,6 +2,7 @@ export type TUser = {
     token: string;
     name: string;
     id?: number;
+    guid: string;
 }
 
 export type TResponse<T> = {
@@ -25,6 +26,7 @@ export type TMessage = {
 }
 
 export type TMap = {
+    guid: string;
     map: number[][];
 }
 

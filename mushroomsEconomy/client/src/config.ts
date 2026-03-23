@@ -35,6 +35,7 @@ const CONFIG = {
             MESSAGE: 'MESSAGE:SOCKET',
 
             SET_MAP: "SET_MAP",
+            GET_MAP: "GET_MAP",
         }
     },
 

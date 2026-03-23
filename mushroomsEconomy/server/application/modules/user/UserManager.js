@@ -17,7 +17,7 @@ class UserManager extends BaseManager {
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
 
-            socket.on('disconnect', () => console.log('disconnect', socket.id));
+            //socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
     }
 
