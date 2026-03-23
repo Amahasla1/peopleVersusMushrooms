@@ -1,5 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import CONFIG from '../../config';
+import { GameContext } from '../../App';
 import { TPoint } from '../../config';
 import Canvas from '../../services/Canvas/Canvas';
 import useCanvas from '../../services/Canvas/useCanvas';
@@ -13,7 +14,8 @@ const GAME_FIELD = 'game-field';
 const { WINDOW, BORDER_PADDING, MIN_ZOOM, MAX_ZOOM, ZOOM_FACTOR } = CONFIG.GRAPHICS;
 
 const GameCanvas: React.FC = () => {
-    
+
+    const game = useContext(GameContext)
 
     let canvas: Canvas | null = null;
     const CanvasRef = useCanvas(render);
@@ -71,7 +73,9 @@ const GameCanvas: React.FC = () => {
     };
 
     const mouseClick = async (x: number, y: number) => {
-        return
+        
+        const { map } = game.get();
+        console.log(map); 
     };
 
     const mouseRightClickDown = (x: number, y: number) => {
