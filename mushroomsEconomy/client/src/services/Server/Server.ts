@@ -214,7 +214,7 @@ class Server {
     }
 
     handleGetMap(response: TResponse<TMap>) {
-        //console.log(response);
+        console.log(response);
         if (response?.result === 'ok' && response.data) {
             const { SET_MAP } = this.mediator.getTriggerTypes();
             this.mediator.get(SET_MAP, response.data);

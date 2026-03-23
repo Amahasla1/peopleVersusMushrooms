@@ -35,6 +35,7 @@ class GameManager extends BaseManager {
     }
 
     getMap(data, socket) {
+        //console.log(data, '\n\n\n\n\n\n');
         const { guid } = data;
         console.log("Запрос на получение карты");
 
