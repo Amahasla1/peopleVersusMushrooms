@@ -6,14 +6,15 @@ const { TRIGGERS } = CONFIG.MEDIATOR;
 
 const useStore = (mediator: Mediator) => {
     const store = new Store();
+    const { SET_STORE, GET_STORE, CLEAR_STORE } = mediator.getTriggerTypes();
 
-    mediator.set(TRIGGERS.SET_STORE, ({ name, value }: { name: string, value: any }) => 
+    mediator.set(SET_STORE, ({ name, value }: { name: string, value: any }) => 
         store.set(name, value)
     );
-    mediator.set(TRIGGERS.GET_STORE, (name: string) => 
+    mediator.set(GET_STORE, (name: string) => 
         store.get(name)
     );
-    mediator.set(TRIGGERS.CLEAR_STORE, (name: string) => 
+    mediator.set(CLEAR_STORE, (name: string) => 
         store.clear(name)
     );
 
