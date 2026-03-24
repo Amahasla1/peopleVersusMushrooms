@@ -71,31 +71,10 @@ class Economy {
             y,
             guid: this.common.guid(),
             callbacks: {
-                checkAround: (x, y) => this.checkAroundMycelium(x, y),
+                getMap: () => this.map,
+                getMycelium: () => this.mycelium,
             },
         }));
-    }
-
-    checkAroundMycelium(x, y) {
-        const directions = [
-            { dx: 0, dy: -1 },
-            { dx: 0, dy: 1 },
-            { dx: -1, dy: 0 },
-            { dx: 1, dy: 0 },
-            { dx: -1, dy: -1 },
-            { dx: 1, dy: -1 },
-            { dx: -1, dy: 1 },
-            { dx: 1, dy: 1 },
-        ];
-
-        return directions
-            .map(({ dx, dy }) => ({ x: x + dx, y: y + dy }))
-            .filter(({ x: nx, y: ny }) =>
-                nx >= 0 && nx < this.m &&
-                ny >= 0 && ny < this.n &&
-                this.map[ny][nx] === 0 &&
-                !this.mycelium.some(m => m.x === nx && m.y === ny)
-            );
     }
 
     destructor() {
