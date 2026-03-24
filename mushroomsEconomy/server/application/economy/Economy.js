@@ -134,9 +134,7 @@ class Economy {
         // 2. расширить грибницу при возможности
         this.mycelium.forEach(mycelium => this.myceliumExtend(mycelium));
         /****************/
-        // this.printMap(); 
-        // Включатать только по надобности!
-        //...
+
 
         if (this.updated) {
             this.updated = false;
