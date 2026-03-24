@@ -20,6 +20,9 @@ const CONFIG = {
     SOCKET: {
         MESSAGE_FROM_CLIENT: "message_from_client",
         MESSAGE_TO_CLIENTS: "message_to_clients",
+        REGISTRATION: "registration",
+        LOGIN: "login",
+        LOGOUT: "logout",
     },
 
     ARMY: {
