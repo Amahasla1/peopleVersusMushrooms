@@ -15,6 +15,7 @@ const CONFIG = {
         },
         TRIGGERS: {
             EXAMPLE_TRIGGER: "EXAMPLE_TRIGGER",
+            GET_USER_BY_GUID,
 
             // Mushrooms
             GET_ALL_MUSHROOMS: "GET_ALL_MUSHROOMS",

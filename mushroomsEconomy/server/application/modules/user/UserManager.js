@@ -19,23 +19,40 @@ class UserManager extends BaseManager {
 
             socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
+
+        // mediator events subscribers
+		//...
+        // mediator triggers setters
+		this.mediator.set(this.TRIGGERS.GET_USER_BY_GUID, (guid) => this.triggerGetUserByGuid(guid));
     }
 
+    /* PRIVATE */
+	
+	/* TRIGGERS */
+	triggerGetUserByGuid(guid) {
+		if (guid && this.users[guid] && this.users[guid].isLogin()) {
+			return this.users[guid];
+		}
+		return null;
+	}
+	
+	/* EVENTS */
+	//...
+
+    /* SOCKETS */
     async socketRegistration(data = {}, socket) {
         const { name, password } = data;
         if (!name || !password) {
             return socket.emit(REGISTRATION, this.answer.bad(13));
         }
-
-        if (await this.db.getUserByName(name)) {
-            return socket.emit(REGISTRATION, this.answer.bad(17));
+        const user = new User({db: this.db, common: this.common, socketId: socket.id});
+        if (await user.registration(name, password)) {
+            this.users[user.guid] = user;
+            socket.emit(REGISTRATION, this.answer.good(user.getSelf()));
+            return;
         }
 
-        const user = new User({db: this.db, common: this.common, socketId: socket.id});
-        await user.registration(name, password);
-        this.users[user.guid] = user;
-
-        socket.emit(REGISTRATION, this.answer.good(user.getSelf()));
+        socket.emit(REGISTRATION, this.answer.bad(17));
     }
 
     async socketLogin(data = {}, socket) {
@@ -61,11 +78,15 @@ class UserManager extends BaseManager {
             return socket.emit(LOGOUT, this.answer.bad(13));
         }
 
-        const user = this.users.get(guid);
-        await user.logout();
-        delete this.users[user.guid];
+        const user = this.users[guid];
+        if (user) {
+            await user.logout();
+            delete this.users[guid];
+            socket.emit(LOGOUT, this.answer.good(true));
+            return;
+        }
 
-        socket.emit(LOGOUT, this.answer.good(true));
+        socket.emit(LOGOUT, this.answer.bad(18));
     }
 }
 
