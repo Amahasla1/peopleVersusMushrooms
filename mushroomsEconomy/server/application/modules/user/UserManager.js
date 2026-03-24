@@ -12,12 +12,10 @@ class UserManager extends BaseManager {
         if (!this.io) return;
 
         this.io.on('connection', (socket) => {
-
             socket.on(REGISTRATION, (data) => this.socketRegistration(data, socket));
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
-
-            //socket.on('disconnect', () => console.log('disconnect', socket.id));
+            socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
 
         // mediator events subscribers
