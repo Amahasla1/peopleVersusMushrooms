@@ -30,7 +30,7 @@ class Server {
         this.socket.on(CONFIG.SOCKET.MESSAGE, (data) => this.handleSendMessage(data));
         this.socket.on(CONFIG.SOCKET.MESSAGES, (data) => this.handleGetMessage(data));
         this.socket.on(CONFIG.SOCKET.NEW_MESSAGE, (data) => this.handleNewMessage(data));
-        this.socket.on(CONFIG.SOCKET.GET_MAP, (data) => this.handleGetMap(data));
+        this.socket.on(CONFIG.SOCKET.GET_SCENE, (data) => this.handleGetScene(data));
     }
 
     sendMessage(message: string): void {
@@ -208,12 +208,12 @@ class Server {
         }
     }
 
-    getMap(guid: string) {
-        const { GET_MAP } = CONFIG.SOCKET;
-        this.socket.emit(GET_MAP, { guid: guid });
+    getScene(guid: string) {
+        const { GET_SCENE } = CONFIG.SOCKET;
+        this.socket.emit(GET_SCENE, { guid: guid });
     }
 
-    handleGetMap(response: TResponse<TMap>) {
+    handleGetScene(response: TResponse<TMap>) {
         console.log(response);
         if (response?.result === 'ok' && response.data) {
             const { SET_MAP } = this.mediator.getTriggerTypes();

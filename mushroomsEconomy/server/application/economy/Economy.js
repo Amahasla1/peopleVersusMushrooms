@@ -34,6 +34,8 @@ class Economy {
         this.interval = setInterval(() => this.update(), INTERVAL);
     }
 
+
+    // TEMPORARY
     mapInit(map) { //Временный метод для заглушки
         if (map) {
             this.map = map;

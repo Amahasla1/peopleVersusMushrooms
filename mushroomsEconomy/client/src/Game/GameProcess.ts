@@ -17,7 +17,7 @@ export default class GameProcess {
         this.server = server;
         this.mediator = mediator;
         this.mediator.set(SET_MAP, (data) => this.setMap(data));
-        this.server.getMap(this.map.guid);
+        this.server.getScene(this.map.guid);
     }
 
     setMap(map: TMap) {
