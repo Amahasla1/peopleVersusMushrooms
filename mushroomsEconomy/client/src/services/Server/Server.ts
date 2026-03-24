@@ -117,6 +117,7 @@ class Server {
     private handleRegistration(response: any) {
         if (response?.result === 'ok' && response.data) {
             const { SET_STORE } = this.mediator.getTriggerTypes();
+            const { REGISTRATION } = this.mediator.getEventTypes();
             this.mediator.get(SET_STORE, {
                 name: 'user',
                 value: {
@@ -124,6 +125,8 @@ class Server {
                     token: response.data.token
                 }
             });
+
+            this.mediator.call(REGISTRATION);
         } else {
             const { SHOW_ERROR } = this.mediator.getEventTypes();
             this.mediator.call(SHOW_ERROR, response.error);
