@@ -12,27 +12,14 @@ const CONFIG = {
     MEDIATOR: {
         EVENTS: {
             EXAMPLE_EVENT: "EXAMPLE_EVENT",
+			
+			START_GAME: 'START_GAME',
         },
         TRIGGERS: {
             EXAMPLE_TRIGGER: "EXAMPLE_TRIGGER",
-
-            // Mushrooms
-            GET_ALL_MUSHROOMS: "GET_ALL_MUSHROOMS",
-            CREATE_MUSHROOM: "CREATE_MUSHROOM",
-            UPDATE_MUSHROOM: "UPDATE_MUSHROOM",
-            DELETE_MUSHROOM: "DELETE_MUSHROOM",
-
-            // Units
-            GET_ALL_UNITS: "GET_ALL_UNITS",
-            CREATE_UNIT: "CREATE_UNIT",
-            UPDATE_UNIT: "UPDATE_UNIT",
-            DELETE_UNIT: "DELETE_UNIT",
-
-            // Matrix
-            UPDATE_MATRIX: "UPDATE_MATRIX",
+            GET_USER_BY_GUID: 'GET_USER_BY_GUID',
         },
     },
-
 
     SOCKET: {
         MESSAGE: 'MESSAGE',  // шлет сообщение
@@ -52,8 +39,8 @@ const CONFIG = {
         DROP_FROM_ROOM: 'DROP_FROM_ROOM',
         GET_ROOMS: 'GET_ROOMS',
  
-        ERROR: 'ERROR',
-        GET_MAP: 'GET_MAP',
+        START_GAME: 'START_GAME',
+		UPDATE_SCENE: 'UPDATE_SCENE',
     },
     
     ECONOMY: {
