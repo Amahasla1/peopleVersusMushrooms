@@ -42,8 +42,8 @@ class User {
         const token = md5(`${Date.now()}-${Math.random()}`);
         const result = await this.db.orm.insert(
             'users',
-            ['username', 'password', 'token'],
-            [username, password, token],
+            ['username', 'password', 'token', 'guid'],
+            [username, password, token, guid],
         );
         this.init({ id: result.id, username, guid, token });
         return true;
@@ -56,7 +56,7 @@ class User {
 
         const token = md5(`${Date.now()}-${Math.random()}`);
         await this.db.updateToken(data.id, token);
-        this.init({ ...data, guid: data.guid || String(data.id), token });
+        this.init({ ...data, guid: data.guid ?? String(data.id), token });
         return true;
     }
 

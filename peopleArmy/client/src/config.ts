@@ -5,6 +5,9 @@ interface SocketEvents {
     DISCONNECT: string;
     MESSAGE_FROM_CLIENT: string;
     MESSAGE_TO_CLIENTS: string;
+    REGISTRATION: string;
+    LOGIN: string;
+    LOGOUT: string;
 }
 
 interface MediatorEvents {
@@ -32,6 +35,9 @@ const CONFIG: Config = {
         DISCONNECT: 'disconnect',
         MESSAGE_FROM_CLIENT: 'message_from_client',
         MESSAGE_TO_CLIENTS: 'message_to_clients',
+        REGISTRATION: 'registration',
+        LOGIN: 'login',
+        LOGOUT: 'logout',
     },
     MEDIATOR: {
         EVENTS: {

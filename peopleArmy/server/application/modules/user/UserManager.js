@@ -31,7 +31,7 @@ class UserManager extends BaseManager {
             return socket.emit(REGISTRATION, this.answer.bad(17));
         }
 
-        const user = new User({db: this.db, common: this.common, socketId: socket.id});
+        const user = new User(this.db);
         await user.registration(name, password);
         this.users[user.guid] = user;
 
