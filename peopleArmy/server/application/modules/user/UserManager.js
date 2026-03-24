@@ -33,7 +33,7 @@ class UserManager extends BaseManager {
 
         const user = new User({db: this.db, common: this.common, socketId: socket.id});
         await user.registration(name, password);
-        this.users[user.id] = user;
+        this.users[user.guid] = user;
 
         socket.emit(REGISTRATION, this.answer.good(user.getSelf()));
     }
@@ -46,7 +46,7 @@ class UserManager extends BaseManager {
 
         const user = new User(this.db);
         if (await user.login(name, password)) {
-            this.users[user.id] = user;
+            this.users[user.guid] = user;
             socket.emit(LOGIN, this.answer.good(user.getSelf()));
             return;
         }
@@ -66,7 +66,7 @@ class UserManager extends BaseManager {
             return socket.emit(LOGOUT, this.answer.bad(11));
         }
 
-        delete this.users[user.id];
+        delete this.users[user.guid];
         socket.emit(LOGOUT, this.answer.good(true));
     }
 }

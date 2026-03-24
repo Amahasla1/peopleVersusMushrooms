@@ -7,9 +7,6 @@ const useLogoutHandler = require("./useLogoutHandler");
 
 module.exports = {
     notFoundHandler,
-    useRegistrationHandler,
     createUnitHandler,
     setUnitTargetHandler,
-    useLoginHandler,
-    useLogoutHandler,
 };
