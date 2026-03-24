@@ -18,10 +18,8 @@ class Mycelium {
     get() {
         return {
             guid: this.guid,
-            x: this.x,
-            y: this.y,
-            hp: this.hp,
             level: this.level,
+            coords: { x: this.x, y: this.y },
         }
     }
 
@@ -44,32 +42,10 @@ class Mycelium {
         return POWER;
     }
 
-    checkAroundMycelium(x, y) {
-        const directions = [
-            { dx: 0, dy: -1 },
-            { dx: 0, dy: 1 },
-            { dx: -1, dy: 0 },
-            { dx: 1, dy: 0 },
-            { dx: -1, dy: -1 },
-            { dx: 1, dy: -1 },
-            { dx: -1, dy: 1 },
-            { dx: 1, dy: 1 },
-        ];
-
-        return directions
-            .map(({ dx, dy }) => ({ x: x + dx, y: y + dy }))
-            .filter(({ x: nx, y: ny }) =>
-                nx >= 0 && nx < this.m &&
-                ny >= 0 && ny < this.n &&
-                this.map[ny][nx] === 0
-            );
-    }
-
     // породить новую грибницу
 
     canExtend(map, mycelium, buildins, enemyBuildings) {
         // могу вырасти или нет
-
 
         const freeCells = this.callbacks.checkAround(this.x, this.y);
         return freeCells.length > 0;
@@ -85,4 +61,4 @@ class Mycelium {
     }
 }
 
-module.exports = Mycelium; 
+module.exports = Mycelium;

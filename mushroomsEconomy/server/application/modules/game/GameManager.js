@@ -38,7 +38,7 @@ class GameManager extends BaseManager {
             db: this.db,
             common: this.common,
             callbacks: {
-				update: (guid, data) => this.callbackUpdate(guid, data)
+				updated: (data) => this.callbackUpdate(guid, data)
 			},
             map,
             guid,
@@ -57,7 +57,7 @@ class GameManager extends BaseManager {
             console.log(1111);
 			this.io.to(user.socketId).emit(
 				this.SOCKETS.START_GAME, 
-				this.answer.good(economy.getSelf())
+				this.answer.good(economy.get())
 			);
 			return;
 		}
@@ -71,19 +71,13 @@ class GameManager extends BaseManager {
         const { guid } = data;
         //console.log("Запрос на получение карты");
 
-        if (guid) {
-            const economy = this.createEconomy();
-            const { map } = economy.get();
-            return socket.emit(GET_SCENE, this.answer.good({ guid: economy.guid, scene }));
-        }
 
         const economy = this.economies[guid];
         if (!economy) {
             return socket.emit(GET_SCENE, this.answer.bad(18));
         }
 
-        const { map } = economy.get();
-        return socket.emit(GET_SCENE, this.answer.good({ guid, scene }));
+        socket.emit(GET_SCENE, this.answer.good(economy.get()));
     }
 
 }
