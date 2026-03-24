@@ -1,35 +1,36 @@
-import { TUser } from "../server/types";
+import { TUser, TMessages, TMessage } from "../Server/types";
 
-const TOKEN = 'token';
+type TData = {
+    token: string | null;
+    user: TUser | null;
+    messages: TMessages;
+    [key: string]: any;
+}
 
 class Store {
-    private token: string | null;
-    private user: TUser | null;
+    messages: TMessages = [];
+    chatHash: string = 'empty chat hash';
 
-    constructor() {
-        this.token = null;
-        this.user = null;
-    }
-    
-    setToken(token: string): void {
-        this.token = token;
+    private data: TData = {
+        token: null,
+        user: null,
+        messages: []
     }
 
-    getToken(): string | null {
-        return this.token;
+    set(name: string, value: any) {
+        this.data[name] = value;
     }
 
-    setUser(user: TUser): void {
-        this.user = user;
-        this.token = user.token;
+    get(name: string) {
+        return this.data[name];
     }
 
-    getUser(): TUser | null {
-        return this.user;
+    clear(name: string) {
+        this.data[name] = null;
     }
 
-    clearUser(): void {
-        this.user = null;
+    getMessages(): TMessages {
+        return this.messages;
     }
 }
 

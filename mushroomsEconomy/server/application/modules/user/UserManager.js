@@ -17,7 +17,7 @@ class UserManager extends BaseManager {
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
 
-            socket.on('disconnect', () => console.log('disconnect', socket.id));
+            //socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
 
         // mediator events subscribers
@@ -86,7 +86,7 @@ class UserManager extends BaseManager {
             return;
         }
 
-        socket.emit(LOGOUT, this.answer.bad(18));
+        socket.emit(LOGOUT, this.answer.bad(19));
     }
 }
 

@@ -1,0 +1,33 @@
+export type TUser = {
+    token: string;
+    name: string;
+    id?: number;
+    guid: string;
+}
+
+export type TResponse<T> = {
+    result: 'ok' | 'error';
+    data?: T;
+    error?: {
+        code: number;
+        text: string;
+    }
+}
+
+export type TError = {
+    code: number;
+    text: string;
+}
+
+export type TMessage = {
+    message: string;
+    author: string;
+    created: string;
+}
+
+export type TMap = {
+    guid: string;
+    map: number[][];
+}
+
+export type TMessages = TMessage[];

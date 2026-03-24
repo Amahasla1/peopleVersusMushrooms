@@ -1,11 +1,31 @@
-import React, { useState } from 'react';
-import { IBasePage, PAGES } from '../PageManager'; 
+import React, { useState, useContext, useEffect } from 'react';
+import { IBasePage, PAGES } from '../PageManager';
+import { MediatorContext, ServerContext } from '../../App';
 import './Login.css';
 
-const Login: React.FC<IBasePage> = ({ setPage, server, store }) => {
+const Login: React.FC<IBasePage> = ({ setPage }) => {
+
+    const server = useContext(ServerContext);
+    const mediator = useContext(MediatorContext);
 
     const [login, setLogin] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+
+    useEffect(() => {
+        if (!mediator) return;
+
+        const eventTypes = mediator.getEventTypes();
+
+        const handleLogin = () => {
+            setPage(PAGES.CHAT);
+        }
+
+        mediator.subscribe(eventTypes.LOGIN, handleLogin);
+
+        return () => {
+            mediator.unsubscribe(eventTypes.LOGIN, handleLogin);
+        }
+    }, [mediator, setPage]);
 
     const handleLogin = async (e: any) => {
         e.preventDefault();
@@ -22,6 +42,7 @@ const Login: React.FC<IBasePage> = ({ setPage, server, store }) => {
 
             <form onSubmit={handleLogin}>
                 <input
+                    id="testing-login-username"
                     type="text"
                     placeholder="Введите логин"
                     value={login}
@@ -30,6 +51,7 @@ const Login: React.FC<IBasePage> = ({ setPage, server, store }) => {
                 />
 
                 <input
+                    id="testing-login-password"
                     type="password"
                     placeholder="Введите пароль"
                     value={password}
@@ -37,12 +59,12 @@ const Login: React.FC<IBasePage> = ({ setPage, server, store }) => {
                     required
                 />
 
-                <button type="submit">
+                <button id="testing-login-submit" type="submit">
                     Войти
                 </button>
             </form>
 
-            <p className="login-switch" onClick={goToRegister}>
+            <p id="testing-login-switch-to-register" className="login-switch" onClick={goToRegister}>
                 Нет аккаунта? Зарегистрироваться
             </p>
         </div>
