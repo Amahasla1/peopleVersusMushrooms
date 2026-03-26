@@ -82,10 +82,8 @@ class Economy {
             x,
             y,
             guid: this.guid,
-            callbacks: {
-                checkAround: (x, y) => this.checkAroundMycelium(x, y),
-                extend: (x, y) => this.addMycelium(x, y),
-            },
+            map: this.map,
+            easyStar: this.easyStar
         });
         this.map[y][x] = 1;
         this.workers.push(worker);
