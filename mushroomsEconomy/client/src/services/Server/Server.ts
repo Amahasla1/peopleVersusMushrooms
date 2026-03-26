@@ -122,7 +122,8 @@ class Server {
                 name: 'user',
                 value: {
                     name: response.data.name,
-                    token: response.data.token
+                    token: response.data.token,
+                    guid: response.data.guid,
                 }
             });
 
@@ -135,13 +136,13 @@ class Server {
 
     private handleLogin(response: any) {
         if (response?.result === 'ok' && response.data) {
-            const { name, token } = response.data;
+            const { name, token, guid } = response.data;
             const { SET_STORE } = this.mediator.getTriggerTypes();
             const { LOGIN } = this.mediator.getEventTypes();
 
             this.mediator.get(SET_STORE, {
                 name: 'user',
-                value: { name, token }
+                value: { name, token, guid }
             });
 
             this.mediator.call(LOGIN);
