@@ -10,10 +10,7 @@ export type TUser = {
 export type TResponse<T> = {
     result: 'ok' | 'error';
     data?: T;
-    error?: {
-        code: number;
-        text: string;
-    }
+    error?: TError;
 }
 
 export type TError = {
@@ -40,3 +37,22 @@ export type TScene = {
 }
 
 export type TMessages = TMessage[];
+
+export type TLoginPayload = {
+    name: string;
+    passwordHash: string;
+};
+
+export type TLogoutPayload = {
+    name: string;
+    password: string;
+};
+
+export type TMessagePayload = {
+    author: string;
+    message: string;
+};
+
+export type TGetScenePayload = {
+    guid: string;
+};
