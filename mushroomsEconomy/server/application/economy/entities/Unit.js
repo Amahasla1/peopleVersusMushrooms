@@ -1,18 +1,63 @@
 class Unit {
-    constructor({ x, y, guid, callbacks, easystar }) {
+    constructor({ x, y, guid, map, easystar }) {
         this.x = x;
         this.y = y;
         this.guid = guid;
-        this.callbacks = callbacks;
         this.easystar = easystar;
+        this.map = map;
+        //Переменные которые обновятся в дочерних функциях
+        this.hp = 1;
+        this.speed = 1;
+
     }
 
     get() {
         return {
             x: this.x,
             y: this.y,
-            hp: this.hp
+            hp: this.hp,
+            guid: this.guid
         }
+    }
+
+    findPath(targetX, targetY) {
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        return new Promise((resolve) => {
+            const attemptFindPath = () => {
+                attempts++;
+
+                this.easystar.findPath(this.x, this.y, targetX, targetY, (path) => {
+                    if (path) {
+                        resolve(path);
+                    } else if (attempts < maxAttempts) {
+                        setTimeout(() => {
+                            attemptFindPath();
+                        }, 1000);
+                    } else {
+                        resolve(null);
+                    }
+                });
+                this.easystar.calculate();
+            };
+
+            attemptFindPath();
+        });
+    }
+
+    async moveTo(targetX, targetY) {
+        const path = await this.findPath(targetX, targetY);
+
+        if (!path) return false;
+
+        for (const point of path.slice(1)) {
+            this.x = point.x;
+            this.y = point.y;
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        return true;
     }
 }
 
