@@ -5,7 +5,7 @@ class Unit {
         this.guid = guid;
         this.easystar = easystar;
         this.map = map;
-        //Переменные которые обновятся в дочерних функциях
+        //Переменные которые обновятся в дочерних классах
         this.hp = 1;
         this.speed = 1;
 
