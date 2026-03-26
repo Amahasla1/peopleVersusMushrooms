@@ -1,7 +1,10 @@
+import { TPoint } from "../../config";
+
 export type TUser = {
     token: string;
     name: string;
     id?: number;
+    guid: string;
 }
 
 export type TResponse<T> = {
@@ -24,7 +27,15 @@ export type TMessage = {
     created: string;
 }
 
-export type TMap = {
+export type TMushroom = {
+    guid: string;
+    level: number;
+    coords: TPoint
+}
+
+export type TScene = {
+    guid: string;
+    mushrooms: TMushroom[];
     map: number[][];
 }
 

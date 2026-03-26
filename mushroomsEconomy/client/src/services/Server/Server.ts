@@ -1,8 +1,9 @@
 import { io, Socket } from "socket.io-client";
 import CONFIG from '../../config';
 import Mediator from '../Mediator/Mediator';
-import { TMap, TMessages, TResponse, TUser } from "../Server/types";
+import { TMessages, TResponse, TScene, TUser } from "../Server/types";
 import { TError } from "../Server/types";
+import md5 from 'md5';
 
 const { HOST } = CONFIG;
 
@@ -30,15 +31,7 @@ class Server {
         this.socket.on(CONFIG.SOCKET.MESSAGE, (data) => this.handleSendMessage(data));
         this.socket.on(CONFIG.SOCKET.MESSAGES, (data) => this.handleGetMessage(data));
         this.socket.on(CONFIG.SOCKET.NEW_MESSAGE, (data) => this.handleNewMessage(data));
-        this.socket.on(CONFIG.SOCKET.GET_MAP, (data) => this.handleGetMap(data));
-    }
-
-    requestMap(): void {
-        this.socket.emit(CONFIG.SOCKET.GET_MAP);
-    }
-
-    onGetMap(handler: (map: number[]) => void): void {
-        this.socket.on(CONFIG.SOCKET.GET_MAP, handler);
+        this.socket.on(CONFIG.SOCKET.GET_SCENE, (data) => this.handleGetScene(data));
     }
 
     sendMessage(message: string): void {
@@ -106,12 +99,14 @@ class Server {
     }
 
     async register(name: string, password: string): Promise<boolean> {
-        this.socket.emit(CONFIG.SOCKET.REGISTRATION, { name, password });
+        const passwordHash = md5(`${name}${password}`);
+        this.socket.emit(CONFIG.SOCKET.REGISTRATION, { name, passwordHash });
         return true;
     }
 
     login(name: string, password: string): void {
-        this.socket.emit(CONFIG.SOCKET.LOGIN, { name, password });
+        const passwordHash = md5(`${name}${password}`);
+        this.socket.emit(CONFIG.SOCKET.LOGIN, { name, passwordHash });
     }
 
     async logout(name: string, password: string): Promise<boolean> {
@@ -120,15 +115,19 @@ class Server {
     }
 
     private handleRegistration(response: any) {
-        if (response) {
+        if (response?.result === 'ok' && response.data) {
             const { SET_STORE } = this.mediator.getTriggerTypes();
+            const { REGISTRATION } = this.mediator.getEventTypes();
             this.mediator.get(SET_STORE, {
                 name: 'user',
                 value: {
                     name: response.data.name,
-                    token: response.data.token
+                    token: response.data.token,
+                    guid: response.data.guid,
                 }
             });
+
+            this.mediator.call(REGISTRATION);
         } else {
             const { SHOW_ERROR } = this.mediator.getEventTypes();
             this.mediator.call(SHOW_ERROR, response.error);
@@ -137,13 +136,13 @@ class Server {
 
     private handleLogin(response: any) {
         if (response?.result === 'ok' && response.data) {
-            const { name, token } = response.data;
+            const { name, token, guid } = response.data;
             const { SET_STORE } = this.mediator.getTriggerTypes();
             const { LOGIN } = this.mediator.getEventTypes();
 
             this.mediator.get(SET_STORE, {
                 name: 'user',
-                value: { name, token }
+                value: { name, token, guid }
             });
 
             this.mediator.call(LOGIN);
@@ -216,14 +215,24 @@ class Server {
         }
     }
 
-    handleGetMap(response: TResponse<TMap>) {
-        if (response?.result === 'ok') {
-            const { SET_MAP } = this.mediator.getTriggerTypes()
-            this.mediator.call(SET_MAP, response);
+    getScene(guid: string) {
+        const { GET_SCENE } = CONFIG.SOCKET;
+        this.socket.emit(GET_SCENE, { guid: guid });
+    }
+
+    handleGetScene(response: TResponse<TScene>): TScene | null {
+        console.log(response);
+        if (response?.result === 'ok' && response.data) {
+            return {
+                guid: response.data.guid,
+                mushrooms: response.data.mushrooms,
+                map: response.data.map
+            }
         }
         else {
             const { SHOW_ERROR } = this.mediator.getEventTypes();
             this.mediator.call(SHOW_ERROR, response.error);
+            return null
         }
     }
 }

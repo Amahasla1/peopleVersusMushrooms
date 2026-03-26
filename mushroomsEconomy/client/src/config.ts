@@ -34,7 +34,7 @@ const CONFIG = {
             // остальные триггеры
             MESSAGE: 'MESSAGE:SOCKET',
 
-            SET_MAP: "SET_MAP",
+            SET_SCENE: "SET_SCENE",
         }
     },
 
@@ -48,18 +48,18 @@ const CONFIG = {
         LOGIN: 'LOGIN',
         LOGOUT: 'LOGOUT',
 
-        GET_MAP: 'GET_MAP',
+        GET_SCENE: 'GET_SCENE',
     },
 
 
     GRAPHICS: {
-        MIN_ZOOM: 1,
-        MAX_ZOOM: 45,
+        MIN_ZOOM: 100,
+        MAX_ZOOM: 45000,
         ZOOM_FACTOR: 0.1,
 
         BORDER_PADDING: 2,
 
-        SPRITE_SIZE: 8, // размер спрайта в пикселях
+        SPRITE_SIZE: 16, // размер спрайта в пикселях
         LINE_OF_SPRITES: 110, // количество спрайтов в карте спрайтов
 
         WINDOW: {
