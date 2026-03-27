@@ -77,6 +77,18 @@ class Economy {
         }));
     }
 
+    addWorker(x, y) {
+        const worker = new Worker({
+            x,
+            y,
+            guid: this.guid,
+            map: this.map,
+            easyStar: this.easyStar
+        });
+        this.map[y][x] = 1;
+        this.workers.push(worker);
+    }
+
     destructor() {
         if (this.interval) {
             clearInterval(this.interval);
