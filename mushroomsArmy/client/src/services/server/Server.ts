@@ -2,9 +2,10 @@ import { io, Socket } from "socket.io-client";
 import CONFIG from '../../config';
 import Mediator from '../Mediator/Mediator';
 import { TResponse, TUser, TError } from './types';
+import { authStorage } from '../../utils/authStorage';
 
 const { HOST, SOCKET } = CONFIG;
-const { REGISTRATION, LOGIN, LOGOUT } = SOCKET;
+const { REGISTRATION, LOGIN, LOGOUT, VALIDATE_TOKEN } = SOCKET;
 
 class Server {
     mediator: Mediator;
@@ -22,6 +23,14 @@ class Server {
             this.socket.on(LOGOUT, (data) => this.handleLogout(data));
         });
     }
+
+    authValidate(token: string): Promise<any> {
+        return new Promise((resolve) => {
+            this.socket.once(VALIDATE_TOKEN, resolve);
+            this.socket.emit(VALIDATE_TOKEN, { token });
+        });
+    }
+
 
     register(username: string, password: string, passwordRepeat: string): void {
         this.socket.emit(REGISTRATION, {
@@ -59,11 +68,11 @@ class Server {
         if (response?.result === 'ok' && response.data) {
             const SET_STORE = this.mediator.getTriggerTypes().SET_STORE;
             const USER_REGISTERED = this.mediator.getEventTypes().USER_REGISTERED;
-            const ERROR = this.mediator.getEventTypes().ERROR;
             this.mediator.get(SET_STORE, {
                 name: 'user',
                 value: response.data
             });
+            authStorage.setAuth(response.data.token!, response.data);
             this.mediator.call(USER_REGISTERED, response.data);
             return;
         } 
@@ -81,7 +90,7 @@ class Server {
                 name: 'user',
                 value: response.data
             });
-
+            authStorage.setAuth(response.data.token!, response.data);
             this.mediator.call(LOGIN, response.data);
         } else {
             this.mediator.call(this.mediator.getEventTypes().ERROR, response.error);
