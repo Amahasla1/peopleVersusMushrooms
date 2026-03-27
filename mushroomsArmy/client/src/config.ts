@@ -20,6 +20,7 @@ const CONFIG = {
         REGISTRATION: 'registration',
         LOGIN: 'login',
         LOGOUT: 'logout',
+        VALIDATE_TOKEN: 'auth:validate',
     }
 };
 

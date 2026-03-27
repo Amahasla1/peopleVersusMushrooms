@@ -19,6 +19,7 @@ interface Config {
         REGISTRATION: string;
         LOGIN: string;
         LOGOUT: string;
+        VALIDATE_TOKEN: string;
     };
 }
 
@@ -44,7 +45,8 @@ const CONFIG: Config = {
     SOCKET: {
         REGISTRATION: 'registration',
         LOGIN: 'login',
-        LOGOUT: 'logout'
+        LOGOUT: 'logout',
+        VALIDATE_TOKEN: 'auth:validate'
     }
 };
 

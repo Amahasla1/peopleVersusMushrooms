@@ -29,17 +29,12 @@ useEffect(() => {
 
 
 
-    //привожу к any,тк метода в Server.ts еще нет
-    const serverAny = server as any;
-    const mediatorAny = mediator as any;
-
-    
-    serverAny.authValidate(token).then((response: any) => {
+    server.authValidate(token).then((response: any) => {
         if (response?.result === 'ok') {
-            mediatorAny.call('USER_LOGGED_IN', response.user); 
+            const SET_STORE = mediator.getTriggerTypes().SET_STORE;
+            mediator.get(SET_STORE, { name: 'user', value: response.data });
             setPage(PAGES.LOBBY);
-        } 
-        else {
+        } else {
             authStorage.clearAuth();
             setPage(PAGES.LOGIN);
         }

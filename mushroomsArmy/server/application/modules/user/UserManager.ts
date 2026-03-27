@@ -3,7 +3,7 @@ import BaseManager from '../BaseManager';
 import CONFIG from '../../../config';
 import User from './User';
 
-const { REGISTRATION, LOGIN, LOGOUT } = CONFIG.SOCKET;
+const { REGISTRATION, LOGIN, LOGOUT, VALIDATE_TOKEN } = CONFIG.SOCKET;
 
 interface UserManagerOptions {
     mediator: any;
@@ -26,6 +26,7 @@ class UserManager extends BaseManager {
             socket.on(REGISTRATION, (data) => this.socketRegistration(data, socket));
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
+            socket.on(VALIDATE_TOKEN, (data) => this.socketValidateToken(data, socket));
 
             socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
@@ -132,6 +133,28 @@ class UserManager extends BaseManager {
         }
 
         socket.emit(LOGOUT, this.answer.good(true));
+    }
+    private async socketValidateToken(data: any = {}, socket: Socket): Promise<void> {
+        const { token } = data;
+
+        if (!token) {
+            socket.emit(VALIDATE_TOKEN, this.answer.bad(13));
+            return;
+        }
+
+        const userData = await this.db.getUserByToken(token);
+
+        if (!userData) {
+            socket.emit(VALIDATE_TOKEN, this.answer.bad(10));
+            return;
+        }
+
+        socket.emit(VALIDATE_TOKEN, this.answer.good({
+            id: userData.id,
+            name: userData.name,
+            guid: userData.guid,
+            token: userData.token,
+        }));
     }
 }
 
