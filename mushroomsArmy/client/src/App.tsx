@@ -47,10 +47,15 @@ useEffect(() => {
 }, [server, mediator]);
 
 
-  return (
+return (
     <div className="App">
         <div className='app'>
-          <PageManager />
+          <PageManager 
+            page={page} 
+            setPage={setPage} 
+            mediator={mediator} 
+            server={server} 
+          />
         </div>
     </div>
   );
