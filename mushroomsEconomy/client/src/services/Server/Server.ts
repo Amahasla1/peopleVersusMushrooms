@@ -7,11 +7,7 @@ import {
     TScene, 
     TUser, 
     TError, 
-    TMessage,
-    TMessagePayload, 
-    TLoginPayload, 
-    TLogoutPayload, 
-    TGetScenePayload 
+    TMessage 
 } from "../Server/types";
 import md5 from 'md5';
 
@@ -42,14 +38,6 @@ class Server {
     private setupSocketListeners(): void {
         this.socket.on("connect", () => {
             console.log('connect');
-            
-            this.socket.removeAllListeners(CONFIG.SOCKET.REGISTRATION);
-            this.socket.removeAllListeners(CONFIG.SOCKET.LOGIN);
-            this.socket.removeAllListeners(CONFIG.SOCKET.LOGOUT);
-            this.socket.removeAllListeners(CONFIG.SOCKET.MESSAGE);
-            this.socket.removeAllListeners(CONFIG.SOCKET.MESSAGES);
-            this.socket.removeAllListeners(CONFIG.SOCKET.NEW_MESSAGE);
-            this.socket.removeAllListeners(CONFIG.SOCKET.GET_SCENE);
 
             this.socket.on(CONFIG.SOCKET.REGISTRATION, (data: TResponse<TUser>) => this.handleRegistration(data));
             this.socket.on(CONFIG.SOCKET.LOGIN, (data: TResponse<TUser>) => this.handleLogin(data));
@@ -70,14 +58,21 @@ class Server {
         return false;
     }
 
-    private request<T>(event: string, payload: object): Promise<TResponse<T> | null> {
+    private request(event: string, payload: object): Promise<TResponse<any> | null> {
         return new Promise((resolve) => {
             const timer = setTimeout(() => {
+                const timeoutError: TError = { code: 500, text: 'Request timeout' };
+
+                const errorResponse: TResponse<any> = {
+                    result: 'error',
+                    error: timeoutError
+                };
+
+                this.checkError(errorResponse);
                 resolve(null);
-                this.checkError({ result: 'error', error: { code: 500, text: 'Request timeout' }});
             }, 5000);
 
-            this.socket.emit(event, payload, (response: TResponse<T>) => {
+            this.socket.emit(event, payload, (response: TResponse<any>) => {
                 clearTimeout(timer);
                 this.checkError(response);
                 resolve(response);
@@ -85,12 +80,13 @@ class Server {
         });
     }
 
+
     public sendMessage(message: string): void {
         const { GET_STORE } = this.mediator.getTriggerTypes();
         const user = this.mediator.get<{ name: string; token: string } | null>(GET_STORE, 'user');
 
         if (user?.name) {
-            const payload: TMessagePayload = { author: user.name, message: message };
+            const payload = { author: user.name, message: message };
             this.socket.emit(CONFIG.SOCKET.MESSAGE, payload);
         }
     }
@@ -99,9 +95,9 @@ class Server {
         this.socket.emit(CONFIG.SOCKET.MESSAGES, {});
     }
 
-    public async register(name: string, password: string): Promise<boolean> {
+    public register(name: string, password: string) {
         const passwordHash = md5(`${name}${password}`);
-        const payload: TLoginPayload = { name, passwordHash };
+        const payload = { name, passwordHash };
         
         this.socket.emit(CONFIG.SOCKET.REGISTRATION, payload);
         return true;
@@ -109,18 +105,18 @@ class Server {
 
     public login(name: string, password: string): void {
         const passwordHash = md5(`${name}${password}`);
-        const payload: TLoginPayload = { name, passwordHash };
+        const payload = { name, passwordHash };
         this.socket.emit(CONFIG.SOCKET.LOGIN, payload);
     }
 
     public logout(name: string, password: string): void {
-        const payload: TLogoutPayload = { name, password };
+        const payload = { name, password };
         this.socket.emit(CONFIG.SOCKET.LOGOUT, payload);
     }
 
     public getScene(guid: string): void {
         const { GET_SCENE } = CONFIG.SOCKET;
-        const payload: TGetScenePayload = { guid };
+        const payload = { guid };
         this.socket.emit(GET_SCENE, payload);
     }
 

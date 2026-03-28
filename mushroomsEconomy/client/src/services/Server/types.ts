@@ -37,22 +37,3 @@ export type TScene = {
 }
 
 export type TMessages = TMessage[];
-
-export type TLoginPayload = {
-    name: string;
-    passwordHash: string;
-};
-
-export type TLogoutPayload = {
-    name: string;
-    password: string;
-};
-
-export type TMessagePayload = {
-    author: string;
-    message: string;
-};
-
-export type TGetScenePayload = {
-    guid: string;
-};
