@@ -40,20 +40,6 @@ class LobbyManager extends BaseManager {
         return this.users[socket.id];
     }
 
-    handleLogin(socket, data) {
-        if (!data || !data.name) return this.sendError(socket, 16);
-        
-        const user = { id: this.common.guid(), name: data.name, socketId: socket.id };
-        this.users[socket.id] = user;
-
-        const rooms = this._getPublicRooms();
-        
-        socket.emit('login_success', { 
-            user, 
-            rooms: rooms 
-        });
-    }
-
     handleCreateRoom(socket, data) {
         const user = this.getUser(socket);
         if (!user) return this.sendError(socket, 17);

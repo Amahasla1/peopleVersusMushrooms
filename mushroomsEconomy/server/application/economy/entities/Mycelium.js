@@ -25,7 +25,7 @@ class Mycelium {
 
     update() {
         if (!this.canGrow) {
-            return;
+            return false;
         }
         this.grow += GROW_SPEED;
         if (this.grow >= GROW_LEVEL_UP) {
@@ -33,6 +33,8 @@ class Mycelium {
             if (this.level < MAX_LEVEL) {
                 this.level += 1;
                 return true;
+            } else {
+                this.canGrow = false;
             }
         }
         return false;
@@ -42,7 +44,14 @@ class Mycelium {
         return POWER;
     }
 
-    checkAroundMycelium(x, y) {
+    checkAroundMycelium(map, mycelium) {
+        const n = map.length;
+        if (!n) return [];
+        const m = map[0].length;
+        if (!m) return [];
+
+        const x = this.x;
+        const y = this.y;
         const directions = [
             { dx: 0, dy: -1 },
             { dx: 0, dy: 1 },
@@ -53,11 +62,6 @@ class Mycelium {
             { dx: -1, dy: 1 },
             { dx: 1, dy: 1 },
         ];
-
-        const map = this.callbacks.getMap();
-        const mycelium = this.callbacks.getMycelium();
-        const n = map.length;
-        const m = map[0]?.length ?? 0;
 
         return directions
             .map(({ dx, dy }) => ({ x: x + dx, y: y + dy }))
@@ -70,19 +74,23 @@ class Mycelium {
     }
 
     // породить новую грибницу
-
     canExtend(map, mycelium, buildins, enemyBuildings) {
-        // могу вырасти или нет
-
-        const freeCells = this.checkAroundMycelium(this.x, this.y);
-        return freeCells.length > 0;
+        if (this.level >= MAX_LEVEL) {
+            // могу вырасти или нет
+            const freeCells = this.checkAroundMycelium(map, mycelium);
+            return freeCells.length > 0;
+        }
+        return false;
     }
 
-    extend() {
+    extend(map, mycelium, buildins, enemyBuildings) {
         this.grow = 0;
         this.level = 0;
-        const freeCells = this.checkAroundMycelium(this.x, this.y);
-        if (freeCells.length === 0) return null;
+        this.canGrow = true;
+        const freeCells = this.checkAroundMycelium(map, mycelium);
+        if (!freeCells.length) {
+            return null;
+        }
         const { x, y } = freeCells[Math.floor(Math.random() * freeCells.length)];
         return { x, y };
     }

@@ -83,7 +83,7 @@ class Economy {
 
     update() {
 
-        //console.log(this.mycelium.length);
+        console.log(this.mycelium.length);
 
         /****************/
         /* про грибницу */

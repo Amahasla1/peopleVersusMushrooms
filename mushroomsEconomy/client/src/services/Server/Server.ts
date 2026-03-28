@@ -47,8 +47,8 @@ class Server {
             this.socket.on(SOCKET.MESSAGE, (data: TResponse<{ message: string }>) => this.handleSendMessage(data));
             this.socket.on(SOCKET.MESSAGES, (data: TResponse<{ messages: TMessages }>) => this.handleGetMessage(data));
             this.socket.on(SOCKET.NEW_MESSAGE, (data: TResponse<TMessage>) => this.handleNewMessage(data));
-            this.socket.on(SOCKET.START_GAME, (data) => this.handleStartGame(data));
-            this.socket.on(SOCKET.UPDATE_SCENE, (data) => this.handleUpdateScene(data));
+            this.socket.on(SOCKET.START_GAME, (data: TResponse<TScene>) => this.handleStartGame(data));
+            this.socket.on(SOCKET.UPDATE_SCENE, (data: TResponse<TScene>) => this.handleUpdateScene(data));
         });
     }
 
@@ -210,21 +210,19 @@ class Server {
     }
 
     handleStartGame(data: TResponse<TScene>) {
-        const { SHOW_ERROR, START_GAME } = this.mediator.getEventTypes();
-        if (data?.result === 'ok' && data.data) {
-            this.mediator.call(START_GAME, data.data);
-            return;
-        }
-        this.mediator.call(SHOW_ERROR, data.error);
+        const { START_GAME } = this.mediator.getEventTypes();
+
+        if (this.checkError(data)) return;
+
+        this.mediator.call(START_GAME, data.data);
+        return
     }
 
     handleUpdateScene(data: TResponse<TScene>) {
-        const { SHOW_ERROR, UPDATE_SCENE } = this.mediator.getEventTypes();
-        if (data?.result === 'ok' && data.data) {
-            this.mediator.call(UPDATE_SCENE, data.data);
-            return;
-        }
-        this.mediator.call(SHOW_ERROR, data.error);
+        const { UPDATE_SCENE } = this.mediator.getEventTypes();
+        if (this.checkError(data)) return;
+        this.mediator.call(UPDATE_SCENE, data.data);
+        return;
     }
 
 }
