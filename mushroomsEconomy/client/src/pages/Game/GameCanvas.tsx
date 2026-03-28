@@ -2,10 +2,12 @@ import React, { useEffect, useContext } from 'react';
 import CONFIG from '../../config';
 import { GameContext } from '../../App';
 import { TPoint } from '../../config';
+import { TMushroom } from '../../services/Server/types';
 import Canvas from '../../services/Canvas/Canvas';
 import useCanvas from '../../services/Canvas/useCanvas';
 import useSprites from '../Hooks/useSprite';
 import TerrainBlock from '../../Game/Entities/TerrainBlock';
+import Mushroom from '../../Game/Entities/Mushroom';
 
 import "./Game.css";
 
@@ -39,22 +41,36 @@ const GameCanvas: React.FC = () => {
     const createTiles = (matrix: number[][]): TerrainBlock[] => {
         const tiles: TerrainBlock[] = [];
 
-        matrix.forEach((row, rowIndex) =>
-            row.forEach((cellId, colIndex) => {
-                const terrainType = cellId === 1 ? "grow" : "water";
-                const tileId = rowIndex * row.length + colIndex;
-                tiles.push(new TerrainBlock(tileId, { x: colIndex, y: rowIndex }, terrainType));
-            })
-        );
+
+        for (let rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
+            const row = matrix[rowIndex];
+            
+            for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                const position = { x: colIndex, y: rowIndex };
+                const tileType = matrix[rowIndex][colIndex];
+                
+                tiles.push(new TerrainBlock(position, tileType));
+            }
+        }
 
         return tiles;
     };
 
+    const createMushroomTiles = (mushrooms: TMushroom[]): Mushroom[] => {
+        const newMushrooms: Mushroom[] = [];
+
+        mushrooms.forEach( (mushroom) => {
+            newMushrooms.push(new Mushroom(mushroom.guid, mushroom.coords, mushroom.level))
+        })
+
+        return newMushrooms;
+    };
+
     const drawMap = () => {
         if (!canvas) return;
-
+        
         const { scene } = game.get();
-
+        
         if (!scene) return
 
         const tileWorldSize = INITIAL_WINDOW_WIDTH / scene.map.length;
@@ -77,6 +93,38 @@ const GameCanvas: React.FC = () => {
         });
     };
 
+    const drawMushrooms = () => {
+        if (!canvas) return;
+        
+        const { scene } = game.get();
+        
+        if (!scene) return
+
+        const tileWorldSize = INITIAL_WINDOW_WIDTH / scene.map.length;
+        const tileSizePx = canvas.dec(tileWorldSize);
+        const mushroomTiles = createMushroomTiles(scene.mushrooms);
+
+        mushroomTiles.forEach((mushroomTile) => {
+            const worldX = mushroomTile.coords.x * tileWorldSize;
+            const worldY = mushroomTile.coords.y * tileWorldSize;
+
+            mushroomTile.sprite.forEach((spriteId) => {
+                const [sx, sy, sSize] = getSprite(spriteId);
+                if (!canvas) return; //Без 2 проверки ругалось
+                canvas.contextV.drawImage(
+                    spritesImage,
+                    sx, sy, sSize, sSize,
+                    canvas.xs(worldX), canvas.ys(worldY), tileSizePx, tileSizePx
+                );
+            });
+        });
+    };
+
+    const drawScene = () => {
+        drawMap();
+        drawMushrooms();
+    }
+
     function render(FPS: number) {
         if (!canvas) return;
 
@@ -87,7 +135,7 @@ const GameCanvas: React.FC = () => {
         }
 
         canvas.clear();
-        drawMap();
+        drawScene();
         canvas.render();
     }
 

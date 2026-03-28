@@ -39,13 +39,16 @@ class Server {
         this.socket.on("connect", () => {
             console.log('connect');
 
-            this.socket.on(CONFIG.SOCKET.REGISTRATION, (data: TResponse<TUser>) => this.handleRegistration(data));
-            this.socket.on(CONFIG.SOCKET.LOGIN, (data: TResponse<TUser>) => this.handleLogin(data));
-            this.socket.on(CONFIG.SOCKET.LOGOUT, (data: TResponse<null>) => this.handleLogout(data));
-            this.socket.on(CONFIG.SOCKET.MESSAGE, (data: TResponse<{ message: string }>) => this.handleSendMessage(data));
-            this.socket.on(CONFIG.SOCKET.MESSAGES, (data: TResponse<{ messages: TMessages }>) => this.handleGetMessage(data));
-            this.socket.on(CONFIG.SOCKET.NEW_MESSAGE, (data: TResponse<TMessage>) => this.handleNewMessage(data));
-            this.socket.on(CONFIG.SOCKET.GET_SCENE, (data: TResponse<TScene>) => this.handleGetScene(data));
+            const { SOCKET } = CONFIG
+
+            this.socket.on(SOCKET.REGISTRATION, (data: TResponse<TUser>) => this.handleRegistration(data));
+            this.socket.on(SOCKET.LOGIN, (data: TResponse<TUser>) => this.handleLogin(data));
+            this.socket.on(SOCKET.LOGOUT, (data: TResponse<null>) => this.handleLogout(data));
+            this.socket.on(SOCKET.MESSAGE, (data: TResponse<{ message: string }>) => this.handleSendMessage(data));
+            this.socket.on(SOCKET.MESSAGES, (data: TResponse<{ messages: TMessages }>) => this.handleGetMessage(data));
+            this.socket.on(SOCKET.NEW_MESSAGE, (data: TResponse<TMessage>) => this.handleNewMessage(data));
+            this.socket.on(SOCKET.START_GAME, (data: TResponse<TScene>) => this.handleStartGame(data));
+            this.socket.on(SOCKET.UPDATE_SCENE, (data: TResponse<TScene>) => this.handleUpdateScene(data));
         });
     }
 
@@ -114,11 +117,6 @@ class Server {
         this.socket.emit(CONFIG.SOCKET.LOGOUT, payload);
     }
 
-    public getScene(guid: string): void {
-        const { GET_SCENE } = CONFIG.SOCKET;
-        const payload = { guid };
-        this.socket.emit(GET_SCENE, payload);
-    }
 
     private handleRegistration(response: TResponse<TUser>): void {
         if (this.checkError(response)) return;
@@ -211,20 +209,22 @@ class Server {
         }
     }
 
-    private handleGetScene(response: TResponse<TScene>): void {
-        if (this.checkError(response)) return;
+    handleStartGame(data: TResponse<TScene>) {
+        const { START_GAME } = this.mediator.getEventTypes();
 
-        if (response.data) {
-            const { SET_STORE } = this.mediator.getTriggerTypes();
-            
-            this.mediator.get(SET_STORE, {
-                name: 'scene',
-                value: response.data
-            });
-            
-            console.log('Scene loaded:', response.data);
-        }
+        if (this.checkError(data)) return;
+
+        this.mediator.call(START_GAME, data.data);
+        return
     }
+
+    handleUpdateScene(data: TResponse<TScene>) {
+        const { UPDATE_SCENE } = this.mediator.getEventTypes();
+        if (this.checkError(data)) return;
+        this.mediator.call(UPDATE_SCENE, data.data);
+        return;
+    }
+
 }
 
 export default Server;

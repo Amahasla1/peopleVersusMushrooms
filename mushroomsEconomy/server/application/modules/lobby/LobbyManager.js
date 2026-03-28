@@ -21,7 +21,6 @@ class LobbyManager extends BaseManager {
         io.on('connection', (socket) => {
             console.log(`LobbyManager: Client connected: ${socket.id}`);
 
-            socket.on(CONFIG.SOCKET.LOGIN, (data) => this.handleLogin(socket, data));
             socket.on(CONFIG.SOCKET.CREATE_ROOM, (data) => this.handleCreateRoom(socket, data));
             socket.on(CONFIG.SOCKET.JOIN_ROOM, (data) => this.handleJoinRoom(socket, data));
             socket.on(CONFIG.SOCKET.LEAVE_ROOM, (data) => this.handleLeaveRoom(socket, data));
@@ -39,20 +38,6 @@ class LobbyManager extends BaseManager {
 
     getUser(socket) { 
         return this.users[socket.id];
-    }
-
-    handleLogin(socket, data) {
-        if (!data || !data.name) return this.sendError(socket, 16);
-        
-        const user = { id: this.common.guid(), name: data.name, socketId: socket.id };
-        this.users[socket.id] = user;
-
-        const rooms = this._getPublicRooms();
-        
-        socket.emit('login_success', { 
-            user, 
-            rooms: rooms 
-        });
     }
 
     handleCreateRoom(socket, data) {
