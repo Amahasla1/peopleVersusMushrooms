@@ -3,7 +3,7 @@ import BaseManager from '../BaseManager';
 import CONFIG from '../../../config';
 import User from './User';
 
-const { REGISTRATION, LOGIN, LOGOUT, VALIDATE_TOKEN } = CONFIG.SOCKET;
+const { REGISTRATION, LOGIN, LOGOUT, LOBBY_START, VALIDATE_TOKEN } = CONFIG.SOCKET;
 
 interface UserManagerOptions {
     mediator: any;
@@ -26,6 +26,7 @@ class UserManager extends BaseManager {
             socket.on(REGISTRATION, (data) => this.socketRegistration(data, socket));
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
+            socket.on(LOBBY_START, (data) => this.socketLobbyStart(data, socket));
             socket.on(VALIDATE_TOKEN, (data) => this.socketValidateToken(data, socket));
 
             socket.on('disconnect', () => console.log('disconnect', socket.id));
@@ -134,6 +135,11 @@ class UserManager extends BaseManager {
 
         socket.emit(LOGOUT, this.answer.good(true));
     }
+
+    private async socketLobbyStart(data: any = {}, socket: Socket): Promise<void> {
+        socket.emit(LOBBY_START, this.answer.good(true));
+    }
+
     private async socketValidateToken(data: any = {}, socket: Socket): Promise<void> {
         const { token } = data;
 
@@ -142,19 +148,15 @@ class UserManager extends BaseManager {
             return;
         }
 
-        const userData = await this.db.getUserByToken(token);
+        const users = Object.values(this.users);
+        const user = users.find((item) => item.getSelf().token === token);
 
-        if (!userData) {
-            socket.emit(VALIDATE_TOKEN, this.answer.bad(10));
+        if (user) {
+            socket.emit(VALIDATE_TOKEN, this.answer.good(user.getSelf()));
             return;
         }
 
-        socket.emit(VALIDATE_TOKEN, this.answer.good({
-            id: userData.id,
-            name: userData.name,
-            guid: userData.guid,
-            token: userData.token,
-        }));
+        socket.emit(VALIDATE_TOKEN, this.answer.bad(10));
     }
 }
 

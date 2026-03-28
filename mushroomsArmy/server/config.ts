@@ -19,6 +19,7 @@ interface Config {
         REGISTRATION: string;
         LOGIN: string;
         LOGOUT: string;
+        LOBBY_START: string;
         VALIDATE_TOKEN: string;
     };
 }
@@ -46,6 +47,7 @@ const CONFIG: Config = {
         REGISTRATION: 'registration',
         LOGIN: 'login',
         LOGOUT: 'logout',
+        LOBBY_START: 'lobby:start',
         VALIDATE_TOKEN: 'auth:validate'
     }
 };

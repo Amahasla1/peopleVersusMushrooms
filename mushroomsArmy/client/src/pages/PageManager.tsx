@@ -16,6 +16,7 @@ export enum PAGES {
     REGISTRATION,
     CHAT,
     LOBBY,
+    GAME,
 }
 
 interface IPageManagerProps {
