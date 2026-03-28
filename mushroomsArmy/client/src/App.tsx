@@ -4,6 +4,7 @@ import { authStorage } from './utils/authStorage';
 import Mediator from './services/Mediator/Mediator';
 import Server from './services/server/Server';
 import CONFIG from './config'
+import useStore from './services/Store/useStore';
 
 //import PageManager from './pages/PageManager';
 
@@ -16,6 +17,7 @@ function App() {
   const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
 
   const mediator = useMemo(() => new Mediator(CONFIG.MEDIATOR), []);
+  useStore(mediator);
   const server = useMemo(() => new Server(mediator), [mediator]);
 
 

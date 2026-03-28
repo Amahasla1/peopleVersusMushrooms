@@ -8,6 +8,7 @@ const CONFIG = {
             USER_REGISTERED: 'USER_REGISTERED',
             USER_LOGGED_OUT: 'USER_LOGGED_OUT',
             LOGIN: 'LOGIN',
+            GAME_STARTED: 'GAME_STARTED',
         },
         TRIGGERS: {
             SET_STORE: 'SET_STORE',
@@ -20,6 +21,7 @@ const CONFIG = {
         REGISTRATION: 'registration',
         LOGIN: 'login',
         LOGOUT: 'logout',
+        LOBBY_START: 'lobby:start',
         VALIDATE_TOKEN: 'auth:validate',
     }
 };
