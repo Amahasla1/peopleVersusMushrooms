@@ -31,7 +31,7 @@ class Server {
         this.socket.on(CONFIG.SOCKET.MESSAGE, (data) => this.handleSendMessage(data));
         this.socket.on(CONFIG.SOCKET.MESSAGES, (data) => this.handleGetMessage(data));
         this.socket.on(CONFIG.SOCKET.NEW_MESSAGE, (data) => this.handleNewMessage(data));
-        this.socket.on(CONFIG.SOCKET.GET_SCENE, (data) => this.handleGetScene(data));
+        this.socket.on(CONFIG.SOCKET.UPDATE_SCENE, (data) => this.handleGetScene(data));
     }
 
     sendMessage(message: string): void {
@@ -215,10 +215,6 @@ class Server {
         }
     }
 
-    getScene(guid: string) {
-        const { GET_SCENE } = CONFIG.SOCKET;
-        this.socket.emit(GET_SCENE, { guid: guid });
-    }
 
     handleGetScene(response: TResponse<TScene>): TScene | null {
         console.log(response);

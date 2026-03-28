@@ -20,8 +20,6 @@ const CONFIG = {
             SHOW_ERROR: 'SHOW_ERROR',
             SHOW_POPUP: 'SHOW_POPUP',
             // остальные события
-            LOGIN: 'LOGIN',
-            NEW_MESSAGE: 'NEW_MESSAGE',
             MESSAGE_LOADED: 'MESSAGE_LOADED',
             MESSAGE_SENT: 'MESSAGE_SEND',
         },
@@ -34,7 +32,6 @@ const CONFIG = {
             // остальные триггеры
             MESSAGE: 'MESSAGE:SOCKET',
 
-            SET_SCENE: "SET_SCENE",
         }
     },
 
@@ -42,13 +39,22 @@ const CONFIG = {
         MESSAGE: 'MESSAGE',  // шлет сообщение
         MESSAGES: 'MESSAGES',
         NEW_MESSAGE: 'NEW_MESSAGE',
-        TYPING: 'TYPING',    // печатает
+        TYPING: 'TYPING',           // печатает
 
         REGISTRATION: 'REGISTRATION',
         LOGIN: 'LOGIN',
         LOGOUT: 'LOGOUT',
 
-        GET_SCENE: 'GET_SCENE',
+        CREATE_ROOM: 'CREATE_ROOM',
+        DELETE_ROOM: 'DELETE_ROOM',
+        JOIN_ROOM: 'JOIN_ROOM',
+        LEAVE_ROOM: 'LEAVE_ROOM',
+        KICK_USER: 'KICK_USER',
+        DROP_FROM_ROOM: 'DROP_FROM_ROOM',
+        GET_ROOMS: 'GET_ROOMS',
+ 
+        START_GAME: 'START_GAME',
+		UPDATE_SCENE: 'UPDATE_SCENE',
     },
 
 
