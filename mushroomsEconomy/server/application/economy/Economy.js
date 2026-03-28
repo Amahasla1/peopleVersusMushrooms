@@ -30,7 +30,7 @@ class Economy {
         //...
 
         /* УДОЛИ МЕНЯ */
-        this.addMycelium(50, 49);
+        this.addMycelium(49, 49);
         /**************/
 
         // start game proccess
@@ -83,7 +83,7 @@ class Economy {
 
     update() {
 
-        console.log(this.mycelium.length);
+        //console.log(this.mycelium.length);
 
         /****************/
         /* про грибницу */

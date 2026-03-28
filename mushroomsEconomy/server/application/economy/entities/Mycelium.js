@@ -10,7 +10,7 @@ class Mycelium {
         this.callbacks = callbacks;
 
         this.hp = HP;
-        this.level = 0; // уровень выросших грибочков
+        this.level = 1; // уровень выросших грибочков
         this.grow = 0; // скорость роста
         this.canGrow = true; // может ли расти грибница (не стоит ли на ней здание)
     }
@@ -85,7 +85,7 @@ class Mycelium {
 
     extend(map, mycelium, buildins, enemyBuildings) {
         this.grow = 0;
-        this.level = 0;
+        this.level = 1;
         this.canGrow = true;
         const freeCells = this.checkAroundMycelium(map, mycelium);
         if (!freeCells.length) {

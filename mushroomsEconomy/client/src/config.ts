@@ -65,14 +65,20 @@ const CONFIG = {
 
         BORDER_PADDING: 2,
 
-        SPRITE_SIZE: 16, // размер спрайта в пикселях
-        LINE_OF_SPRITES: 110, // количество спрайтов в карте спрайтов
+        SPRITE_SIZE: 32, // размер спрайта в пикселях
+        LINE_OF_SPRITES: 32, // количество ЛИНИЙ спрайтов в карте спрайтов
 
         WINDOW: {
             LEFT: 0,
             TOP: 0,
             HEIGHT: 700,
             WIDTH: 700,
+        },
+
+        MAP: {
+            GRASS: 0,
+            WATER: 1,
+            STONE: 2,
         },
     },
 

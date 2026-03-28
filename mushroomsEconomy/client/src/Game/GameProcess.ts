@@ -35,6 +35,7 @@ export default class GameProcess {
     }
 
     updateScene(data: TScene): void {
-        console.log('update!', data);
+        this.scene = data;
+        //console.log('update!', data);
     }
 }
