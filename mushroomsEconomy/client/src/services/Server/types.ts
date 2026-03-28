@@ -10,10 +10,7 @@ export type TUser = {
 export type TResponse<T> = {
     result: 'ok' | 'error';
     data?: T;
-    error?: {
-        code: number;
-        text: string;
-    }
+    error?: TError;
 }
 
 export type TError = {
