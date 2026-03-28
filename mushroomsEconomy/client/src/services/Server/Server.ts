@@ -39,12 +39,16 @@ class Server {
         this.socket.on("connect", () => {
             console.log('connect');
 
-            this.socket.on(CONFIG.SOCKET.REGISTRATION, (data: TResponse<TUser>) => this.handleRegistration(data));
-            this.socket.on(CONFIG.SOCKET.LOGIN, (data: TResponse<TUser>) => this.handleLogin(data));
-            this.socket.on(CONFIG.SOCKET.LOGOUT, (data: TResponse<null>) => this.handleLogout(data));
-            this.socket.on(CONFIG.SOCKET.MESSAGE, (data: TResponse<{ message: string }>) => this.handleSendMessage(data));
-            this.socket.on(CONFIG.SOCKET.MESSAGES, (data: TResponse<{ messages: TMessages }>) => this.handleGetMessage(data));
-            this.socket.on(CONFIG.SOCKET.NEW_MESSAGE, (data: TResponse<TMessage>) => this.handleNewMessage(data));
+            const { SOCKET } = CONFIG
+
+            this.socket.on(SOCKET.REGISTRATION, (data: TResponse<TUser>) => this.handleRegistration(data));
+            this.socket.on(SOCKET.LOGIN, (data: TResponse<TUser>) => this.handleLogin(data));
+            this.socket.on(SOCKET.LOGOUT, (data: TResponse<null>) => this.handleLogout(data));
+            this.socket.on(SOCKET.MESSAGE, (data: TResponse<{ message: string }>) => this.handleSendMessage(data));
+            this.socket.on(SOCKET.MESSAGES, (data: TResponse<{ messages: TMessages }>) => this.handleGetMessage(data));
+            this.socket.on(SOCKET.NEW_MESSAGE, (data: TResponse<TMessage>) => this.handleNewMessage(data));
+            this.socket.on(SOCKET.START_GAME, (data) => this.handleStartGame(data));
+            this.socket.on(SOCKET.UPDATE_SCENE, (data) => this.handleUpdateScene(data));
         });
     }
 
@@ -205,20 +209,24 @@ class Server {
         }
     }
 
-    private handleGetScene(response: TResponse<TScene>): void {
-        if (this.checkError(response)) return;
-
-        if (response.data) {
-            const { SET_STORE } = this.mediator.getTriggerTypes();
-            
-            this.mediator.get(SET_STORE, {
-                name: 'scene',
-                value: response.data
-            });
-            
-            console.log('Scene loaded:', response.data);
+    handleStartGame(data: TResponse<TScene>) {
+        const { SHOW_ERROR, START_GAME } = this.mediator.getEventTypes();
+        if (data?.result === 'ok' && data.data) {
+            this.mediator.call(START_GAME, data.data);
+            return;
         }
+        this.mediator.call(SHOW_ERROR, data.error);
     }
+
+    handleUpdateScene(data: TResponse<TScene>) {
+        const { SHOW_ERROR, UPDATE_SCENE } = this.mediator.getEventTypes();
+        if (data?.result === 'ok' && data.data) {
+            this.mediator.call(UPDATE_SCENE, data.data);
+            return;
+        }
+        this.mediator.call(SHOW_ERROR, data.error);
+    }
+
 }
 
 export default Server;
