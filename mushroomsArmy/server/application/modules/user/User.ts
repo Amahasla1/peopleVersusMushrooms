@@ -76,6 +76,15 @@ class User {
         };
     }
 
+    toClient(): { id?: number; guid?: string; name?: string; token?: string } {
+        return {
+            id: this.id,
+            guid: this.guid,
+            name: this.name,
+            token: this.token
+        };
+    }
+
     isLogin(): boolean {
         return !!(this.socketId && this.token);
     }
@@ -88,17 +97,21 @@ class User {
 
         if (userData.password_hash === passwordHash) {
             const newToken = this.generateToken();
+            const expiresInMinutes = 1440;
 
             if (userData.id) {
-                await this.db.updateToken(userData.id, newToken);
+                await this.db.updateToken(userData.id, newToken, expiresInMinutes);
             }
+
+            const expirationDate = new Date();
+            expirationDate.setMinutes(expirationDate.getMinutes() + expiresInMinutes);
             
             this.id = userData.id;
             this.guid = userData.guid;
             this.name = userData.name;
             this.passwordHash = userData.password_hash;
             this.token = newToken;
-            this.token_expiration = userData.token_expiration;
+            this.token_expiration = expirationDate.toISOString();
 
             return this;
         }
@@ -106,10 +119,12 @@ class User {
         return null;
     }
 
-    logout(): void {
-         if (this.id){
-            this.db.invalidateToken(this.id);
+    async logout(): Promise<void> {
+        if (this.id) {
+            await this.db.invalidateToken(this.id);
         }
+        this.token = undefined;
+        this.token_expiration = undefined;
     }
 
     async registration(name: string, password: string): Promise<User> {
@@ -117,7 +132,7 @@ class User {
         const token = this.generateToken();
         const guid = this.common.guid();
 
-        const result = await this.db.registration(name, guid, passwordHash, token);    
+        const result = await this.db.registration(name, guid, passwordHash, token);
 
         if (result) {
             this.id = result.id;
@@ -126,7 +141,7 @@ class User {
             this.passwordHash = passwordHash;
             this.token = token;
 
-             if(this.id){
+            if (this.id) {
                 await this.db.updateToken(this.id, token);
             }
         }

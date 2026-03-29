@@ -88,7 +88,7 @@ class UserManager extends BaseManager {
         await user.registration(name, password);
         this.users[user.getSelf().guid!] = user;
 
-        socket.emit(REGISTRATION, this.answer.good(user.getSelf()));
+        socket.emit(REGISTRATION, this.answer.good(user.toClient()));
     }
 
     private async socketLogin(data: any = {}, socket: Socket): Promise<void> {
@@ -112,7 +112,7 @@ class UserManager extends BaseManager {
         const user = new User({ db: this.db, common: this.common, socketId: socket.id });
         if (await user.login(name, password)) {
             this.users[user.getSelf().guid!] = user;
-            socket.emit(LOGIN, this.answer.good(user.getSelf()));
+            socket.emit(LOGIN, this.answer.good(user.toClient()));
             return;
         }
 
@@ -129,7 +129,7 @@ class UserManager extends BaseManager {
 
         const user = this.users[guid];
         if (user) {
-            user.logout();
+            await user.logout();
             delete this.users[user.getSelf().guid!];
         }
 
@@ -148,11 +148,22 @@ class UserManager extends BaseManager {
             return;
         }
 
-        const users = Object.values(this.users);
-        const user = users.find((item) => item.getSelf().token === token);
+        // Сначала проверяем в памяти
+        const cachedUser = Object.values(this.users).find((item) => item.getSelf().token === token);
+        if (cachedUser) {
+            socket.emit(VALIDATE_TOKEN, this.answer.good(cachedUser.toClient()));
+            return;
+        }
 
-        if (user) {
-            socket.emit(VALIDATE_TOKEN, this.answer.good(user.getSelf()));
+        // Если нет в памяти — восстанавливаем из БД (например, после перезагрузки страницы)
+        const userData = await this.db.getUserByValidToken(token);
+        if (userData) {
+            const user = User.restoreFromData(
+                { db: this.db, common: this.common, socketId: socket.id },
+                userData as any
+            );
+            this.users[user.getSelf().guid!] = user;
+            socket.emit(VALIDATE_TOKEN, this.answer.good(user.toClient()));
             return;
         }
 
