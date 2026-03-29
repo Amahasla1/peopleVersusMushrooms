@@ -11,6 +11,7 @@ interface User {
     guid: string;
     password_hash: string;
     token?: string;
+    token_expiration?: string;
     created_at?: string;
 }
 
@@ -34,6 +35,7 @@ class DB {
                 guid TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL,
                 token TEXT UNIQUE,
+                token_expiration DATETIME,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `;
@@ -62,8 +64,32 @@ class DB {
         return await this.orm.insert('users', ['name', 'guid', 'password_hash', 'token'], [name, guid, passwordHash, token]);
     }
 
-    async updateToken(id: number, token: string): Promise<any> {
-        return await this.orm.update('users', ['token'], [token], { id });
+    async updateToken(id: number, token: string, expiresInMinutes: number = 1440): Promise<any> {
+        const expirationDate = new Date();
+        expirationDate.setMinutes(expirationDate.getMinutes() + expiresInMinutes);
+        const tokenExpiration = expirationDate.toISOString();
+        
+        return await this.orm.update('users', ['token', 'token_expiration'], [token, tokenExpiration], { id });
+    }
+
+    async invalidateToken(id: number): Promise<any>{
+        return await this.orm.update('users', ['token', 'token_expiration'], [undefined, undefined], { id });
+    }
+
+    async getUserByValidToken(token: string): Promise<User | null> {
+        const user = await this.getUserByToken(token);
+        
+        if (user && user.token_expiration) {
+  
+            const currentTime = new Date();
+            const expirationTime = new Date(user.token_expiration);
+            
+            if (expirationTime > currentTime) {
+                return user;
+            }
+            
+        }
+        return null;
     }
 
     destructor(): void {
