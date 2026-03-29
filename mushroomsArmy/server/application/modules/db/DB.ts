@@ -92,6 +92,23 @@ class DB {
         return null;
     }
 
+    static async restoreFromData(userData: User): Promise<User> {
+        const restoredUser = new User({
+            db: userData.db,
+            common: userData.common,
+            socketId: userData.socketId
+        });
+        
+        restoredUser.id = userData.id;
+        restoredUser.guid = userData.guid;
+        restoredUser.name = userData.name;
+        restoredUser.passwordHash = userData.passwordHash;
+        restoredUser.token = userData.token;
+        restoredUser.token_expiration = userData.token_expiration;
+        
+        return restoredUser;
+    }
+
     destructor(): void {
         this.db.close();
     }
