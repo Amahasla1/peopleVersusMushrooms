@@ -14,6 +14,7 @@ interface UserData {
     name?: string;
     passwordHash?: string;
     token?: string;
+    token_expiration?: string;
 }
 
 class User {
@@ -26,6 +27,7 @@ class User {
     private name?: string;
     private passwordHash?: string;
     private token?: string;
+    private token_expiration?: string;
 
     constructor({ db, common, socketId }: UserConstructorOptions) {
         this.db = db;
@@ -37,6 +39,7 @@ class User {
         this.name = undefined;
         this.passwordHash = undefined;
         this.token = undefined;
+        this.token_expiration = undefined;
     }
 
     async get(): Promise<{ name?: string; guid?: string }> {
@@ -55,7 +58,8 @@ class User {
             guid: this.guid,
             name: this.name,
             passwordHash: this.passwordHash,
-            token: this.token
+            token: this.token,
+            token_expiration: this.token_expiration
         };
     }
 
@@ -70,11 +74,18 @@ class User {
         const passwordHash = this.hashPassword(password);
 
         if (userData.password_hash === passwordHash) {
+            const newToken = this.generateToken();
+
+            if (userData.id) {
+                await this.db.updateToken(userData.id, newToken);
+            }
+            
             this.id = userData.id;
             this.guid = userData.guid;
             this.name = userData.name;
             this.passwordHash = userData.password_hash;
-            this.token = userData.token;
+            this.token = newToken;
+            this.token_expiration = userData.token_expiration;
 
             return this;
         }
@@ -83,7 +94,9 @@ class User {
     }
 
     logout(): void {
-        this.token = undefined;
+         if (this.id){
+            this.db.invalidateToken(this.id);
+        }
     }
 
     async registration(name: string, password: string): Promise<User> {
@@ -91,7 +104,7 @@ class User {
         const token = this.generateToken();
         const guid = this.common.guid();
 
-        const result = await this.db.registration(name, guid, passwordHash, token);
+        const result = await this.db.registration(name, guid, passwordHash, token);    
 
         if (result) {
             this.id = result.id;
@@ -99,6 +112,10 @@ class User {
             this.name = name;
             this.passwordHash = passwordHash;
             this.token = token;
+
+             if(this.id){
+                await this.db.updateToken(this.id, token);
+            }
         }
 
         return this;
