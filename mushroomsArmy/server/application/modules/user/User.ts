@@ -14,6 +14,7 @@ interface UserData {
     name?: string;
     passwordHash?: string;
     token?: string;
+    token_expiration?: string;
 }
 
 class User {
@@ -26,6 +27,7 @@ class User {
     private name?: string;
     private passwordHash?: string;
     private token?: string;
+    private token_expiration?: string;
 
     constructor({ db, common, socketId }: UserConstructorOptions) {
         this.db = db;
@@ -37,6 +39,20 @@ class User {
         this.name = undefined;
         this.passwordHash = undefined;
         this.token = undefined;
+        this.token_expiration = undefined;
+    }
+
+    static restoreFromData({db, common, socketId }:UserConstructorOptions, userData: User): User {
+        const user = new User({db, common, socketId });
+        
+        user.id = userData.id;
+        user.guid = userData.guid;
+        user.name = userData.name;
+        user.passwordHash = userData.passwordHash;
+        user.token = userData.token;
+        user.token_expiration = userData.token_expiration;
+
+        return user;
     }
 
     async get(): Promise<{ name?: string; guid?: string }> {
@@ -55,6 +71,16 @@ class User {
             guid: this.guid,
             name: this.name,
             passwordHash: this.passwordHash,
+            token: this.token,
+            token_expiration: this.token_expiration
+        };
+    }
+
+    toClient(): { id?: number; guid?: string; name?: string; token?: string } {
+        return {
+            id: this.id,
+            guid: this.guid,
+            name: this.name,
             token: this.token
         };
     }
@@ -70,11 +96,22 @@ class User {
         const passwordHash = this.hashPassword(password);
 
         if (userData.password_hash === passwordHash) {
+            const newToken = this.generateToken();
+            const expiresInMinutes = 1440;
+
+            if (userData.id) {
+                await this.db.updateToken(userData.id, newToken, expiresInMinutes);
+            }
+
+            const expirationDate = new Date();
+            expirationDate.setMinutes(expirationDate.getMinutes() + expiresInMinutes);
+            
             this.id = userData.id;
             this.guid = userData.guid;
             this.name = userData.name;
             this.passwordHash = userData.password_hash;
-            this.token = userData.token;
+            this.token = newToken;
+            this.token_expiration = expirationDate.toISOString();
 
             return this;
         }
@@ -82,8 +119,12 @@ class User {
         return null;
     }
 
-    logout(): void {
+    async logout(): Promise<void> {
+        if (this.id) {
+            await this.db.invalidateToken(this.id);
+        }
         this.token = undefined;
+        this.token_expiration = undefined;
     }
 
     async registration(name: string, password: string): Promise<User> {
@@ -99,6 +140,10 @@ class User {
             this.name = name;
             this.passwordHash = passwordHash;
             this.token = token;
+
+            if (this.id) {
+                await this.db.updateToken(this.id, token);
+            }
         }
 
         return this;
