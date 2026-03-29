@@ -92,21 +92,15 @@ class DB {
         return null;
     }
 
-    static async restoreFromData(userData: User): Promise<User> {
-        const restoredUser = new User({
-            db: userData.db,
-            common: userData.common,
-            socketId: userData.socketId
-        });
-        
-        restoredUser.id = userData.id;
-        restoredUser.guid = userData.guid;
-        restoredUser.name = userData.name;
-        restoredUser.passwordHash = userData.passwordHash;
-        restoredUser.token = userData.token;
-        restoredUser.token_expiration = userData.token_expiration;
-        
-        return restoredUser;
+        static async restoreFromData(userData: User): Promise<User> {
+        return {
+            id: userData.id,
+            guid: userData.guid,
+            name: userData.name,
+            password_hash: userData.password_hash, 
+            token: userData.token,
+            token_expiration: userData.token_expiration
+        };
     }
 
     destructor(): void {
