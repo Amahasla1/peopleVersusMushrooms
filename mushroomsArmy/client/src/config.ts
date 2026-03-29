@@ -9,6 +9,8 @@ const CONFIG = {
             USER_LOGGED_OUT: 'USER_LOGGED_OUT',
             LOGIN: 'LOGIN',
             GAME_STARTED: 'GAME_STARTED',
+            GAME_STATE_UPDATED: 'GAME_STATE_UPDATED',
+            GAME_OVER: 'GAME_OVER',
         },
         TRIGGERS: {
             SET_STORE: 'SET_STORE',
@@ -23,6 +25,8 @@ const CONFIG = {
         LOGOUT: 'logout',
         LOBBY_START: 'lobby:start',
         VALIDATE_TOKEN: 'auth:validate',
+        GAME_STATE: 'game:state',
+        GAME_OVER: 'game:over',
     }
 };
 
