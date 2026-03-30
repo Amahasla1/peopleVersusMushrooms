@@ -9,17 +9,13 @@ interface Config {
     };
     MEDIATOR: {
         EVENTS: {
-            GAME_START: string;  // payload: { userId: string }
-            ARMY_UPDATE: string;  //  payload: { armyGuid: string, units: Unit[] }
-            GAME_TICK: string;  // payload: { tick: number, timestamp: number, deltaTime: number }
-            UNIT_DIED: string;  // payload: { unitId: string, armyGuid: string}
-            UNIT_EXPLODED: string; // payload: { unitId: string, position: {x: number, y:number } }
+            START_GAME: string;  // payload: { guid: string, map: number[][], buildings: any[] }
+            ARMY_UPDATE: string;  // payload: { armyGuid: string, units: Unit[] }
+            UNIT_DIED: string;  // payload: { unitId: string, armyGuid: string }
+            UNIT_EXPLODED: string; // payload: { unitId: string, position: {x: number, y: number} }
         };
         TRIGGERS: {
-            GET_USER_BY_GUID: string; // payload: { userGuid: string } -> returns: User 
-            GET_MAP_DATA: string;  // payload: { mapId: string } -> returns: MapData
-            GET_ARMY_BY_GUID: string; //payload: { armyGuid: string } -> returns: Army 
-
+            GET_USER_BY_GUID: string; // payload: guid -> returns: User
         };
     };
     SOCKET: {
@@ -46,16 +42,13 @@ const CONFIG: Config = {
 
     MEDIATOR: {
         EVENTS: {
-            GAME_START: 'GAME_START',
+            START_GAME: 'START_GAME',
             ARMY_UPDATE: 'ARMY_UPDATE',
-            GAME_TICK: 'GAME_TICK',
             UNIT_DIED: 'UNIT_DIED',
             UNIT_EXPLODED: 'UNIT_EXPLODED'
         },
         TRIGGERS: {
-            GET_USER_BY_GUID:  'GET_USER_BY_GUID',
-            GET_MAP_DATA:  'GET_MAP_DATA',
-            GET_ARMY_BY_GUID:  'GET_ARMY_BY_GUID',
+            GET_USER_BY_GUID: 'GET_USER_BY_GUID',
         },
     },
     SOCKET: {
