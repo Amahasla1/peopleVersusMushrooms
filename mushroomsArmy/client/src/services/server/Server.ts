@@ -17,14 +17,14 @@ class Server {
 
         this.socket.on("connect", () => {
             console.log(`[Server] Подключено к серверу ${HOST}`);
-
-            this.socket.on(REGISTRATION, (data) => this.handleRegistration(data));
-            this.socket.on(LOGIN, (data) => this.handleLogin(data));
-            this.socket.on(LOGOUT, (data) => this.handleLogout(data));
-            this.socket.on(LOBBY_START, (data) => this.handleLobbyStart(data));
-            this.socket.on(GAME_STATE, (data) => this.handleGameState(data));
-            this.socket.on(GAME_OVER, (data) => this.handleGameOver(data));
         });
+
+        this.socket.on(REGISTRATION, (data) => this.handleRegistration(data));
+        this.socket.on(LOGIN, (data) => this.handleLogin(data));
+        this.socket.on(LOGOUT, (data) => this.handleLogout(data));
+        this.socket.on(LOBBY_START, (data) => this.handleLobbyStart(data));
+        this.socket.on(GAME_STATE, (data) => this.handleGameState(data));
+        this.socket.on(GAME_OVER, (data) => this.handleGameOver(data));
     }
 
     register(username: string, password: string, passwordRepeat: string): void {
