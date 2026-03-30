@@ -49,3 +49,32 @@ export type TLogoutData = {
     token: string;
     guid: string;
 }
+
+//Юнит на карте
+
+export type TUnit = {
+    guid: string;
+    type: string;
+    x: number;
+    y: number;
+    hp: number;
+    maxHp: number;
+    isAlive: boolean;
+}
+
+// Лужа слайма
+export type TSlimePool = {
+    x: number;
+    y: number;
+    radius: number;
+    ttl: number;
+}
+
+// Карта — матрица 50x50 (0=равнина, 1=вода, 2=горы, null=неизвестно)
+export type TMapData = (number | null)[][];
+
+// Состояние армии (приходит каждые 200мс через game:state)
+export type TArmyState = {
+    units: TUnit[];
+    slimePools: TSlimePool[];
+}
