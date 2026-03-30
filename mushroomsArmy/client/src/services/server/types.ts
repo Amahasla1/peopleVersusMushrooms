@@ -49,3 +49,40 @@ export type TLogoutData = {
     token: string;
     guid: string;
 }
+
+//Юнит на карте
+
+export type TUnit = {
+    guid: string;
+    type: string;
+    x: number;
+    y: number;
+    hp: number;
+    maxHp: number;
+    isAlive: boolean;
+}
+
+// Лужа слайма
+export type TSlimePool = {
+    x: number;
+    y: number;
+    radius: number;
+    ttl: number;
+}
+
+//Данные карты
+
+export type TMapData = {
+    grid: number[][];
+    width: number;
+    height: number;
+    cellSize: number;
+    center: { x: number; y: number };
+}
+
+// Снимок состояния игры
+export type TGameState = {
+    units: TUnit[];
+    slimePools: TSlimePool[];
+    mapData: TMapData;
+}

@@ -1,11 +1,11 @@
 import { io, Socket } from "socket.io-client";
 import CONFIG from '../../config';
 import Mediator from '../Mediator/Mediator';
-import { TResponse, TUser } from './types';
+import { TGameState, TResponse, TUser } from './types';
 import { authStorage } from '../../utils/authStorage';
 
 const { HOST, SOCKET } = CONFIG;
-const { REGISTRATION, LOGIN, LOGOUT, LOBBY_START, VALIDATE_TOKEN } = SOCKET;
+const { REGISTRATION, LOGIN, LOGOUT, LOBBY_START, VALIDATE_TOKEN, GAME_STATE, GAME_OVER } = SOCKET;
 
 class Server {
     mediator: Mediator;
@@ -22,6 +22,8 @@ class Server {
             this.socket.on(LOGIN, (data) => this.handleLogin(data));
             this.socket.on(LOGOUT, (data) => this.handleLogout(data));
             this.socket.on(LOBBY_START, (data) => this.handleLobbyStart(data));
+            this.socket.on(GAME_STATE, (data) => this.handleGameState(data));
+            this.socket.on(GAME_OVER, (data) => this.handleGameOver(data));
         });
     }
 
@@ -141,6 +143,16 @@ class Server {
         } else {
             this.mediator.call(this.mediator.getEventTypes().ERROR, response.error);
         }
+    }
+
+    private handleGameState(data: TGameState) {
+        const GAME_STATE_UPDATED = this.mediator.getEventTypes().GAME_STATE_UPDATED;
+        this.mediator.call(GAME_STATE_UPDATED, data);
+    }
+
+    private handleGameOver(data: any) {
+        const GAME_OVER_EVENT = this.mediator.getEventTypes().GAME_OVER;
+        this.mediator.call(GAME_OVER_EVENT, data);
     }
 }
 
