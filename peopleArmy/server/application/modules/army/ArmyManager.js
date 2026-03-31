@@ -55,8 +55,8 @@ class ArmyManager extends BaseManager {
 
         // Проверяем залогиненность юзера (isLogin)
         const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid);
-        if (!user || !user.isLogin) {
-            return { ok: false, error: 'USER_NOT_LOGGED_IN' };
+        if (!user || !user?.isLogin()) {
+            return { ok: false, error: 'USER_NOT_LOGGED_IN '};
         }
 
         // Проверяем наличие армии у этого юзера
