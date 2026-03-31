@@ -1,11 +1,16 @@
-class Common { //Класс для того, что вроде как и не запихнуть в другие классы
+const crypto = require('crypto');
 
-    guid() { // Можно найти лцчший вариант
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-        .replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0, 
-                v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
+class Common {
+
+    md5(text) {
+        return crypto.createHash('md5').update(text).digest('hex');
+    }
+
+    guid() {
+        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+            (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+        );
     }
 }
+
+module.exports = Common;

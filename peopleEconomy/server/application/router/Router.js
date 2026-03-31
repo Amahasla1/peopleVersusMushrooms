@@ -1,14 +1,21 @@
 const express = require('express');
 const router = express.Router();
-
 const {
-    useRegistrationHandler,
-    notFoundHandler,
 } = require('./handlers');
 
-function Router({ exampleManager }) {
-    router.get('/reg/:username/:password', useRegistrationHandler(exampleManager)); //Методы для примера, замените своими
-    router.all('/*path', notFoundHandler);
+function Router(mediator, answer) {
+    // ============ LOBBY ROUTES ============
+    // для http методов из LobbyManager
+
+    // ============ BUILDING ROUTES ============
+    // для http методов из BuildingManager
+
+    // ============ NOT FOUND ============
+    router.all('/*path', (_, res) => {
+        res.json(answer.bad(404));
+    });
+
+
     return router;
 }
 
