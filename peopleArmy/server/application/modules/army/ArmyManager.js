@@ -78,6 +78,7 @@ class ArmyManager extends BaseManager {
                 buildings,
                 common: this.common,
                 guid,
+                db: this.db,
                 callbacks: {
                     update: (guid, data) => this.updateArmyCallback(guid, data)
                 }

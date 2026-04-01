@@ -5,7 +5,7 @@ const BMP = require("./entities/BMP");
 const { INTERVAL } = CONFIG.ARMY;
 
 class Army {
-    constructor({ map, buildings, common, callbacks = {}, guid }) {
+    constructor({ map, buildings, common, callbacks = {}, guid, db }) {
         this.guid = guid;
         this.common = common;
         this.callbacks = callbacks;
@@ -17,6 +17,9 @@ class Army {
         this.buildings = buildings; // постройки на карте
         this.enemyUnits = []; // юниты-врагм
         this.enemyBuildings = []; // здания-враги
+
+        this.unitTypes = {};
+        db.getUnitTypes().then(types => { this.unitTypes = types; });
 
         this.interval = setInterval(() => this.update(), INTERVAL); // интервал обновления игры
 
@@ -45,9 +48,13 @@ class Army {
      */
     createUnit({ x, y, type = 'soldier' }) {
         const unitType = String(type).toLowerCase();
-        const guid = this.common.guid();
+        const stats = this.unitTypes[unitType];
+        if (!stats) {
+            return { ok: false, error: 'UNKNOWN_UNIT_TYPE' };
+        }
 
-        const options = { guid, x, y };
+        const guid = this.common.guid();
+        const options = { guid, x, y, ...stats };
         const unit = unitType === 'bmp' ? new BMP(options) : new Soldier(options);
 
         this.units.push(unit);
