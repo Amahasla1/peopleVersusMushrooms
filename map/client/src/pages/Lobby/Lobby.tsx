@@ -34,8 +34,8 @@ const Lobby: React.FC<IBasePage & IPageManager> = (props) => {
 
     const confirmCreateLobby = () => {
         if (lobbyName.trim()) {
-            server.createLobby(lobbyName.trim());
-            setShowCreateModal(false);
+            console.log(props.server.user.guid)
+            server.createLobby(props.server.user.guid, lobbyName.trim(), 'spectator');
             setLobbyName('');
         }
     }
@@ -46,20 +46,20 @@ const Lobby: React.FC<IBasePage & IPageManager> = (props) => {
     }
 
     const joinLobbyHandler = (lobbyGuid: string) => {
-        server.joinToLobby(lobbyGuid);
+        server.joinToLobby(props.server.user.guid, lobbyGuid, 'spectator');
     }
 
     const leaveLobbyHandler = () => {
-        server.leaveLobby();
+        server.leaveLobby(props.server.user.guid);
     }
 
     const startGameHandler = () => {
-        server.startGame();
+        server.startGame(props.server.user.guid);
     }
 
     const getLobbiesHandler = () => {
         setIsLoading(true);
-        server.getLobbies();
+        server.getLobbies(props.server.user.guid);
     }
 
     useEffect(() => {
@@ -132,8 +132,6 @@ const Lobby: React.FC<IBasePage & IPageManager> = (props) => {
         mediator.subscribe(LOBBY_UPDATED, lobbyUpdatedHandler);
         mediator.subscribe(LOBBIES_LIST_UPDATED, lobbiesListUpdatedHandler);
         mediator.subscribe(START_GAME, startGameHandler);
-
-        server.getLobbies();
 
         return () => {
             mediator.unsubscribe(LOGOUT, logoutHandler);

@@ -10,6 +10,7 @@ class Server {
     socket: Socket;
     chatInterval: NodeJS.Timer | null = null;
     mediator: Mediator;
+    user: any;
 
     constructor(mediator: Mediator) {
         this.mediator = mediator;
@@ -31,6 +32,8 @@ class Server {
             if (result) {
                 const { LOGIN } = this.mediator.getEventTypes();
                 this.mediator.call(LOGIN, data);
+                console.log(result)
+                this.user = result
             }
         });
 
@@ -166,28 +169,28 @@ class Server {
         this.socket.emit(MEDIATOR.EVENTS.LOGOUT);
     }
 
-    createLobby(lobbyName: string): void {
-        this.socket.emit(EMESSAGES.CREATE_LOBBY, { lobbyName });
+    createLobby(guid: string, lobbyName: string, role: string): void {
+        this.socket.emit(EMESSAGES.CREATE_LOBBY, { guid, lobbyName, role });
     }
 
-    joinToLobby(lobbyGuid: string): void {
-        this.socket.emit(EMESSAGES.JOIN_TO_LOBBY, { lobbyGuid });
+    joinToLobby(guid: string, lobbyGuid: string, role: string): void {
+        this.socket.emit(EMESSAGES.JOIN_TO_LOBBY, { guid, lobbyGuid, role });
     }
 
-    leaveLobby(): void {
-        this.socket.emit(EMESSAGES.LEAVE_LOBBY, {});
+    leaveLobby(guid: string): void {
+        this.socket.emit(EMESSAGES.LEAVE_LOBBY, { guid });
     }
 
-    dropFromLobby(targetGuid: string): void {
-        this.socket.emit(EMESSAGES.DROP_FROM_LOBBY, { targetGuid });
+    dropFromLobby(guid: string, targetGuid: string): void {
+        this.socket.emit(EMESSAGES.DROP_FROM_LOBBY, { guid, targetGuid });
     }
 
-    startGame(): void {
-        this.socket.emit(EMESSAGES.START_GAME, {});
+    startGame(guid: string): void {
+        this.socket.emit(EMESSAGES.START_GAME, { guid });
     }
 
-    getLobbies(): void {
-        this.socket.emit(EMESSAGES.GET_LOBBIES, {});
+    getLobbies(guid: string): void {
+        this.socket.emit(EMESSAGES.GET_LOBBIES, { guid });
     }
 }
 
