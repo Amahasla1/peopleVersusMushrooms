@@ -10,6 +10,7 @@ class Server {
     socket: Socket;
     chatInterval: NodeJS.Timer | null = null;
     mediator: Mediator;
+    user: any;
 
     constructor(mediator: Mediator) {
         this.mediator = mediator;
@@ -31,6 +32,8 @@ class Server {
             if (result) {
                 const { LOGIN } = this.mediator.getEventTypes();
                 this.mediator.call(LOGIN, data);
+                console.log(result)
+                this.user = result
             }
         });
 
@@ -50,6 +53,70 @@ class Server {
             }
         });
 
+        this.socket.on(EMESSAGES.CREATE_LOBBY, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { CREATE_LOBBY } = this.mediator.getEventTypes();
+                this.mediator.call(CREATE_LOBBY, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.JOIN_TO_LOBBY, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { JOIN_TO_LOBBY } = this.mediator.getEventTypes();
+                this.mediator.call(JOIN_TO_LOBBY, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.LEAVE_LOBBY, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { LEAVE_LOBBY } = this.mediator.getEventTypes();
+                this.mediator.call(LEAVE_LOBBY, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.DROP_FROM_LOBBY, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { DROP_FROM_LOBBY } = this.mediator.getEventTypes();
+                this.mediator.call(DROP_FROM_LOBBY, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.START_GAME, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { START_GAME } = this.mediator.getEventTypes();
+                this.mediator.call(START_GAME, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.GET_LOBBIES, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { GET_LOBBIES } = this.mediator.getEventTypes();
+                this.mediator.call(GET_LOBBIES, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.LOBBY_UPDATED, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { LOBBY_UPDATED } = this.mediator.getEventTypes();
+                this.mediator.call(LOBBY_UPDATED, data);
+            }
+        });
+
+        this.socket.on(EMESSAGES.LOBBIES_LIST_UPDATED, (data: TAnswer<any>) => {
+            const result = this._validate(data);
+            if (result) {
+                const { LOBBIES_LIST_UPDATED } = this.mediator.getEventTypes();
+                this.mediator.call(LOBBIES_LIST_UPDATED, data);
+            }
+        });
+
         this.socket.on(MEDIATOR.EVENTS.GENERATE_MAP, (data: TAnswer<TMap>) => {
             const result = this._validate(data);
             if (result) {
@@ -58,6 +125,7 @@ class Server {
             }
         });
     }
+
     _validate(data: any) {
         if (data.result === "ok") {
             return data.data;
@@ -107,6 +175,30 @@ class Server {
 
     logout(): void {
         this.socket.emit(MEDIATOR.EVENTS.LOGOUT);
+    }
+
+    createLobby(guid: string, lobbyName: string, role: string): void {
+        this.socket.emit(EMESSAGES.CREATE_LOBBY, { guid, lobbyName, role });
+    }
+
+    joinToLobby(guid: string, lobbyGuid: string, role: string): void {
+        this.socket.emit(EMESSAGES.JOIN_TO_LOBBY, { guid, lobbyGuid, role });
+    }
+
+    leaveLobby(guid: string): void {
+        this.socket.emit(EMESSAGES.LEAVE_LOBBY, { guid });
+    }
+
+    dropFromLobby(guid: string, targetGuid: string): void {
+        this.socket.emit(EMESSAGES.DROP_FROM_LOBBY, { guid, targetGuid });
+    }
+
+    startGame(guid: string): void {
+        this.socket.emit(EMESSAGES.START_GAME, { guid });
+    }
+
+    getLobbies(guid: string): void {
+        this.socket.emit(EMESSAGES.GET_LOBBIES, { guid });
     }
 
     generateMap(): void {
