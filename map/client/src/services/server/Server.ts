@@ -1,7 +1,7 @@
 import md5 from 'md5';
 import { io, Socket } from 'socket.io-client';
 import CONFIG, { MEDIATOR, EMESSAGES } from '../../config';
-import { TAnswer, TMap TUser } from "./types";
+import { TAnswer, TMap, TUser } from "./types";
 import Mediator from '../Mediator/Mediator';
 
 const HOST = CONFIG.HOST;
