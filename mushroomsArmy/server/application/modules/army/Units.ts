@@ -66,13 +66,13 @@ class Unit {
         
         if (this.decisionAccumulator >= this.DECISION_INTERVAL) {
             this.decisionAccumulator = 0;
-            this.makeDecision(enemies, mapData);
+            this.makeDecision(enemies);
         }
         
         this.moveTo(this.targetX, this.targetY, mapData, deltaTime);
     }
     
-    private makeDecision(enemies: Unit[], mapData: MapData): void {
+    private makeDecision(enemies: Unit[]): void {
         let nearestEnemy: Unit | null = null;
         let nearestDistance: number = Infinity;
         

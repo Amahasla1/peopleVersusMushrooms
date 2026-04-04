@@ -20,8 +20,8 @@ class Champigneb extends Unit {
     constructor(options: any) {
         super(options);
         this.hp = 50;
+        this.maxHp = 50;
         this.speed = 4;
-
     }
 
     protected explode(): void {
