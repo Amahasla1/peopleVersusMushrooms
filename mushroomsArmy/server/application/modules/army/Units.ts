@@ -37,6 +37,7 @@ class Unit {
     public isAlive: boolean;
     public attackRange: number;
     public fireDamageMultiplier: number = 2;
+    protected enemies: Unit [] = [];
     
     private decisionAccumulator: number = 0;
     private readonly DECISION_INTERVAL: number = 0.5; 
@@ -58,18 +59,20 @@ class Unit {
 
     update(enemies: Unit[], mapData: MapData, deltaTime: number): void {
         if (!this.isAlive) return;
+
+        this.enemies = enemies;
         
         this.decisionAccumulator += deltaTime;
         
         if (this.decisionAccumulator >= this.DECISION_INTERVAL) {
             this.decisionAccumulator = 0;
-            this.makeDecision(enemies, mapData);
+            this.makeDecision(enemies);
         }
         
         this.moveTo(this.targetX, this.targetY, mapData, deltaTime);
     }
     
-    private makeDecision(enemies: Unit[], mapData: MapData): void {
+    private makeDecision(enemies: Unit[]): void {
         let nearestEnemy: Unit | null = null;
         let nearestDistance: number = Infinity;
         
@@ -94,7 +97,7 @@ class Unit {
         }
     }
 
-    moveTo(targetX: number, targetY: number, mapData: MapData, deltaTime: number): void {
+    protected moveTo(targetX: number, targetY: number, mapData: MapData, deltaTime: number): void {
         if (!this.isAlive) return;
 
         const dx = targetX - this.x;
