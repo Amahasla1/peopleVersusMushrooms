@@ -12,7 +12,7 @@ export type TerrainType = 0 | 1 | 2;
  * Игровой юнит (споромёт или шампиньеб)
  */
 export interface Unit {
-  id: string;               
+  guid: string;               
   x: number;                
   y: number;                
   type: 'sporomet' | 'shampigneb';

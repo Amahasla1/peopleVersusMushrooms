@@ -45,7 +45,7 @@ const PageManager: React.FC<IPageManagerProps> = ({page, setPage, mediator, serv
                 {page === PAGES.LOGIN && <Login setPage={setPage} />}
                 {page === PAGES.CHAT && <Chat setPage={setPage} />}
                 {page === PAGES.LOBBY && <Lobby setPage={setPage} />}
-                {page === PAGES.GAME && <Game />}
+                {page === PAGES.GAME && <Game setPage={setPage} />}
             </ServerContext.Provider>
         </MediatorContext.Provider>
     );

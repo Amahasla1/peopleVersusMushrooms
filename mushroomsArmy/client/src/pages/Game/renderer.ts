@@ -103,12 +103,13 @@ function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, 
  * Заглушка на случай отсутствия состояния
  */
 function drawPlaceholder(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(0, 0, width, height);
-  ctx.fillStyle = '#222';
-  ctx.font = '18px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('Ожидание игры...', width / 2, height / 2);
+  const cellW = width / 50;
+  const cellH = height / 50;
+  for (let y = 0; y < 50; y++) {
+    for (let x = 0; x < 50; x++) {
+      ctx.fillStyle = '#a0d6a0';
+      ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+    }
+  }
+  drawGrid(ctx, width, height, cellW, cellH);
 }

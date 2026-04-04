@@ -4,13 +4,18 @@ import { MediatorContext } from '../../App';
 import CONFIG from '../../config';
 import { drawGame } from './renderer';
 import { GameState } from './types';
+import { PAGES } from '../PageManager';
 import './Game.css';
 
-const Game: React.FC = () => {
+const Game: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gameStateRef = useRef<GameState | null>(null);
   const mediator = useContext(MediatorContext);
   const [isGameOver, setIsGameOver] = useState(false);
+
+  const GET_STORE = mediator.getTriggerTypes().GET_STORE;
+  const user = mediator.get(GET_STORE, 'user');
+  const username = user?.name || user?.username || 'Игрок';
 
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
@@ -77,32 +82,8 @@ const Game: React.FC = () => {
 
     mediator.subscribe(EVENT_NAME, handler);
 
-    // Тестовая эмуляция (через 1 секунду)
-    const timeoutId = setTimeout(() => {
-      const fakeState: GameState = {
-        map: Array(50).fill(null).map((_, y) =>
-          Array(50).fill(null).map((_, x) => {
-            if (y > 40) return 1;
-            if (x > 45 && y < 10) return 2;
-            return 0;
-          })
-        ),
-        units: [
-          { id: 'u1', x: 10, y: 10, type: 'sporomet', hp: 80, maxHp: 100 },
-          { id: 'u2', x: 30, y: 20, type: 'shampigneb', hp: 45, maxHp: 100 },
-          { id: 'u3', x: 40, y: 40, type: 'sporomet', hp: 0, maxHp: 100 },
-        ],
-        slimePuddles: [
-          { x: 25, y: 25, radius: 0.4 },
-          { x: 15, y: 35, radius: 0.3 },
-        ],
-      };
-      mediator.call(EVENT_NAME, fakeState);
-    }, 1000);
-
     return () => {
       mediator.unsubscribe(EVENT_NAME, handler);
-      clearTimeout(timeoutId);
     };
   }, [mediator]);
 
@@ -116,8 +97,7 @@ const Game: React.FC = () => {
   }, [mediator]);
 
   const handleExitToLobby = () => {
-    // Здесь будет логика перехода в лобби
-    console.log('Выход в лобби');
+    setPage(PAGES.LOBBY);
   };
 
   const handleGoToLobby = () => {
@@ -129,7 +109,7 @@ const Game: React.FC = () => {
     <div className="game-page">
       <header className="game-header">
         <div className="game-user">
-          Имя пользователя: <strong>Player</strong>
+          <strong>{username}</strong>
         </div>
         <button type="button" className="game-exit" onClick={handleExitToLobby}>
           Выход в лобби
