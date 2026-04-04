@@ -37,6 +37,7 @@ class Unit {
     public isAlive: boolean;
     public attackRange: number;
     public fireDamageMultiplier: number = 2;
+    protected enemies: Unit [] = [];
     
     private decisionAccumulator: number = 0;
     private readonly DECISION_INTERVAL: number = 0.5; 
@@ -58,6 +59,8 @@ class Unit {
 
     update(enemies: Unit[], mapData: MapData, deltaTime: number): void {
         if (!this.isAlive) return;
+
+        this.enemies = enemies;
         
         this.decisionAccumulator += deltaTime;
         
@@ -94,7 +97,7 @@ class Unit {
         }
     }
 
-    moveTo(targetX: number, targetY: number, mapData: MapData, deltaTime: number): void {
+    private moveTo(targetX: number, targetY: number, mapData: MapData, deltaTime: number): void {
         if (!this.isAlive) return;
 
         const dx = targetX - this.x;
