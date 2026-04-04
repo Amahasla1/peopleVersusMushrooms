@@ -3,7 +3,7 @@ import BaseManager from '../BaseManager';
 import CONFIG from '../../../config';
 import User from './User';
 
-const { REGISTRATION, LOGIN, LOGOUT } = CONFIG.SOCKET;
+const { REGISTRATION, LOGIN, LOGOUT, LOBBY_START, VALIDATE_TOKEN } = CONFIG.SOCKET;
 
 interface UserManagerOptions {
     mediator: any;
@@ -26,6 +26,8 @@ class UserManager extends BaseManager {
             socket.on(REGISTRATION, (data) => this.socketRegistration(data, socket));
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
+            socket.on(LOBBY_START, (data) => this.socketLobbyStart(data, socket));
+            socket.on(VALIDATE_TOKEN, (data) => this.socketValidateToken(data, socket));
 
             socket.on('disconnect', () => console.log('disconnect', socket.id));
         });
@@ -86,7 +88,7 @@ class UserManager extends BaseManager {
         await user.registration(name, password);
         this.users[user.getSelf().guid!] = user;
 
-        socket.emit(REGISTRATION, this.answer.good(user.getSelf()));
+        socket.emit(REGISTRATION, this.answer.good(user.toClient()));
     }
 
     private async socketLogin(data: any = {}, socket: Socket): Promise<void> {
@@ -110,7 +112,7 @@ class UserManager extends BaseManager {
         const user = new User({ db: this.db, common: this.common, socketId: socket.id });
         if (await user.login(name, password)) {
             this.users[user.getSelf().guid!] = user;
-            socket.emit(LOGIN, this.answer.good(user.getSelf()));
+            socket.emit(LOGIN, this.answer.good(user.toClient()));
             return;
         }
 
@@ -127,11 +129,45 @@ class UserManager extends BaseManager {
 
         const user = this.users[guid];
         if (user) {
-            user.logout();
+            await user.logout();
             delete this.users[user.getSelf().guid!];
         }
 
         socket.emit(LOGOUT, this.answer.good(true));
+    }
+
+    private async socketLobbyStart(data: any = {}, socket: Socket): Promise<void> {
+        socket.emit(LOBBY_START, this.answer.good(true));
+    }
+
+    private async socketValidateToken(data: any = {}, socket: Socket): Promise<void> {
+        const { token } = data;
+
+        if (!token) {
+            socket.emit(VALIDATE_TOKEN, this.answer.bad(13));
+            return;
+        }
+
+        // Сначала проверяем в памяти
+        const cachedUser = Object.values(this.users).find((item) => item.getSelf().token === token);
+        if (cachedUser) {
+            socket.emit(VALIDATE_TOKEN, this.answer.good(cachedUser.toClient()));
+            return;
+        }
+
+        // Если нет в памяти — восстанавливаем из БД (например, после перезагрузки страницы)
+        const userData = await this.db.getUserByValidToken(token);
+        if (userData) {
+            const user = User.restoreFromData(
+                { db: this.db, common: this.common, socketId: socket.id },
+                userData as any
+            );
+            this.users[user.getSelf().guid!] = user;
+            socket.emit(VALIDATE_TOKEN, this.answer.good(user.toClient()));
+            return;
+        }
+
+        socket.emit(VALIDATE_TOKEN, this.answer.bad(10));
     }
 }
 
