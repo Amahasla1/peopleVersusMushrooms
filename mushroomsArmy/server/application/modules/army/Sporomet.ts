@@ -139,19 +139,6 @@ class Sporomet extends Unit {
         }
     }
 
-    public takeDamage(amount: number, type: string): void {
-        if (!this.isAlive) return;
-        
-        if (type === 'fire') {
-            const poisonEffects = (this as any).poisonEffects as PoisonEffect[] | undefined;
-            if (poisonEffects) {
-                (this as any).poisonEffects = [];
-            }
-        }
-        
-        super.takeDamage(amount, type);
-    }
-
     protected onDeath(): void {
     }
 }
