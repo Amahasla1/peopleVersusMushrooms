@@ -8,6 +8,8 @@ const CONFIG = {
             USER_REGISTERED: 'USER_REGISTERED',
             USER_LOGGED_OUT: 'USER_LOGGED_OUT',
             LOGIN: 'LOGIN',
+            GAME_STATE_UPDATED: 'GAME_STATE_UPDATED', 
+            GAME_OVER: 'GAME_OVER', 
         },
         TRIGGERS: {
             SET_STORE: 'SET_STORE',

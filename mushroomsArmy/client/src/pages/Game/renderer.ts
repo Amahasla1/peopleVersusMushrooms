@@ -1,0 +1,114 @@
+import { GameState, TerrainType } from './types';
+
+export function drawGame(
+  ctx: CanvasRenderingContext2D,
+  state: GameState | null,
+  widthCSS: number,
+  heightCSS: number
+) {
+  if (!state) {
+    drawPlaceholder(ctx, widthCSS, heightCSS);
+    return;
+  }
+
+  const cellW = widthCSS / 50;
+  const cellH = heightCSS / 50;
+
+  // 1. Отрисовка карты (тайлы 50×50)
+  for (let y = 0; y < 50; y++) {
+    for (let x = 0; x < 50; x++) {
+      const terrain = state.map[y][x];
+      ctx.fillStyle = getTerrainColor(terrain);
+      ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+    }
+  }
+
+  // 2. Отрисовка луж слизи (полупрозрачные, под юнитами)
+  state.slimePuddles.forEach(puddle => {
+    const cx = puddle.x * cellW + cellW / 2;
+    const cy = puddle.y * cellH + cellH / 2;
+    const radiusPx = puddle.radius * Math.min(cellW, cellH);
+    ctx.beginPath();
+    ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(76, 175, 80, 0.4)'; // зелёный с прозрачностью 0.4
+    ctx.fill();
+  });
+
+  // 3. Отрисовка юнитов (только живых)
+  state.units.forEach(unit => {
+    if (unit.hp <= 0) return; // мёртвых не рисуем
+
+    const cx = unit.x * cellW + cellW / 2;
+    const cy = unit.y * cellH + cellH / 2;
+    const radius = Math.min(cellW, cellH) * 0.35;
+
+    // Круг юнита
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = unit.type === 'sporomet' ? '#4caf50' : '#ff9800';
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Полоска HP
+    const barWidth = radius * 1.8;
+    const barHeight = 5;
+    const barX = cx - barWidth / 2;
+    const barY = cy - radius - 5;
+
+    ctx.fillStyle = '#d32f2f'; // красный фон
+    ctx.fillRect(barX, barY, barWidth, barHeight);
+
+    const hpPercent = Math.max(0, Math.min(1, unit.hp / unit.maxHp));
+    ctx.fillStyle = '#4caf50'; // зелёный заряд
+    ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+  });
+
+  // 4. Опциональная сетка (поверх всего)
+  drawGrid(ctx, widthCSS, heightCSS, cellW, cellH);
+}
+
+/**
+ * Возвращает цвет тайла в зависимости от типа местности
+ */
+function getTerrainColor(type: TerrainType): string {
+  switch (type) {
+    case 0: return '#a0d6a0'; // равнина
+    case 1: return '#4a7db4'; // вода
+    case 2: return '#555555'; // горы
+    default: return '#a0d6a0';
+  }
+}
+
+/**
+ * Рисует тонкую серую сетку 50×50
+ */
+function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, cellW: number, cellH: number) {
+  ctx.beginPath();
+  ctx.strokeStyle = '#cccccc';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 50; i++) {
+    const x = i * cellW;
+    const y = i * cellH;
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+  }
+  ctx.stroke();
+}
+
+/**
+ * Заглушка на случай отсутствия состояния
+ */
+function drawPlaceholder(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#222';
+  ctx.font = '18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Ожидание игры...', width / 2, height / 2);
+}

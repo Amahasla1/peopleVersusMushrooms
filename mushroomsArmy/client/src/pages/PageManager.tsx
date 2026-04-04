@@ -4,6 +4,7 @@ import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat'
 import Lobby from './Lobby/Lobby';
+import Game from './Game/Game';
 import Store from '../services/Store/Store';
 import CONFIG from '../config';
 import Mediator from '../services/Mediator/Mediator';
@@ -16,10 +17,11 @@ export enum PAGES {
     REGISTRATION,
     CHAT,
     LOBBY,
+    GAME,
 }
 
 const PageManager: React.FC = () => {
-    const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
+    const [page, setPage] = useState<PAGES>(PAGES.GAME);
     const mediator = useMemo(() => new Mediator(CONFIG.MEDIATOR), []);
     const store = useStore(mediator);
     const server = useMemo(() => new Server(mediator), [mediator]);
@@ -31,6 +33,7 @@ const PageManager: React.FC = () => {
                 {page === PAGES.LOGIN && <Login setPage={setPage} />}
                 {page === PAGES.CHAT && <Chat setPage={setPage} />}
                 {page === PAGES.LOBBY && <Lobby setPage={setPage} />}
+                {page === PAGES.GAME && <Game />}
             </ServerContext.Provider>
         </MediatorContext.Provider>
     );
