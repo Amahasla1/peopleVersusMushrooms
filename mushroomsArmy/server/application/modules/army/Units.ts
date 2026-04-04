@@ -21,7 +21,7 @@ interface UnitState {
 }
 
 interface MapData {
-  map: number[][];
+  map: (number | null)[][];
 }
 
 class Unit {
@@ -117,10 +117,25 @@ class Unit {
         let newY = this.y + stepY;
 
         const map = mapData.map;
-        const tile = map[newY][newX];
 
+        // Округляем до индексов клетки
+        const tileX = Math.floor(newX);
+        const tileY = Math.floor(newY);
+
+        // Проверяем границы карты
+        if (tileY < 0 || tileY >= map.length || tileX < 0 || tileX >= map[0].length) {
+            return;
+        }
+
+        const tile = map[tileY][tileX];
+
+        // Грибы проходят по 0 (равнина) и 2 (горы). Вода (1) — смерть. null — непроходимо.
         if (tile === 1) {
             this.die();
+            return;
+        }
+
+        if (tile === null || tile === undefined) {
             return;
         }
         
