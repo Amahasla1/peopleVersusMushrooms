@@ -149,6 +149,11 @@ class Unit {
     takeDamage(amount: number, type: string): void {
         if (!this.isAlive) return;
 
+        // Огонь снимает яд с отравленного юнита
+        if (type === 'fire' && (this as any).poisonEffects) {
+            (this as any).poisonEffects = [];
+        }
+
         const finalAmount = type === 'fire' ? amount * this.fireDamageMultiplier : amount;
 
         this.hp -= finalAmount;
