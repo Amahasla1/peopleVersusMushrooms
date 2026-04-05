@@ -4,6 +4,8 @@ import CONFIG from '../../../config';
 import User from './User';
 
 const { REGISTRATION, LOGIN, LOGOUT, LOBBY_START, VALIDATE_TOKEN } = CONFIG.SOCKET;
+const { START_GAME } = CONFIG.MEDIATOR.EVENTS;
+const { GET_USER_BY_GUID } = CONFIG.MEDIATOR.TRIGGERS;
 
 interface UserManagerOptions {
     mediator: any;
@@ -19,6 +21,9 @@ class UserManager extends BaseManager {
     constructor(options: UserManagerOptions) {
         super(options);
         this.users = {}; // Ключ guid значение new User
+
+        // Триггер: вернуть пользователя по guid
+        this.mediator.set(GET_USER_BY_GUID, (guid: string) => this.users[guid] || null);
 
         if (!this.io) return;
 
@@ -137,7 +142,32 @@ class UserManager extends BaseManager {
     }
 
     private async socketLobbyStart(data: any = {}, socket: Socket): Promise<void> {
+        const { guid, token } = data;
+
+        if (!guid || !token || !this.users[guid]) {
+            socket.emit(LOBBY_START, this.answer.bad(10));
+            return;
+        }
+
+        const user = this.users[guid];
+        if (user.getSelf().token !== token) {
+            socket.emit(LOBBY_START, this.answer.bad(10));
+            return;
+        }
+
+        user.setSocketId(socket.id);
+
+        // Захардкоженная карта 50×50: 0=равнина, 1=вода, 2=горы
+        const map: (number | null)[][] = Array.from({ length: 50 }, (_, row) =>
+            Array.from({ length: 50 }, (_, col) => {
+                if (col === 10) return 1; // полоса воды
+                return 0;
+            })
+        );
+
         socket.emit(LOBBY_START, this.answer.good(true));
+
+        this.mediator.call(START_GAME, { guid, map, buildings: [] });
     }
 
     private async socketValidateToken(data: any = {}, socket: Socket): Promise<void> {

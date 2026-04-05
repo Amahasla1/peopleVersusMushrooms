@@ -1,4 +1,4 @@
-interface UnitConstructorOptions {
+export interface UnitConstructorOptions {
     guid: string;
     type: string;
     hp: number;
@@ -7,10 +7,10 @@ interface UnitConstructorOptions {
     x: number;
     y: number;
     attackRange: number;
-    fireDamageMultiplier: number; 
+    fireDamageMultiplier?: number;
 }
 
-interface UnitState {
+export interface UnitState {
   guid: string;
   type: string;
   x: number;
@@ -20,7 +20,7 @@ interface UnitState {
   isAlive: boolean;
 }
 
-interface MapData {
+export interface MapData {
   map: (number | null)[][];
 }
 
