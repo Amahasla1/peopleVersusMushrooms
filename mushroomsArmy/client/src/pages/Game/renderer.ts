@@ -1,4 +1,18 @@
 import { GameState, TerrainType } from './types';
+import sporometSrc from './Sporomet.png';
+import champignebSrc from './Champigneb.png';
+
+// Предзагрузка изображений (один раз)
+const unitImages: Record<string, HTMLImageElement> = {};
+
+function getUnitImage(type: string, src: string): HTMLImageElement {
+  if (!unitImages[type]) {
+    const img = new Image();
+    img.src = src;
+    unitImages[type] = img;
+  }
+  return unitImages[type];
+}
 
 export function drawGame(
   ctx: CanvasRenderingContext2D,
@@ -41,15 +55,23 @@ export function drawGame(
     const cx = unit.x * cellW + cellW / 2;
     const cy = unit.y * cellH + cellH / 2;
     const radius = Math.min(cellW, cellH) * 0.35;
+    const size = radius * 2;
 
-    // Круг юнита
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = unit.type === 'sporomet' ? '#4caf50' : '#ff9800';
-    ctx.fill();
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    // Изображение юнита
+    const imgSrc = unit.type === 'sporomet' ? sporometSrc : champignebSrc;
+    const img = getUnitImage(unit.type, imgSrc);
+    if (img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, cx - size / 2, cy - size / 2, size, size);
+    } else {
+      // fallback — цветной круг пока изображение не загружено
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = unit.type === 'sporomet' ? '#4caf50' : '#ff9800';
+      ctx.fill();
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
 
     // Полоска HP
     const barWidth = radius * 1.8;
