@@ -1,23 +1,21 @@
-import Unit from "./Units";
+import Unit, { UnitConstructorOptions } from "./Units";
 
-interface SlimePuddle {
+export interface SlimePuddle {
   x: number;
   y: number;
   radius: number;
   ttl: number;
 }
 
-const emptySlime: SlimePuddle = {x: 0, y: 0, radius: 0, ttl: 0};
-
 class Champigneb extends Unit {
 
-    public explosionRadius : number = 3;
-    public explosionDamage : number = 100;
-    public slimeDuration : number = 10;
-    public slimePuddle: SlimePuddle = emptySlime;
+    public explosionRadius: number = 3;
+    public explosionDamage: number = 100;
+    public slimeDuration: number = 10;
+    public slimePuddle: SlimePuddle = { x: 0, y: 0, radius: 0, ttl: 0 };
     public hasExploded: boolean = false;
 
-    constructor(options: any) {
+    constructor(options: UnitConstructorOptions) {
         super(options);
         this.hp = 50;
         this.maxHp = 50;

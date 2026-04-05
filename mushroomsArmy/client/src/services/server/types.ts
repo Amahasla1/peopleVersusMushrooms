@@ -75,6 +75,7 @@ export type TMapData = (number | null)[][];
 
 // Состояние армии (приходит каждые 200мс через game:state)
 export type TArmyState = {
+    map: (number | null)[][];
     units: TUnit[];
-    slimePools: TSlimePool[];
+    slimePuddles: TSlimePool[];
 }
