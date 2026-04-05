@@ -8,6 +8,7 @@ import DB from './application/modules/db/DB';
 import Mediator from './application/modules/mediator/Mediator';
 import Answer from './application/Answer';
 import UserManager from './application/modules/user/UserManager';
+import ArmyManager from './application/modules/army/ArmyManager';
 import Common from './application/modules/common/Common';
 
 const { NAME, PORT, DATABASE } = CONFIG;
@@ -22,6 +23,7 @@ const common = new Common();
 const answer = new Answer();
 
 new UserManager({ mediator, db, common, io, answer });
+new ArmyManager({ mediator, db, common, io, answer });
 
 app.use(express.static(`${__dirname}/public`));
 app.use('/', Router({ answer }));

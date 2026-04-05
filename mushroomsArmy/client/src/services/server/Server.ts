@@ -145,9 +145,10 @@ class Server {
         }
     }
 
-    private handleGameState(data: TArmyState) {
+    private handleGameState(response: any) {
+        if (response?.result !== 'ok' || !response.data) return;
         const GAME_STATE_UPDATED = this.mediator.getEventTypes().GAME_STATE_UPDATED;
-        this.mediator.call(GAME_STATE_UPDATED, data);
+        this.mediator.call(GAME_STATE_UPDATED, response.data);
     }
 
     private handleGameOver(data: any) {

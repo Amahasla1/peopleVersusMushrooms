@@ -62,6 +62,10 @@ class User {
         };
     }
 
+    setSocketId(socketId: string): void {
+        this.socketId = socketId;
+    }
+
     getSelf(): UserData & { db: DB; common: Common; socketId: string } {
         return {
             db: this.db,

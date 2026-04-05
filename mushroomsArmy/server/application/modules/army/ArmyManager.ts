@@ -1,5 +1,6 @@
 import BaseManager from '../BaseManager';
 import CONFIG from '../../../config';
+import { Army } from './Army';
 
 const { GAME_STATE, GAME_OVER } = CONFIG.SOCKET;
 
@@ -12,7 +13,7 @@ interface ArmyManagerOptions {
 }
 
 class ArmyManager extends BaseManager {
-    private army: { [guid: string]: any };
+    private army: { [guid: string]: Army };
 
     constructor(options: ArmyManagerOptions) {
         super(options);
@@ -56,17 +57,15 @@ class ArmyManager extends BaseManager {
             this.destroyArmy(guid);
         }
 
-        // заменить any на Army когда класс будет создан (таска B4)
-        // Раскомментировать после создания класса Army
-        // this.army[guid] = new Army({
-        //     map,
-        //     buildings,
-        //     common: this.common,
-        //     guid,
-        //     callbacks: {
-        //         update: (guid: string, data: any) => this.updateArmyCallback(guid, data)
-        //     }
-        // });
+        this.army[guid] = new Army({
+            map: { map },
+            buildings,
+            common: this.common,
+            guid,
+            callbacks: {
+                update: (guid: string, data: any) => this.updateArmyCallback(guid, data)
+            }
+        });
 
         console.log(`[ArmyManager] Армия создана для игрока ${guid}`);
     }
