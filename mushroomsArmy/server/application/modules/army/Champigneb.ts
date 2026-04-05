@@ -1,6 +1,6 @@
 import Unit from "./Units";
 
-interface SlimePuddle {
+export interface SlimePuddle {
   x: number;
   y: number;
   radius: number;
@@ -13,7 +13,7 @@ class Champigneb extends Unit {
 
     public explosionRadius : number = 3;
     public explosionDamage : number = 100;
-    public slimeDuration : number = 10;
+    public slimeDuration : number = 10 * 1000;
     public slimePuddle: SlimePuddle = emptySlime;
     public hasExploded: boolean = false;
 

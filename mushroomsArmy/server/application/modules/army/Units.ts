@@ -10,7 +10,7 @@ interface UnitConstructorOptions {
     fireDamageMultiplier: number; 
 }
 
-interface UnitState {
+export interface UnitState {
   guid: string;
   type: string;
   x: number;
@@ -20,7 +20,7 @@ interface UnitState {
   isAlive: boolean;
 }
 
-interface MapData {
+export interface MapData {
   map: (number | null)[][];
 }
 
