@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { MediatorContext } from '../App';
 import Server from '../services/server/Server';
 import Registration from './Registration/Registration';
 import Login from './Login/Login';
 import Chat from './Chat/Chat'
 import Lobby from './Lobby/Lobby';
+import MapPage from './Map/MapPage';
 import Store from '../services/Store/Store';
 
 import Mediator from '../services/Mediator/Mediator';
@@ -13,7 +15,8 @@ export enum PAGES {
     LOGIN,
     REGISTRATION,
     CHAT,
-    LOBBY
+    LOBBY,
+    MAP
 }
 
 export interface IBasePage {
@@ -23,17 +26,16 @@ export interface IBasePage {
 export interface IPageManager {
     server: Server,
     store: Store,
-    mediator: Mediator
 }
 
-const PageManager: React.FC<IPageManager> = ({ server, store, mediator }) => {
+const PageManager: React.FC<IPageManager> = ({ server, store }) => {
+    const mediator = useContext(MediatorContext);
     const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
 
     const props = {
         setPage,
         server,
         store,
-        mediator
     }
 
     const { SHOW_ERROR } = mediator.getEventTypes();
@@ -47,6 +49,7 @@ const PageManager: React.FC<IPageManager> = ({ server, store, mediator }) => {
             {page === PAGES.LOGIN && <Login {...props} />}
             {page === PAGES.CHAT && <Chat {...props} />}
             {page === PAGES.LOBBY && <Lobby {...props} />}
+            {page === PAGES.MAP && <MapPage {...props} />}
         </>
     );
 }
