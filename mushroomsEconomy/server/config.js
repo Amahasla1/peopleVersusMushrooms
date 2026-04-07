@@ -3,7 +3,14 @@ const CONFIG = {
     PORT: 3005,
     CORS: {
         origin: "*",
+        middleware: (_, res, next) => {
+            res.header('Content-Type', 'application/json; charset=utf-8');
+            res.header('Access-Control-Allow-Origin', '*');
+            next();
+        }
     },
+
+    MUSHROOMS_ARMY_URL: 'http://localhost:3003',
 
     DATABASE: {
         NAME: 'data.db',
@@ -11,14 +18,13 @@ const CONFIG = {
 
     MEDIATOR: {
         EVENTS: {
-            EXAMPLE_EVENT: "EXAMPLE_EVENT",
+            DELETE_USER: "DELETE_USER",
 
             START_GAME: 'START_GAME',
-            LOAD_GAME: 'LOAD_GAME',
         },
         TRIGGERS: {
-            EXAMPLE_TRIGGER: "EXAMPLE_TRIGGER",
             GET_USER_BY_GUID: 'GET_USER_BY_GUID',
+            GET_USER_BY_SOCKET_ID: 'GET_USER_BY_SOCKET_ID',
         },
     },
 
@@ -31,12 +37,16 @@ const CONFIG = {
         REGISTRATION: 'REGISTRATION',
         LOGIN: 'LOGIN',
         LOGOUT: 'LOGOUT',
-        RECONNECT: 'RECONNECT',
 
         CREATE_LOBBY: 'CREATE_LOBBY',
-        DELETE_LOBBY: 'DELETE_LOBBY',
-        JOIN_LOBBY: 'JOIN_LOBBY',
+        JOIN_TO_LOBBY: 'JOIN_TO_LOBBY',
         LEAVE_LOBBY: 'LEAVE_LOBBY',
+        DROP_FROM_LOBBY: 'DROP_FROM_LOBBY',
+        START_GAME: 'START_GAME',
+        GET_LOBBIES: 'GET_LOBBYS',
+        LOBBY_UPDATED: 'LOBBY_UPDATED',
+        LOBBIES_LIST_UPDATED: 'LOBBYS_LIST_UPDATED',
+        SET_READY: 'SET_READY',
 
         START_GAME: 'START_GAME',
         UPDATE_SCENE: 'UPDATE_SCENE',
