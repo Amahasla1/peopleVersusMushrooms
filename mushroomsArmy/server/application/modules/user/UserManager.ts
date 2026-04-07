@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import BaseManager from '../BaseManager';
+import BaseManager, { TManagerOptions } from '../BaseManager';
 import CONFIG from '../../../config';
 import User from './User';
 
@@ -7,18 +7,10 @@ const { REGISTRATION, LOGIN, LOGOUT, LOBBY_START, VALIDATE_TOKEN } = CONFIG.SOCK
 const { START_GAME } = CONFIG.MEDIATOR.EVENTS;
 const { GET_USER_BY_GUID } = CONFIG.MEDIATOR.TRIGGERS;
 
-interface UserManagerOptions {
-    mediator: any;
-    db: any;
-    io: any;
-    answer: any;
-    common: any;
-}
-
 class UserManager extends BaseManager {
     private users: { [guid: string]: User };
 
-    constructor(options: UserManagerOptions) {
+    constructor(options: TManagerOptions) {
         super(options);
         this.users = {}; // Ключ guid значение new User
 
@@ -61,7 +53,7 @@ class UserManager extends BaseManager {
         return !!(password && password.length >= 6 && password.length <= 50);
     }
 
-    private async socketRegistration(data: any = {}, socket: Socket): Promise<void> {
+    private async socketRegistration(data: { name?: string; password?: string; passwordRepeat?: string } = {}, socket: Socket): Promise<void> {
         const { name, password, passwordRepeat } = data;
 
         if (!name || !password || !passwordRepeat) {
@@ -96,7 +88,7 @@ class UserManager extends BaseManager {
         socket.emit(REGISTRATION, this.answer.good(user.toClient()));
     }
 
-    private async socketLogin(data: any = {}, socket: Socket): Promise<void> {
+    private async socketLogin(data: { name?: string; password?: string } = {}, socket: Socket): Promise<void> {
         const { name, password } = data;
 
         if (!name || !password) {
@@ -124,10 +116,10 @@ class UserManager extends BaseManager {
         socket.emit(LOGIN, this.answer.bad(11));
     }
 
-    private async socketLogout(data: any = {}, socket: Socket): Promise<void> {
+    private async socketLogout(data: { token?: string; guid?: string } = {}, socket: Socket): Promise<void> {
         const { token, guid } = data;
 
-        if (!token) {
+        if (!token || !guid) {
             socket.emit(LOGOUT, this.answer.bad(13));
             return;
         }
@@ -141,7 +133,7 @@ class UserManager extends BaseManager {
         socket.emit(LOGOUT, this.answer.good(true));
     }
 
-    private async socketLobbyStart(data: any = {}, socket: Socket): Promise<void> {
+    private async socketLobbyStart(data: { guid?: string; token?: string } = {}, socket: Socket): Promise<void> {
         const { guid, token } = data;
 
         if (!guid || !token || !this.users[guid]) {
@@ -158,19 +150,28 @@ class UserManager extends BaseManager {
         user.setSocketId(socket.id);
 
         // Захардкоженная карта 50×50: 0=равнина, 1=вода, 2=горы
-        const map: (number | null)[][] = Array.from({ length: 50 }, (_, row) =>
-            Array.from({ length: 50 }, (_, col) => {
+        const map: (number | null)[][] = Array.from({ length: 50 }, (_row, row) =>
+            Array.from({ length: 50 }, (_col, col) => {
                 if (col === 10) return 1; // полоса воды
                 return 0;
             })
         );
 
+        // Тестовые здания людей (цели для армии грибов)
+        const buildings = [
+            { guid: this.common.guid(), type: 'house', x: 35, y: 15, hp: 200, maxHp: 200 },
+            { guid: this.common.guid(), type: 'barracks', x: 40, y: 25, hp: 300, maxHp: 300 },
+            { guid: this.common.guid(), type: 'tower', x: 38, y: 35, hp: 150, maxHp: 150 },
+        ];
+
+        const mapGuid = this.common.guid();
+
         socket.emit(LOBBY_START, this.answer.good(true));
 
-        this.mediator.call(START_GAME, { guid, map, buildings: [] });
+        this.mediator.call(START_GAME, { guid, map, buildings, mapGuid });
     }
 
-    private async socketValidateToken(data: any = {}, socket: Socket): Promise<void> {
+    private async socketValidateToken(data: { token?: string } = {}, socket: Socket): Promise<void> {
         const { token } = data;
 
         if (!token) {
@@ -190,7 +191,7 @@ class UserManager extends BaseManager {
         if (userData) {
             const user = User.restoreFromData(
                 { db: this.db, common: this.common, socketId: socket.id },
-                userData as any
+                userData
             );
             this.users[user.getSelf().guid!] = user;
             socket.emit(VALIDATE_TOKEN, this.answer.good(user.toClient()));

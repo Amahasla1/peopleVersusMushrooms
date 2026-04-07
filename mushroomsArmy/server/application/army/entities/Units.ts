@@ -1,11 +1,12 @@
 import EasyStar = require('easystarjs');
+import { TMap } from '../Army';
 
 // Тайл-ID для непроходимых клеток (null в исходной карте → этот номер в EasyStar)
 const BLOCKED_TILE = 3;
 // Грибы проходимы по равнинам (0) и горам (2)
 const ACCEPTABLE_TILES = [0, 2];
 
-export interface UnitConstructorOptions {
+export type TUnitOptions = {
     guid: string;
     type: string;
     hp: number;
@@ -15,21 +16,22 @@ export interface UnitConstructorOptions {
     y: number;
     attackRange: number;
     fireDamageMultiplier?: number;
-}
+};
 
-export interface UnitState {
+export type TUnitState = {
   guid: string;
   type: string;
   x: number;
   y: number;
   hp: number;
   maxHp: number;
-  isAlive: boolean;
-}
+};
 
-export interface MapData {
-  map: (number | null)[][];
-}
+export type TPoisonEffect = {
+    duration: number;
+    damagePerSecond: number;
+    sourceGuid: string;
+};
 
 class Unit {
     public guid: string;
@@ -44,6 +46,7 @@ class Unit {
     public isAlive: boolean;
     public attackRange: number;
     public fireDamageMultiplier: number = 2;
+    public poisonEffects: TPoisonEffect[] = [];
     protected enemies: Unit [] = [];
     
     private easyStar: EasyStar.js;
@@ -54,7 +57,7 @@ class Unit {
     private decisionAccumulator: number = 0;
     private readonly DECISION_INTERVAL: number = 0.5; 
 
-    constructor({guid, type, x, y, hp, maxHp, speed, attackRange, fireDamageMultiplier = 2}: UnitConstructorOptions) {
+    constructor({guid, type, x, y, hp, maxHp, speed, attackRange, fireDamageMultiplier = 2}: TUnitOptions) {
         this.guid = guid;
         this.type = type;
         this.x = x;
@@ -75,7 +78,7 @@ class Unit {
         this.lastTargetTileY = Math.floor(y);
     }
 
-    update(enemies: Unit[], mapData: MapData, deltaTime: number): void {
+    update(enemies: Unit[], map: TMap, deltaTime: number): void {
         if (!this.isAlive) return;
 
         this.enemies = enemies;
@@ -87,7 +90,7 @@ class Unit {
             this.makeDecision(enemies);
         }
         
-        this.moveTo(this.targetX, this.targetY, mapData, deltaTime);
+        this.moveTo(this.targetX, this.targetY, map, deltaTime);
     }
     
     private makeDecision(enemies: Unit[]): void {
@@ -115,10 +118,10 @@ class Unit {
         }
     }
 
-    protected moveTo(targetX: number, targetY: number, mapData: MapData, deltaTime: number): void {
+    protected moveTo(targetX: number, targetY: number, map: TMap, deltaTime: number): void {
         if (!this.isAlive) return;
 
-        this.calculateUnitPath(mapData);
+        this.calculateUnitPath(map);
 
         if (this.path.length === 0) return;
 
@@ -140,7 +143,7 @@ class Unit {
     }
 
     /** Строит числовую сетку для EasyStar: null → BLOCKED_TILE */
-    private buildGrid(map: (number | null)[][]): number[][] {
+    private buildGrid(map: TMap): number[][] {
         return map.map(row => row.map(tile => tile === null ? BLOCKED_TILE : tile));
     }
 
@@ -148,8 +151,8 @@ class Unit {
      * Ищет путь от текущей позиции до цели через EasyStar.
      * Возвращает массив клеток или null если путь не найден.
      */
-    private findPath(mapData: MapData): Array<{x: number, y: number}> | null {
-        const grid = this.buildGrid(mapData.map);
+    private findPath(map: TMap): Array<{x: number, y: number}> | null {
+        const grid = this.buildGrid(map);
         this.easyStar.setGrid(grid);
 
         const height = grid.length;
@@ -185,9 +188,9 @@ class Unit {
     }
 
     /** Пересчитывает путь если цель изменилась или путь пустой */
-    private calculateUnitPath(mapData: MapData): void {
-        const endX = Math.max(0, Math.min((mapData.map[0]?.length ?? 50) - 1, Math.round(this.targetX)));
-        const endY = Math.max(0, Math.min((mapData.map.length ?? 50) - 1, Math.round(this.targetY)));
+    private calculateUnitPath(map: TMap): void {
+        const endX = Math.max(0, Math.min((map[0]?.length ?? 50) - 1, Math.round(this.targetX)));
+        const endY = Math.max(0, Math.min((map.length ?? 50) - 1, Math.round(this.targetY)));
 
         const targetChanged = endX !== this.lastTargetTileX || endY !== this.lastTargetTileY;
 
@@ -197,7 +200,7 @@ class Unit {
         this.lastTargetTileY = endY;
         this.path = [];
 
-        const p = this.findPath(mapData);
+        const p = this.findPath(map);
         if (p === null || p.length < 2) return;
         // Срезаем первую точку — это текущая позиция юнита
         this.path = p.slice(1);
@@ -225,7 +228,7 @@ class Unit {
         this.onDeath();
     }
     
-    getState(): UnitState {
+    getState(): TUnitState {
         return {
             guid: this.guid,
             type: this.type,
@@ -233,7 +236,6 @@ class Unit {
             y: this.y,
             hp: this.hp,
             maxHp: this.maxHp,
-            isAlive: this.isAlive,
         };
     }
 
