@@ -94,6 +94,7 @@ class ArmyManager extends BaseManager {
         this.army[guid].destructor();
         delete this.army[guid];
         this.updateArmyCallback(guid, { units: [] });
+        console.log('армия с guid: ${guid} уничтожена');
     }
 
     /* SOCKETS */

@@ -45,6 +45,7 @@ class UserManager extends BaseManager {
         await user.logout();
         this.mediator.call(this.EVENTS.USER_DISCONNECT, { guid: user.guid });
         delete this.users[user.guid];
+        console.log('пользователь с guid: ${user.guid} отключился');
     }
 
     /* SOCKETS */
