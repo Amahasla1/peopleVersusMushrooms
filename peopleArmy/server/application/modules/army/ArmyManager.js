@@ -13,6 +13,7 @@ class ArmyManager extends BaseManager {
         });
         // mediator event subscribers
         this.mediator.subscribe(this.EVENTS.START_GAME, (data) => this.eventStartGame(data));
+        this.mediator.subscribe(this.EVENTS.USER_DISCONNECT, (data) => this.eventUserDisconnect(data));
         // mediator trigger setters
         this.mediator.set(this.TRIGGERS.CREATE_UNIT, (data) => this.createUnit(data));
     }
@@ -84,6 +85,15 @@ class ArmyManager extends BaseManager {
                 }
             });
         }
+    }
+
+    eventUserDisconnect({ guid }) {
+        if (!guid || !this.army[guid]) {
+            return;
+        }
+        this.army[guid].destructor();
+        delete this.army[guid];
+        this.updateArmyCallback(guid, { units: [] });
     }
 
     /* SOCKETS */
