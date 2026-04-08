@@ -14,6 +14,7 @@ class UserManager extends BaseManager {
             socket.on(REGISTRATION, (data) => this.socketRegistration(data, socket));
             socket.on(LOGIN, (data) => this.socketLogin(data, socket));
             socket.on(LOGOUT, (data) => this.socketLogout(data, socket));
+            socket.on('disconnect', () => this.handleDisconnect(socket));
         });
         // mediator event subscribers
         //...
@@ -34,6 +35,18 @@ class UserManager extends BaseManager {
 
     /* EVENTS */
     //...
+
+    async handleDisconnect(socket) {
+        const guid = socket?.data?.guid;
+        const user = this.triggerGetUserByGuid(guid);
+        if (!user || !user.isLogin()) {
+            return;
+        }
+        await user.logout();
+        this.mediator.call(this.EVENTS.USER_DISCONNECT, { guid: user.guid });
+        delete this.users[user.guid];
+        console.log(`пользователь с guid: ${user.guid} отключился`);
+    }
 
     /* SOCKETS */
     async socketRegistration(data = {}, socket) {
@@ -66,6 +79,7 @@ class UserManager extends BaseManager {
         });
         if (await user.login(name, password)) {
             this.users[user.guid] = user;
+            socket.data.guid = user.guid;
             socket.emit(LOGIN, this.answer.good(user.getSelf()));
 
             const map = Array(50).fill().map(() => Array(50).fill(0));
@@ -90,7 +104,11 @@ class UserManager extends BaseManager {
             return socket.emit(LOGOUT, this.answer.bad(11));
         }
         await user.logout();
+        this.mediator.call(this.EVENTS.USER_DISCONNECT, { guid: user.guid });
         delete this.users[user.guid];
+        if (socket.data) {
+            delete socket.data.guid;
+        }
         socket.emit(LOGOUT, this.answer.good(true));
     }
 }
