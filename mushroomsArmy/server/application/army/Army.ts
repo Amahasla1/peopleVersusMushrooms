@@ -62,19 +62,61 @@ export class Army {
     }
 
     /** Обновляет список целей армии из данных видимости (здания и юниты врага) */
+    /** Синхронизирует урон по proxy-цели с локальным списком зданий врага */
+    private syncBuildingDamage(guid: string, hp: number): void {
+        const buildingIndex = this.buildings.findIndex(building => building.guid === guid);
+
+        if (buildingIndex === -1) {return;}
+
+        if (hp <= 0) {
+            this.buildings.splice(buildingIndex, 1);
+            return;
+        }
+
+        this.buildings[buildingIndex].hp = hp;
+    }
+
+    /** Создаёт proxy-юнита для здания и пробрасывает урон обратно в this.buildings. */
+    private createEnemyProxy(entity: TBuilding): Unit {
+        const proxy = new Unit({
+            guid: entity.guid,
+            type: entity.type,
+            x: entity.x,
+            y: entity.y,
+            hp: entity.hp,
+            maxHp: entity.maxHp,
+            speed: 0,
+            attackRange: 0,
+        });
+
+        const baseTakeDamage = proxy.takeDamage.bind(proxy);
+
+        proxy.takeDamage = (amount: number, type: string): void => {
+            baseTakeDamage(amount, type);
+            this.syncBuildingDamage(proxy.guid, proxy.hp);
+        };
+
+        return proxy;
+    }
+
+    /** Обновляет цели из видимости: существующим proxy меняет координаты, и создаёт новых по guid. */
     public updateEnemyEntities(entities: TBuilding[]): void {
-        this.enemyUnits = entities.map(entity =>
-            new Unit({
-                guid: entity.guid,
-                type: entity.type,
-                x: entity.x,
-                y: entity.y,
-                hp: entity.hp,
-                maxHp: entity.maxHp,
-                speed: 0,
-                attackRange: 0,
-            })
+        const existingEnemiesByGuid = new Map(
+            this.enemyUnits.map(enemy => [enemy.guid, enemy] as const)
         );
+
+        this.enemyUnits = entities.map(entity => {
+            const existingEnemy = existingEnemiesByGuid.get(entity.guid);
+
+            if (existingEnemy) {
+                existingEnemy.x = entity.x;
+                existingEnemy.y = entity.y;
+                return existingEnemy;
+            }
+
+            return this.createEnemyProxy(entity);
+        });
+        
     }
 
     private update(): void {
