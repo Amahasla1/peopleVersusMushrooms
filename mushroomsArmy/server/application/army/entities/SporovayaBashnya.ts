@@ -16,12 +16,12 @@ class SporovayaBashnya {
     public y: number;
     public hp: number;
     public maxHp: number;
-    public readonly sizeX: number = 2;
+     public readonly sizeX: number = 2;
     public readonly sizeY: number = 2;
 
-    private readonly attackRange: number = 10;
+    private readonly attackRange: number = 20;
     private readonly attackCooldown: number = 2;
-    private readonly attackDamage: number = 25;
+    private readonly attackDamage: number = 50;
     private attackTimer: number = 0;
 
     constructor(options: TSporovayaBashnyaOptions) {
