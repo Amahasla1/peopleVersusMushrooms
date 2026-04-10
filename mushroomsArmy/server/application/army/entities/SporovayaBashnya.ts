@@ -16,7 +16,7 @@ class SporovayaBashnya {
     public y: number;
     public hp: number;
     public maxHp: number;
-     public readonly sizeX: number = 2;
+    public readonly sizeX: number = 2;
     public readonly sizeY: number = 2;
 
     public isAlive: boolean = true;

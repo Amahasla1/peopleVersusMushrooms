@@ -160,7 +160,7 @@ export class Army {
             units: this.units.map(u => u.getState()),
             buildings: [
                 ...this.buildings.filter(building => building.type !== 'sporovaya_bashnya'),
-                ...this.sporovyeBashni.filter(b => b.isAlive).map(bashnya => bashnya.getState())
+                ...this.sporovyeBashni.map(bashnya => bashnya.getState())
             ],
             slimePuddles: this.units
                 .filter(u => u.type === 'champigneb' && !u.isAlive)
