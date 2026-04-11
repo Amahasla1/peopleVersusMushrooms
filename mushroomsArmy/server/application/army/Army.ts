@@ -10,7 +10,7 @@ export type TMap = (number | null)[][];
 export type TArmyOptions = {
     mapGuid: string;
     map: TMap;
-    buildings: any[];
+    buildings: IBuilding<any>[];
     guid: string;
     common: Common;
     callbacks: { update: (guid: string, data: TArmyState) => void };
@@ -75,24 +75,24 @@ export class Army {
         
         console.log(`[Army] Создано ${this.buildings.length} зданий: ${this.buildings.map(b => b.type).join(', ')}`);
 
-        // Создаём прокси-юниты только из ВРАЖЕСКИХ зданий (не наших)
-        const enemyBuildings = initialBuildings.filter(b => b.type !== 'sporovaya_bashnya' && b.type !== 'vzryvomor');
-        this.updateEnemyEntities(enemyBuildings);
+        // Вражеские здания (house, barracks, tower) — в прокси-цели для юнитов
+        this.enemyBuildings = initialBuildings.filter(b => b.type !== 'sporovaya_bashnya' && b.type !== 'vzryvomor') as IBuilding<any>[];
+        this.updateEnemyEntities(this.enemyBuildings);
     }
 
     /** Обновляет список целей армии из данных видимости (здания и юниты врага) */
     /** Синхронизирует урон по proxy-цели с локальным списком зданий врага */
     private syncBuildingDamage(guid: string, hp: number): void {
-        const buildingIndex = this.buildings.findIndex(building => building.guid === guid);
+        const buildingIndex = this.enemyBuildings.findIndex(building => building.guid === guid);
 
-        if (buildingIndex === -1) {return;}
+        if (buildingIndex === -1) { return; }
 
         if (hp <= 0) {
-            this.buildings.splice(buildingIndex, 1);
+            this.enemyBuildings.splice(buildingIndex, 1);
             return;
         }
 
-        this.buildings[buildingIndex].hp = hp;
+        this.enemyBuildings[buildingIndex].hp = hp;
     }
 
     /** Создаёт proxy-юнита для здания и пробрасывает урон обратно в this.buildings. */
@@ -176,7 +176,10 @@ export class Army {
         return {
             map: this.map,
             units: this.units.map(u => u.getState()),
-            buildings: this.buildings.map(b => b.getState()),
+            buildings: [
+                ...this.buildings.map(b => b.getState()),
+                ...this.enemyBuildings,
+            ],
             slimePuddles: this.units
                 .filter(u => u.type === 'champigneb' && !u.isAlive)
                 .map(u => (u as Champigneb).slimePuddle)
