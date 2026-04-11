@@ -4,29 +4,63 @@ const ORM = require('./ORM');
 // Тут используется sqlite3, но вы можете сменить её на другую (лучше так и сделать). Трусов упомянул postgreSQL, поэтому если будете менять, ставьте её
 
 class DB {
-    constructor({ DATABASE }) {
-        this.db = new sqlite3.Database(`${__dirname}/${DATABASE.NAME}`);
-        this.orm = new ORM(this.db);
+    constructor() {
+        this.db = null;
+        this.orm = null;
+        (async () => {
+            this.db = await open({
+                filename: CONFIG.SQLITE_PATH,
+                driver: sqlite3.Database,
+                mode: sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE
+            });
+            
+            await this.db.run('PRAGMA foreign_keys = ON');
+    
+            this.orm = new ORM(this);    
+        })();
     }
 
-    async getUserByName(name) {
-        return await this.orm.get('users', { name });
+    // ============ BASE METHODS ============
+    execute(sql, params = []) {
+        return this.db.run(sql, params);
     }
 
-    async getUserByToken(token) {
-        return await this.orm.get('users', { token });
+    query(sql, params = []) {
+        return this.db.get(sql, params);
     }
 
-    async registration(name, guid, passwordHash) {
-        return await this.orm.insert('users', ['name', 'guid', 'passwordHash'], [name, guid, passwordHash]);
+    queryAll(sql, params = []) {
+        return this.db.all(sql, params);
     }
 
-    async updateToken(id, token) {
-        return await this.orm.update('users', ['token'], [token], { id });
+    // ============ USER METHODS ============
+    getUserByGuid(guid) {
+        return this.orm.get('users', { guid });
     }
 
-    destructor() {
-        this.db.close();
+    getUserByLogin(login) {
+        return this.orm.get('users', { login });
+    }
+
+    getUserByToken(token) {
+        return this.orm.get('users', { token });
+    }
+
+    updateToken(userGuid, token) {
+        return this.orm.update('users', { guid: userGuid }, { token });
+    }
+
+    createUser(login, passwordHash, guid, token) {
+        return this.orm.insert('users', {
+            login,
+            password: passwordHash,
+            guid,
+            token,
+        });
+    }
+
+    clearToken(userGuid) {
+        return this.orm.update('users', { guid: userGuid }, { token: null });
     }
 }
 
