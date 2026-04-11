@@ -33,6 +33,8 @@ class ArmyManager extends BaseManager {
         this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.TAKE_DAMAGE_HANDLER, (data: { armyGuid: string; unitGuid: string; amount: number; type: string }) =>
             this.triggerTakeDamage(data)
         );
+
+        this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.DESTROY_ARMY, (guid: string) => this.destroyArmy(guid));
     }
 
     private triggerTakeDamage({ armyGuid, unitGuid, amount, type }: {
