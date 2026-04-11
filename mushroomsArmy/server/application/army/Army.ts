@@ -10,7 +10,7 @@ export type TMap = (number | null)[][];
 export type TArmyOptions = {
     mapGuid: string;
     map: TMap;
-    buildings: IBuilding<any>[];
+    buildings: any[];
     guid: string;
     common: Common;
     callbacks: { update: (guid: string, data: TArmyState) => void };
@@ -36,15 +36,14 @@ export class Army {
 
     constructor(options: TArmyOptions) {
         this.map = options.map;
-        this.buildings = options.buildings;
         this.mapGuid = options.mapGuid;
         this.guid = options.guid;
         this.callbacks = options.callbacks;
-        this.create(options.common);
+        this.create(options.common, options.buildings);
         this.intervalId = setInterval(() => this.update(), 200);
     }
 
-    private create(common: Common) {
+    private create(common: Common, initialBuildings: any[] = []) {
         this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
         this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
         this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
@@ -58,8 +57,9 @@ export class Army {
         this.buildings.push(new SporovayaBashnya({ guid: common.guid(), type: 'sporovaya_bashnya', x: 40, y: 42, hp: 80, maxHp: 100 }));
         
 
-        // Создаём прокси-юниты из зданий как изначальных целей для армии
-        this.updateEnemyEntities(this.buildings.filter(building => building.type !== 'sporovaya_bashnya'));
+        // Создаём прокси-юниты только из ВРАЖЕСКИХ зданий (не наших)
+        const enemyBuildings = initialBuildings.filter(b => b.type !== 'sporovaya_bashnya' && b.type !== 'vzryvomor');
+        this.updateEnemyEntities(enemyBuildings);
     }
 
     /** Обновляет список целей армии из данных видимости (здания и юниты врага) */
