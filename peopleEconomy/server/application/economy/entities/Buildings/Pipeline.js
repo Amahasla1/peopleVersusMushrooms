@@ -59,18 +59,8 @@ class Pipeline extends Building {
     
     //переместить ресурс
     transferResources(resource) {
-        //находим здание в конце трубопровода по координатам
-        const targetBuilding = this.economy.buildings.find(b => 
-            b.x === this.endX && b.y === this.endY
-        );
-        
-        //если здание найдено и у него есть метод addResource - добавляем ресурс
-        if (targetBuilding && targetBuilding.addResource) {
-            targetBuilding.addResource(resource);
-        }
-        
-        this.economy.updated = true;
-        return true;
+        //сложна
+        //обдумать взамимодействие с другими путями труб
     }
     
     //проверить, проходит ли трубопровод через указанную клетку
