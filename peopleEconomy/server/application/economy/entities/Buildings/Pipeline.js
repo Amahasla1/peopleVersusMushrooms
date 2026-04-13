@@ -10,7 +10,7 @@ class Pipeline extends Building {
             y: startY,
             callbacks,
             hp: 100,
-            size: { width: 1, height: 1 }
+            size: 1,
         });
         
         this.startX = startX;

@@ -9,7 +9,7 @@ class DieselGenerator extends Building {
             y,
             callbacks,
             hp: 100,
-            size: { width: 2, height: 2 },
+            size: 2,
             production: 50,      // производство электричества
             consumption: 10,     // потребление нефти
             capacity: 200        // емкость хранилища электричества
