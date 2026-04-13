@@ -2,7 +2,6 @@ const Building = require('./Building');
 
 class DieselGenerator extends Building {
     constructor({ type, guid, x, y, callbacks = {} }) {
-        //вызываем конструктор Building
         super({
             type,
             guid,

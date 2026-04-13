@@ -44,6 +44,7 @@ class Building {
         return this.capacity;
     }
 
+    //уничтожить здание ?? (переопределять у труб, вопрос)
     destroy() {
         if (this.callbacks.onDestroy) {
             this.callbacks.onDestroy(this.guid);
