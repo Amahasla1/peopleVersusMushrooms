@@ -14,7 +14,6 @@ class GameManager extends BaseManager {
 		this.io.on('connection', (socket) => { });
 		// mediator events subscribers
 		this.mediator.subscribe(this.EVENTS.START_GAME, (data) => this.eventStartGame(data));
-		this.mediator.subscribe(this.EVENTS.LOAD_GAME, (data) => this.eventLoadGame(data));
 		// mediator triggers setters
 		//...
 	}

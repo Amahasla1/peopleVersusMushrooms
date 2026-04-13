@@ -1,66 +1,71 @@
-class DieselGenerator {
-    constructor({ type, guid, x, y, role, callbacks = {} }) {
-        this.x = x;
-        this.y = y;
-        this.type = type;
-        this.guid = guid;
-        this.role = role;
-        this.callbacks = callbacks;
-        
-        //==== ВСЕ НИЖЕ ВЫНЕСТИ ПОТОМ В КОНФИГУ====
-        //параметры генератора
-        this.hp = 100;
-        this.size = { width: 2, height: 2 };
-        
-        //потребление нефти за единицу времени
-        this.oilConsumption = 10;
-        
-        //производство электричества за единицу времени
-        this.electricityProduction = 50;
+const Building = require('./Building');
+
+class DieselGenerator extends Building {
+    constructor({ type, guid, x, y, callbacks = {} }) {
+        //вызываем конструктор Building
+        super({
+            type,
+            guid,
+            x,
+            y,
+            callbacks,
+            hp: 100,
+            size: { width: 2, height: 2 },
+            production: 50,      // производство электричества
+            consumption: 10,     // потребление нефти
+            capacity: 200        // емкость хранилища электричества
+        });
         
         //внутреннее хранилище нефти
         this.oilStorage = 0;
         this.oilCapacity = 100;
-        
+
         //внутреннее хранилище электричества
         this.electricityStorage = 0;
-        this.electricityCapacity = 200;
         
         //работает ли генератор
         this.isActive = false;
     }
 
-     get() {
+    get() {
         return {
-            guid: this.guid,
-            coords: { x: this.x, y: this.y },
-            type: this.type,
-            hp: this.hp,
-            size: this.size,
+            ...super.get(),
             isActive: this.isActive
         };
     }
 
     getSelf() {
         return {
-            ...this.get(),
-            oilConsumption: this.oilConsumption,
-            electricityProduction: this.electricityProduction,
+            ...super.getSelf(),
             oilStorage: this.oilStorage,
             oilCapacity: this.oilCapacity,
-            electricityStorage: this.electricityStorage,
-            electricityCapacity: this.electricityCapacity
+            isActive: this.isActive
         };
     }
 
     //добавить нефть
     addOil(amount) {
+        const availableSpace = this.oilCapacity - this.oilStorage;
+        const added = Math.min(amount, availableSpace);
+        this.oilStorage += added;
         
+        if (this.callbacks.onOilAdded) {
+            this.callbacks.onOilAdded(this.guid, added);
+        }
+        
+        return added;
     }
 
     //забрать электричество
     takeElectricity(amount) {
-
+        const taken = Math.min(amount, this.electricityStorage);
+        this.electricityStorage -= taken;
+        
+        if (this.callbacks.onElectricityTaken) {
+            this.callbacks.onElectricityTaken(this.guid, taken);
+        }
+        
+        return taken;
     }
 
     //получить текущий запас нефти
@@ -70,7 +75,7 @@ class DieselGenerator {
 
     //получить потребление нефти
     getOilConsumption() {
-        return this.oilConsumption;
+        return this.consumption;
     }
 
     //получить емкость хранилища нефти
@@ -80,12 +85,12 @@ class DieselGenerator {
     
     //получить производство электричества
     getElectricityProduction() {
-        return this.electricityProduction;
+        return this.production;
     }
 
     //получить емкость хранилища электричества
     getElectricityCapacity() {
-        return this.electricityCapacity;
+        return this.capacity;
     }
 
     //получить текущий запас электричества
@@ -96,6 +101,6 @@ class DieselGenerator {
     update() {
 
     }
-
-
 }
+
+module.exports = DieselGenerator;

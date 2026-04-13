@@ -44,8 +44,11 @@ class Building {
         return this.capacity;
     }
 
-
-
+    destroy() {
+        if (this.callbacks.onDestroy) {
+            this.callbacks.onDestroy(this.guid);
+        }
+    }
 }
 
 module.exports = Building;

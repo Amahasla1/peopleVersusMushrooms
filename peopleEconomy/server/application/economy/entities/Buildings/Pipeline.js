@@ -1,8 +1,18 @@
 const EasyStar = require('easystarjs');
+const Building = require('./Building');
 
-class Pipeline {
-    constructor({ startX, startY, endX, endY, map, guid, economy }) {
-        this.guid = guid;
+class Pipeline extends Building {
+    constructor({ startX, startY, endX, endY, map, guid, economy, callbacks = {} }) {
+        super({
+            type: 'pipeline',
+            guid,
+            x: startX,
+            y: startY,
+            callbacks,
+            hp: 100,
+            size: { width: 1, height: 1 }
+        });
+        
         this.startX = startX;
         this.startY = startY;
         this.endX = endX;
@@ -11,9 +21,6 @@ class Pipeline {
         this.map = map;
         this.economy = economy;
         this.path = [];
-
-        this.hp = 100;
-        this.size = { width: 1, height: 1 };
         
         this._buildPath();
     }
@@ -23,7 +30,7 @@ class Pipeline {
         const easystar = new EasyStar.js();
         
         //получаем сетку проходимости из карты
-        const grid = this.map.getPassability(); // такого метода нет, обудмать хорошечно
+        const grid = this.map.getPassability();
         easystar.setGrid(grid);
         
         //разрешаем ходить только по определенным тайлам (1)
@@ -43,12 +50,10 @@ class Pipeline {
     
     get() {
         return {
-            guid: this.guid,
+            ...super.get(),
             start: { x: this.startX, y: this.startY },
             end: { x: this.endX, y: this.endY },
-            path: this.path,
-            hp: this.hp,
-            size: this.size
+            path: this.path
         };
     }
     
@@ -59,7 +64,7 @@ class Pipeline {
             b.x === this.endX && b.y === this.endY
         );
         
-        //если здание найдено и у него есть метод addResource(?) - добавляем ресурс
+        //если здание найдено и у него есть метод addResource - добавляем ресурс
         if (targetBuilding && targetBuilding.addResource) {
             targetBuilding.addResource(resource);
         }
@@ -78,11 +83,6 @@ class Pipeline {
         return this.path;
     }
     
-    //уничтожить трубу
-    destroy() {
-        this.path = [];
-        this.economy.updated = true;
-    }
 }
 
 module.exports = Pipeline;
