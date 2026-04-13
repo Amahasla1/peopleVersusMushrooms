@@ -30,7 +30,7 @@ class Pipeline extends Building {
         const easystar = new EasyStar.js();
         
         //получаем сетку проходимости из карты
-        const grid = this.map.getPassability();
+        const grid = this.map;
         easystar.setGrid(grid);
         
         //разрешаем ходить только по определенным тайлам (1)
