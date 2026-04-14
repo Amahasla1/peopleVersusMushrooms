@@ -71,7 +71,8 @@ const Lobby: React.FC<IBasePage> = (props) => {
             LOBBIES_LIST_UPDATED,
             START_GAME,
             GENERATE_MAP,
-            SET_READY
+            SET_READY,
+            
         } = mediator.getEventTypes();
 
         const logoutHandler = () => {

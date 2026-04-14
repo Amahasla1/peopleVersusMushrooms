@@ -125,11 +125,6 @@ class Store {
 
     handleSetReady(data: any): void {
         console.log('Set ready:', data);
-        // Обработка статуса готовности
-        if (data && data.guid && this.currentLobby) {
-            // Здесь можно обновить статус готовности игрока в текущем лобби
-            // Это зависит от того, как вы храните статусы готовности
-        }
     }
 
     handleLobbiesListUpdated(data: ILobby[]): void {
