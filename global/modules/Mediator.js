@@ -4,8 +4,14 @@ class Mediator {
         this.triggers = {};
         this.EVENTS = EVENTS;
         this.TRIGGERS = TRIGGERS;
-        Object.keys(this.EVENTS  ).forEach(key => this.events[this.EVENTS[key]] = []);
-        Object.keys(this.TRIGGERS).forEach(key => this.triggers[this.TRIGGERS[key]] = () => { return null; });
+
+        Object.keys(EVENTS).forEach(key => {
+            this.events[this.EVENTS[key]] = [];
+        });
+
+        Object.keys(TRIGGERS).forEach(key => {
+            this.triggers[this.TRIGGERS[key]] = () => { return null; };
+        });
     }
 
     getEventTypes() {
@@ -18,30 +24,34 @@ class Mediator {
         }
     }
 
-    unsubscribe(name, _func) {
-        if (!(this.events[name] && _func instanceof Function)) {
-            return;
+    call(name, data) {
+        if (this.events[name]) {
+            const event = this.events[name][0];
+            if (event instanceof Function) {
+                return event(data);
+            }
         }
+    }
+
+
+    unsubscribe(name, _func) {
+        if (!this.events[name]) return;
+
         const handlerEntry = this.events[name]
             .map((func, i) => ([func, i]))
             .filter(([func]) => func === _func)[0];
+
         if (handlerEntry) {
             this.events[name].splice(handlerEntry[1], 1);
         }
     }
 
     unsubscribeAll(name) {
-        if (name && this.events[name]) {
+        if (name) {
             this.events[name] = [];
-        }
-    }
-
-    call(name, data) {
-        if (this.events[name]) {
-            this.events[name].forEach(event => {
-                if (event instanceof Function) { 
-                    event(data);
-                }
+        } else {
+            Object.keys(this.events).forEach(key => {
+                this.events[key] = [];
             });
         }
     }
@@ -51,13 +61,17 @@ class Mediator {
     }
 
     set(name, func) {
-        if (name && func instanceof Function) {
+        if (this.triggers.hasOwnProperty(name) && func instanceof Function) {
             this.triggers[name] = func;
         }
     }
 
     get(name, data) {
-        return (this.triggers[name] && this.triggers[name] instanceof Function) ? this.triggers[name](data) : null;
+        if (this.triggers[name] && this.triggers[name] instanceof Function) {
+            return this.triggers[name](data);
+        }
+        return null;
     }
 }
+
 module.exports = Mediator;

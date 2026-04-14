@@ -1,7 +1,7 @@
 class ORM {
-    constructor(db) { //НАСТОЯТЕЛЬНО рекомендуется подредактировать orm так, чтобы передавать нужно было не массив с колонками, а строку
-        this.db = db; //Сейчас: orm.get("users", { id }, ["username", "token", "online"]);
-    }                 //Должно быть: orm.get("users", { id }, "username, token, online");
+    constructor(db) {
+        this.db = db; 
+    }
 
     get(table, params = null, columns = "*", operand = 'AND') {
         const query = [];
