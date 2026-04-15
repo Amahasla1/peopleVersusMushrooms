@@ -1,24 +1,23 @@
+//GLOBAL
+const GLOBAL_CONFIG = require('../../../../global/globalConfig');
+//..
+
+//LOCAL
 const express = require('express');
 const router = express.Router();
+
+
 const {
-    useStartGameHandler,
-    useLobbiesUpdatedHandler
+    notFoundHandler,
+	useLobbyUpdatedHandler,
 } = require('./handlers');
 
-function Router(mediator, answer, common) {
-    // ============ LOBBY ROUTES ============
-    router.post('/startGame{/:guid}', useStartGameHandler(mediator, answer, common));
-    router.post('/lobbiesUpdated', useLobbiesUpdatedHandler(mediator, answer, common));
+function Router({ mediator, answer }) {
+	
+	// про лобби
+	router.post('/lobbyUpdated', useLobbyUpdatedHandler(mediator, answer));
 
-    // ============ BUILDING ROUTES ============
-    // для http методов из BuildingManager
-
-    // ============ NOT FOUND ============
-    router.all('/*path', (_, res) => {
-        res.json(answer.bad(404));
-    });
-
-
+    router.all('/*path', notFoundHandler);
     return router;
 }
 
