@@ -62,8 +62,8 @@ const GLOBAL_CONFIG = {
         GET_RELIEF: '/getRelief',
         GET_VISIBILITY: '/getVisibility',
         GET_RESOURSE_VISIBILITY: '/getResourseVisibility',
-        UPDATE_UNITS_HANDLER: 'updateUnitsHandler',
-        UPDATE_BUILDINGS_HANDLER: 'updateBuldingsHandler'
+        UPDATE_UNITS: '/updateUnits',
+        UPDATE_BUILDINGS: '/updateBuldings',
     }
 };
 

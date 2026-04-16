@@ -222,7 +222,7 @@ class Map {
             positions.add(pos);
         }
 
-        positions.forEach((pos, index) => {
+        [...positions].forEach((pos, index) => {
             const y = Math.floor(pos / this.width);
             const x = pos % this.width;
             this.sources.push(

@@ -36,8 +36,8 @@ function Router(mediator, answer, common) {
     router.get(`${URLS.GET_RESOURSE_VISIBILITY}{/:mapGuid}{/:userGuid}`, useGetResourseVisibilityHandler(mediator, answer, common));
     router.get('/getGeneratedMap', useGetGeneratedMapHandler(mediator, answer, common));
 
-    router.post(URLS.UPDATE_UNITS_HANDLER, useUpdateUnitsHandler(mediator, answer, common));
-    router.post(URLS.UPDATE_BUILDINGS_HANDLER, useUpdateBuildingsHandler(mediator, answer, common));
+    router.post(URLS.UPDATE_UNITS, useUpdateUnitsHandler(mediator, answer, common));
+    router.post(URLS.UPDATE_BUILDINGS, useUpdateBuildingsHandler(mediator, answer, common));
 
 
     // ============ NOT FOUND ============
