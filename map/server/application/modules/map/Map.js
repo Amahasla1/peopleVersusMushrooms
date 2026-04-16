@@ -213,8 +213,8 @@ class Map {
         this.iron = clamp(this.iron);
         this.oil = clamp(this.oil);
         const mapSize = this.width * this.height;
-        const ironSize = Math.floor(mapSize * iron / 100);
-        const oilSize = Math.floor(mapSize * oil / 100);
+        const ironSize = Math.floor(mapSize * this.iron / 100);
+        const oilSize = Math.floor(mapSize * this.oil / 100);
         const positions = new Set();
 
         while (positions.size < ironSize + oilSize) {
