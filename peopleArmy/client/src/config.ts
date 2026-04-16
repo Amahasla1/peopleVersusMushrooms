@@ -8,7 +8,11 @@ interface SocketEvents {
     REGISTRATION: string;
     LOGIN: string;
     LOGOUT: string;
-    UPDATE_ARMY: 'UPDATE_ARMY',
+    UPDATE_ARMY: 'UPDATE_ARMY';
+    /** События лобби — те же имена, что в global/globalConfig SOCKET (серверный LobbyManager). */
+    CREATE_LOBBY: 'CREATE_LOBBY';
+    LEAVE_LOBBY: 'LEAVE_LOBBY';
+    LOBBY_UPDATED: 'LOBBY_UPDATED';
 }
 
 interface MediatorEvents {
@@ -40,6 +44,9 @@ const CONFIG: Config = {
         LOGIN: 'login',
         LOGOUT: 'logout',
         UPDATE_ARMY: 'UPDATE_ARMY',
+        CREATE_LOBBY: 'CREATE_LOBBY',
+        LEAVE_LOBBY: 'LEAVE_LOBBY',
+        LOBBY_UPDATED: 'LOBBY_UPDATED',
     },
     MEDIATOR: {
         EVENTS: {
