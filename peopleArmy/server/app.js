@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 // global imports
-const LobbyManager = require('../../global/modules/LobbyManager');
+const LobbyManager = require('../../global/modules/lobby/LobbyManager');
 // config
 // answer
 // mediator
