@@ -1,5 +1,5 @@
 import { TMap } from "../Army";
-import Unit, { TUnitOptions } from "./Units";
+import Unit, { TUnitOptions, TUnitState } from "./Units";
 
 class Eblekar extends Unit {
     public healRange: number = 10;
@@ -115,6 +115,13 @@ class Eblekar extends Unit {
 
     private canHealAlly(ally: Unit): boolean {
         return ally.type === 'sporomet' || ally.type === 'champigneb' || ally.type === 'eblekar';
+    }
+
+    public getState(): TUnitState {
+        return {
+            ...super.getState(),
+            isHealing: this.isAiming,
+        };
     }
 
     protected onDeath(): void {}

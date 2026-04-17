@@ -177,7 +177,7 @@ export function drawGame(
       // fallback — цветной круг пока изображение не загружено
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.fillStyle = unit.type === 'sporomet' ? '#4caf50' : '#ff9800';
+      ctx.fillStyle = unit.type === 'sporomet' ? '#4caf50' : unit.type === 'eblekar' ? '#e040fb' : '#ff9800';
       ctx.fill();
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 1;

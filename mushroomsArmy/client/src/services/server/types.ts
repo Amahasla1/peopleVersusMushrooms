@@ -58,6 +58,7 @@ export type TUnit = {
     y: number;
     hp: number;
     maxHp: number;
+    isHealing?: boolean;
 }
 
 // Здание (цель для армии грибов)
