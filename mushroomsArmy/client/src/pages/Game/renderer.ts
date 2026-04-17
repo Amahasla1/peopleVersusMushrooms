@@ -1,17 +1,32 @@
-import { GameState, TerrainType } from './types';
+import { GameState, TerrainType, Unit } from './types';
 import sporometSrc from '../../assets/units/Sporomet.png';
 import champignebSrc from '../../assets/units/Champigneb.png';
+import eblekarSrc from '../../assets/units/Eblekar.png';
+
 
 // Предзагрузка изображений (один раз)
 const unitImages: Record<string, HTMLImageElement> = {};
 
-function getUnitImage(type: string, src: string): HTMLImageElement {
-  if (!unitImages[type]) {
-    const img = new Image();
-    img.src = src;
-    unitImages[type] = img;
+function getUnitImage(unit: Unit): HTMLImageElement | undefined {
+
+  let getImage = (unit: Unit) => {
+    switch (unit.type) {
+      case 'sporomet': return sporometSrc;
+      case 'champigneb': return champignebSrc;
+      case 'eblekar': return eblekarSrc;
+      default: return undefined;
+    }
   }
-  return unitImages[type];
+
+  if (!unitImages[unit.type]) {
+    const imgSrc = getImage(unit);
+    if (imgSrc == undefined) return undefined;
+    
+    const img = new Image();
+    img.src = imgSrc;
+    unitImages[unit.type] = img;
+  }
+  return unitImages[unit.type];
 }
 
 export function drawGame(
@@ -155,9 +170,8 @@ export function drawGame(
     const size = radius * 2;
 
     // Изображение юнита
-    const imgSrc = unit.type === 'sporomet' ? sporometSrc : champignebSrc;
-    const img = getUnitImage(unit.type, imgSrc);
-    if (img.complete && img.naturalWidth > 0) {
+    const img = getUnitImage(unit);
+    if (img != undefined && img.complete && img.naturalWidth > 0) {
       ctx.drawImage(img, cx - size / 2, cy - size / 2, size, size);
     } else {
       // fallback — цветной круг пока изображение не загружено
