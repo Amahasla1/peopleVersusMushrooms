@@ -16,9 +16,10 @@ export type Unit = {
   guid: string;               
   x: number;                
   y: number;                
-  type: 'sporomet' | 'champigneb';
+  type: 'sporomet' | 'champigneb' | 'eblekar';
   hp: number;               
-  maxHp: number;            
+  maxHp: number;  
+  isHealing?: boolean;          
 };
 
 /**

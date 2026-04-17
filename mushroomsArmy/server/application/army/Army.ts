@@ -45,13 +45,12 @@ export class Army {
     }
 
     private create(common: Common, initialBuildings: any[] = []) {
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 30, maxHp: 30, speed: 2, attackRange: 16 }));
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 30, maxHp: 30, speed: 2, attackRange: 16 }));
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 30, maxHp: 30, speed: 2, attackRange: 16 }));
-        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 5, y: 5, hp: 50, maxHp: 50, speed: 4, attackRange: 6 }));
-        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 15, y: 15, hp: 50, maxHp: 50, speed: 4, attackRange: 6 }));
-        this.units.push(new Eblekar({ guid: common.guid(), type: 'eblekar', x: 10, y: 0, hp: 40, maxHp: 40, speed: 2, attackRange: 0 }));
-        
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
+        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 5, y: 5, hp: 50, maxHp: 50, speed: 1, attackRange: 5 }));
+        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 15, y: 15, hp: 50, maxHp: 50, speed: 1, attackRange: 5 }));
+        this.units.push(new Eblekar({guid:common.guid(), type: 'eblekar', x: 15, y: 20, hp: 40, maxHp: 40, speed: 2, attackRange: 1}));
         // Создание своих зданий из initialBuildings
         for (const building of initialBuildings) {
             if (building.type === 'sporovaya_bashnya') {
