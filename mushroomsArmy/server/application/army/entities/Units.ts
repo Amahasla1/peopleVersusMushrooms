@@ -16,6 +16,7 @@ export type TUnitOptions = {
     y: number;
     attackRange: number;
     fireDamageMultiplier?: number;
+    projectiles?: TProjectile[];
 };
 
 export type TUnitState = {
@@ -34,6 +35,16 @@ export type TPoisonEffect = {
     sourceGuid: string;
 };
 
+export type TProjectile = {
+    guid: string;
+    type: 'sporomet' | 'sporovaya_bashnya' | 'eblekar';
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+    createdAt: number;
+};
+
 class Unit {
     public guid: string;
     public type: string;
@@ -48,6 +59,7 @@ class Unit {
     public attackRange: number;
     public fireDamageMultiplier: number = 2;
     public poisonEffects: TPoisonEffect[] = [];
+    public projectiles: TProjectile[] = [];
     protected enemies: Unit [] = [];
     
     private easyStar: EasyStar.js;
@@ -58,7 +70,7 @@ class Unit {
     private decisionAccumulator: number = 0;
     private readonly DECISION_INTERVAL: number = 0.5; 
 
-    constructor({guid, type, x, y, hp, maxHp, speed, attackRange, fireDamageMultiplier = 2}: TUnitOptions) {
+    constructor({guid, type, x, y, hp, maxHp, speed, attackRange, fireDamageMultiplier = 2, projectiles = []}: TUnitOptions) {
         this.guid = guid;
         this.type = type;
         this.x = x;
@@ -68,6 +80,7 @@ class Unit {
         this.speed = speed;
         this.attackRange = attackRange;
         this.fireDamageMultiplier = fireDamageMultiplier;
+        this.projectiles = projectiles;
         this.targetX = x;
         this.targetY = y;
         this.isAlive = true;
