@@ -8,8 +8,8 @@ import useStore from './services/Store/useStore';
 
 import './App.css';
 
-export const MediatorContext = createContext<any>(null!);
-export const ServerContext = createContext<any>(null!);
+export const MediatorContext = createContext<Mediator>(null!);
+export const ServerContext = createContext<Server>(null!);
 
 function App() {
   const [page, setPage] = useState<PAGES>(PAGES.LOGIN);
@@ -26,8 +26,6 @@ useEffect(() => {
         setPage(PAGES.LOGIN);
         return;
     }
-
-
 
     server.authValidate(token).then((response: any) => {
         if (response?.result === 'ok') {

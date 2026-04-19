@@ -47,12 +47,12 @@ export class Army {
     }
 
     private create(common: Common, initialBuildings: any[] = []) {
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 100, maxHp: 100, speed: 1, attackRange: 10, projectiles: this.projectiles }));
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 100, maxHp: 100, speed: 1, attackRange: 10, projectiles: this.projectiles }));
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 100, maxHp: 100, speed: 1, attackRange: 10, projectiles: this.projectiles }));
-        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 5, y: 5, hp: 50, maxHp: 50, speed: 1, attackRange: 5 }));
-        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 15, y: 15, hp: 50, maxHp: 50, speed: 1, attackRange: 5 }));
-        this.units.push(new Eblekar({guid:common.guid(), type: 'eblekar', x: 15, y: 20, hp: 40, maxHp: 40, speed: 2, attackRange: 1, projectiles: this.projectiles}));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 8, maxHp: 8, speed: 1, attackRange: 12, projectiles: this.projectiles }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 8, maxHp: 8, speed: 1, attackRange: 12, projectiles: this.projectiles }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 8, maxHp: 8, speed: 1, attackRange: 12, projectiles: this.projectiles }));
+        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 5, y: 5, hp: 35, maxHp: 35, speed: 3, attackRange: 6 }));
+        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 15, y: 15, hp: 35, maxHp: 35, speed: 3, attackRange: 6 }));
+        this.units.push(new Eblekar({ guid: common.guid(), type: 'eblekar', x: 15, y: 20, hp: 40, maxHp: 40, speed: 1, attackRange: 1, projectiles: this.projectiles }));
         // Создание своих зданий из initialBuildings
         for (const building of initialBuildings) {
             if (building.type === 'sporovaya_bashnya') {
@@ -72,25 +72,9 @@ export class Army {
                     y: building.y,
                     hp: building.hp,
                     maxHp: building.maxHp,
-                    attackRange: building.attackRange || 5
+                    attackRange: building.attackRange || 7
                 }));
             }
-        }
-        
-        console.log(`[Army] Создано ${this.buildings.length} зданий: ${this.buildings.map(b => b.type).join(', ')}`);
-
-        // Тестовые здания грибов (для проверки анимаций пока нет данных с сервера карты)
-        if (this.buildings.length === 0) {
-            this.buildings.push(new SporovayaBashnya({
-                guid: common.guid(), type: 'sporovaya_bashnya',
-                x: 30, y: 30, hp: 200, maxHp: 200
-            }));
-            this.buildings.push(new Vzryvomor({
-                guid: common.guid(), x: 35, y: 35, hp: 100, maxHp: 100, attackRange: 6
-            }));
-            this.buildings.push(new Vzryvomor({
-                guid: common.guid(), x: 38, y: 32, hp: 100, maxHp: 100, attackRange: 6
-            }));
         }
 
         // Вражеские здания (house, barracks, tower) — в прокси-цели для юнитов

@@ -87,8 +87,6 @@ class ArmyManager extends BaseManager {
 
         const { units, slimePuddles, buildings } = armyState;
 
-        console.log(`[ArmyManager] Отправка на карту: ${buildings.length} зданий, ${units.length} юнитов`);
-
         // Отправляем юниты и здания на отдельные эндпоинты карты
         await this.send<{ mapGuid: string; userGuid: string; units: any[] }>(
             `${CONFIG.SERVICES.MAP_URL}/updateUnitsHandler`,
@@ -146,8 +144,6 @@ class ArmyManager extends BaseManager {
                 update: (guid: string, armyState: TArmyState) => this.updateArmyCallback(guid, armyState)
             }
         });
-
-        console.log(`[ArmyManager] Армия создана для игрока ${guid}`);
     }
 }
 
