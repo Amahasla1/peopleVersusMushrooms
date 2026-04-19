@@ -15,6 +15,7 @@ import vzryvomorFrame9 from '../../assets/buildings/vzryvomor/frame_9.png';
 import vzryvomorFrame10 from '../../assets/buildings/vzryvomor/frame_10.png';
 import sporovayaBashnyaIdle from '../../assets/buildings/sporovaya_bashnya/idle.png';
 import sporovayaBashnyaAttack from '../../assets/buildings/sporovaya_bashnya/attack.png';
+import sporovayaBashnyaDestroyed from '../../assets/buildings/sporovaya_bashnya/destroyed.png';
 import {
   getVzryvomorFrameKey,
   stepVzryvomorAnimation,
@@ -82,6 +83,7 @@ function preloadBuildingImages(): void {
   });
   getBuildingImage('sporovaya_bashnya:idle', sporovayaBashnyaIdle);
   getBuildingImage('sporovaya_bashnya:attack', sporovayaBashnyaAttack);
+  getBuildingImage('sporovaya_bashnya:destroyed', sporovayaBashnyaDestroyed);
 }
 
 preloadBuildingImages();
@@ -237,10 +239,13 @@ export function drawGame(
       const pw = sx * cellW;
       const ph = sy * cellH;
 
-      const attacking = building.isAttacking === true;
-      const sbImg = attacking
-        ? getBuildingImage('sporovaya_bashnya:attack', sporovayaBashnyaAttack)
-        : getBuildingImage('sporovaya_bashnya:idle', sporovayaBashnyaIdle);
+      const destroyed = building.isAlive === false || building.hp <= 0;
+      const attacking = !destroyed && building.isAttacking === true;
+      const sbImg = destroyed
+        ? getBuildingImage('sporovaya_bashnya:destroyed', sporovayaBashnyaDestroyed)
+        : attacking
+          ? getBuildingImage('sporovaya_bashnya:attack', sporovayaBashnyaAttack)
+          : getBuildingImage('sporovaya_bashnya:idle', sporovayaBashnyaIdle);
 
       if (!isImageDrawable(sbImg) || !tryDrawImageScaled(ctx, sbImg, px, py, pw, ph)) {
         ctx.fillStyle = '#4e342e';
