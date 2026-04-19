@@ -52,7 +52,6 @@ export interface IBuilding<T> {
     takeDamage: (amount: number, type: string) => void;
     getState: () => T;
 }
-// IBuilding — интерфейс поведения, оставлен как interface намеренно
 
 export class Vzryvomor implements IBuilding<VzryvomorState> {
 

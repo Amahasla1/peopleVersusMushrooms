@@ -92,7 +92,7 @@ class ArmyManager extends BaseManager {
             return;
         }
 
-        const { units, slimePuddles, buildings } = armyState;
+        const { units, buildings } = armyState;
 
         // Отправляем юниты и здания на отдельные эндпоинты карты
         await this.send<{ mapGuid: string; userGuid: string; units: TArmyState['units'] }>(

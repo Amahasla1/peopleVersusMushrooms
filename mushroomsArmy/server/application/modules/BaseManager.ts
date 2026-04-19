@@ -17,10 +17,7 @@ type TMediator = {
     getTriggerTypes: () => { [key: string]: string };
 };
 
-type TDB = {
-    getUserByName: (name: string) => Promise<unknown>;
-    getUserByToken: (token: string) => Promise<unknown>;
-};
+type TDB = object;
 
 export type TManagerOptions = {
     mediator: TMediator;
@@ -62,7 +59,6 @@ class BaseManager {
         data: T | null = null,
         method = 'POST'
     ): Promise<K | null> {
-        console.log('send to', url, data);
         try {
             const params: RequestInit = {
                 method,
@@ -77,8 +73,6 @@ class BaseManager {
 
             const res = await fetch(url, params);
             const answer = await res.json() as TApiResponse;
-
-            console.log('answer', answer);
 
             if (answer && answer.result === 'ok') {
                 return answer.data as K;
@@ -112,19 +106,6 @@ class BaseManager {
         return this.send(`${GLOBAL_CONFIG.MUSHROOMS_ECONOMY.URL}${urlPath}`, data);
     }
 
-    sendToPeopleArmy<T, K = undefined>(
-        urlPath: string,
-        data: T | null = null
-    ): Promise<K | null> {
-        return this.send(`${GLOBAL_CONFIG.PEOPLE_ARMY.URL}${urlPath}`, data);
-    }
-
-    sendToPeopleEconomy<T, K = undefined>(
-        urlPath: string,
-        data: T | null = null
-    ): Promise<K | null> {
-        return this.send(`${GLOBAL_CONFIG.PEOPLE_ECONOMY.URL}${urlPath}`, data);
-    }
 }
 
 export default BaseManager;

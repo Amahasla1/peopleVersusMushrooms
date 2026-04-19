@@ -1,5 +1,4 @@
 // GLOBAL
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const GLOBAL_CONFIG = require('../../../../global/globalConfig');
 
 // LOCAL
