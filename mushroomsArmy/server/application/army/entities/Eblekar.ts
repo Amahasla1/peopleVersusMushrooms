@@ -21,7 +21,7 @@ class Eblekar extends Unit {
         super(options);
         this.hp = 40;
         this.maxHp = 40;
-        this.speed = 2;
+        this.speed = 1;
     }
 
     public update(enemies: Unit[], map: TMap, deltaTime: number, allies: Unit[] = []): void {
@@ -60,6 +60,15 @@ class Eblekar extends Unit {
         if (currentTime - this.lastHealTime < this.healCooldown) return;
 
         if (currentTime - this.aimStartTime >= this.aimTime) {
+             this.projectiles.push({
+                guid: `${this.guid}-${Date.now()}-${Math.random()}`,
+                type: 'eblekar',
+                fromX: this.x,
+                fromY: this.y,
+                toX: ally.x,
+                toY: ally.y,
+                createdAt: Date.now(),
+            });
             ally.hp = Math.min(ally.maxHp, ally.hp + this.healAmount);
             this.lastHealTime = currentTime;
             this.isAiming = false;

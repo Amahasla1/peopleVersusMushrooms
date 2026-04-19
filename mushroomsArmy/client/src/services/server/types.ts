@@ -71,6 +71,7 @@ export type TBuilding = {
     maxHp: number;
     sizeX?: number;
     sizeY?: number;
+    isAlive?: boolean;
     isExploding?: boolean;
     isAttacking?: boolean;
 }
@@ -83,13 +84,25 @@ export type TSlimePool = {
     ttl: number;
 }
 
-// Карта — матрица 50x50 (0=равнина, 1=вода, 2=горы, null=неизвестно)
+// Снаряд
+export type TProjectile = {
+    guid: string;
+    type: 'sporomet' | 'sporovaya_bashnya' | 'eblekar';
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+    createdAt: number;
+}
+
+// Карта — матрица 100x100 (0=равнина, 1=вода, 2=горы, null=неизвестно)
 export type TMapData = (number | null)[][];
 
 // Состояние армии (приходит каждые 200мс через game:state)
 export type TArmyState = {
-    map: (number | null)[][];
+    map: TMapData;
     units: TUnit[];
     buildings: TBuilding[];
     slimePuddles: TSlimePool[];
-}
+    projectiles: TProjectile[];
+};
