@@ -1,4 +1,4 @@
-import { GameState, TerrainType, Unit } from './types';
+import { GameState, Projectile, TerrainType, Unit } from './types';
 import sporometSrc from '../../assets/units/Sporomet.png';
 import champignebSrc from '../../assets/units/Champigneb.png';
 import eblekarSrc from '../../assets/units/Eblekar.png';
@@ -24,6 +24,7 @@ import {
 
 
 const unitImages: Record<string, HTMLImageElement> = {};
+const activeProjectiles = new Map<string, Projectile & { duration: number }>();
 
 const buildingImages: Record<string, HTMLImageElement> = {};
 
@@ -306,6 +307,35 @@ export function drawGame(
     }
   }
 
+  // Отрисовка снарядов
+  const now = Date.now();
+  for (const projectile of state.projectiles ?? []) {
+    if (!activeProjectiles.has(projectile.guid)) {
+      activeProjectiles.set(projectile.guid, {
+        ...projectile,
+        duration: getProjectileDuration(projectile.type),
+      });
+    }
+  }
+
+  for (const [guid, projectile] of activeProjectiles.entries()) {
+    const elapsed = Math.max(0, (now - projectile.createdAt) / projectile.duration);
+    if (elapsed >= 1) {
+      activeProjectiles.delete(guid);
+      continue;
+    }
+
+    const x = projectile.fromX + (projectile.toX - projectile.fromX) * elapsed;
+    const y = projectile.fromY + (projectile.toY - projectile.fromY) * elapsed;
+    const px = x * cellW + cellW / 2;
+    const py = y * cellH + cellH / 2;
+
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fillStyle = getProjectileColor(projectile.type);
+    ctx.fill();
+  }
+
   // 4. Отрисовка юнитов (только живых)
   state.units.forEach(unit => {
     if (unit.hp <= 0) return; // мёртвых не рисуем
@@ -350,6 +380,34 @@ function getTerrainColor(type: TerrainType): string {
   }
 }
 
+function getProjectileDuration(type: Projectile['type']): number {
+  switch (type) {
+    case 'sporovaya_bashnya':
+      return 500;
+    case 'eblekar':
+      return 450;
+    case 'sporomet':
+    default:
+      return 400;
+  }
+}
+
+function getProjectileColor(type: Projectile['type']): string {
+  switch (type) {
+    case 'sporomet':
+      return '#4caf50';
+    case 'sporovaya_bashnya':
+      return '#f1c40f';
+    case 'eblekar':
+      return '#2196f3';
+    default:
+      return '#ffffff';
+  }
+}
+
+/**
+ * Рисует тонкую серую сетку 50×50
+ */
 function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, cellW: number, cellH: number) {
   ctx.beginPath();
   ctx.strokeStyle = '#cccccc';

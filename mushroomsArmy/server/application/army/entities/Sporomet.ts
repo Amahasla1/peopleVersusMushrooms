@@ -25,6 +25,16 @@ class Sporomet extends Unit {
 
     private shoot(enemy: Unit): void {
         if (!this.isAlive || !enemy.isAlive) return;
+
+        this.projectiles.push({
+            guid: `${this.guid}-${Date.now()}-${Math.random()}`,
+            type: 'sporomet',
+            fromX: this.x,
+            fromY: this.y,
+            toX: enemy.x,
+            toY: enemy.y,
+            createdAt: Date.now(),
+        });
         
         enemy.takeDamage(this.attackDamage, 'physical');
         

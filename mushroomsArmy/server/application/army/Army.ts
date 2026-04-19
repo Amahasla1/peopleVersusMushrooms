@@ -3,7 +3,7 @@ import Champigneb, { TSlimePuddle } from "./entities/Champigneb";
 import Eblekar from "./entities/Eblekar";
 import Sporomet from "./entities/Sporomet";
 import SporovayaBashnya from "./entities/SporovayaBashnya";
-import Unit, { TUnitState } from "./entities/Units";
+import Unit, { TProjectile, TUnitState } from "./entities/Units";
 import { IBuilding, Vzryvomor } from "./entities/Vzryvomor";
 
 export type TMap = (number | null)[][];
@@ -22,6 +22,7 @@ export type TArmyState = {
     units: TUnitState[];
     buildings: IBuilding<any>[];
     slimePuddles: TSlimePuddle[];
+    projectiles: TProjectile[];
 }
 
 export class Army {
@@ -32,6 +33,7 @@ export class Army {
     public units: Unit[] = [];
     public enemyUnits: Unit[] = [];
     public enemyBuildings: IBuilding<any>[] = [];
+    public projectiles: TProjectile[] = [];
     public callbacks: { update: (guid: string, data: TArmyState) => void };
     private intervalId: NodeJS.Timeout;
 
@@ -45,12 +47,12 @@ export class Army {
     }
 
     private create(common: Common, initialBuildings: any[] = []) {
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
-        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 100, maxHp: 100, speed: 1, attackRange: 10 }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 0, y: 0, hp: 100, maxHp: 100, speed: 1, attackRange: 10, projectiles: this.projectiles }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 100, maxHp: 100, speed: 1, attackRange: 10, projectiles: this.projectiles }));
+        this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 100, maxHp: 100, speed: 1, attackRange: 10, projectiles: this.projectiles }));
         this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 5, y: 5, hp: 50, maxHp: 50, speed: 1, attackRange: 5 }));
         this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 15, y: 15, hp: 50, maxHp: 50, speed: 1, attackRange: 5 }));
-        this.units.push(new Eblekar({guid:common.guid(), type: 'eblekar', x: 15, y: 20, hp: 40, maxHp: 40, speed: 2, attackRange: 1}));
+        this.units.push(new Eblekar({guid:common.guid(), type: 'eblekar', x: 15, y: 20, hp: 40, maxHp: 40, speed: 2, attackRange: 1, projectiles: this.projectiles}));
         // Создание своих зданий из initialBuildings
         for (const building of initialBuildings) {
             if (building.type === 'sporovaya_bashnya') {
@@ -60,7 +62,8 @@ export class Army {
                     x: building.x,
                     y: building.y,
                     hp: building.hp,
-                    maxHp: building.maxHp
+                    maxHp: building.maxHp,
+                    projectiles: this.projectiles,
                 }));
             } else if (building.type === 'vzryvomor') {
                 this.buildings.push(new Vzryvomor({
@@ -178,6 +181,7 @@ export class Army {
 
     private update(): void {
         const deltaTime = 0.2;
+        this.projectiles.length = 0;
 
         const aliveAllies = this.units.filter(u => u.isAlive);
 
@@ -229,7 +233,8 @@ export class Army {
             ],
             slimePuddles: this.units
                 .filter(u => u.type === 'champigneb' && !u.isAlive)
-                .map(u => (u as Champigneb).slimePuddle)
+                .map(u => (u as Champigneb).slimePuddle),
+            projectiles: this.projectiles,
         };
     }
 
