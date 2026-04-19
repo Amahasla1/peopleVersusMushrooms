@@ -81,7 +81,7 @@ export class Army {
         this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 10, y: 10, hp: 8, maxHp: 8, speed: 1, attackRange: 12, projectiles: this.projectiles }));
         this.units.push(new Sporomet({ guid: common.guid(), type: 'sporomet', x: 20, y: 20, hp: 8, maxHp: 8, speed: 1, attackRange: 12, projectiles: this.projectiles }));
         this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 5, y: 5, hp: 35, maxHp: 35, speed: 3, attackRange: 6 }));
-        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 15, y: 15, hp: 35, maxHp: 35, speed: 3, attackRange: 6 }));
+        this.units.push(new Champigneb({ guid: common.guid(), type: 'champigneb', x: 45, y: 50, hp: 35, maxHp: 35, speed: 3, attackRange: 6 }));
         this.units.push(new Eblekar({ guid: common.guid(), type: 'eblekar', x: 15, y: 20, hp: 40, maxHp: 40, speed: 1, attackRange: 1, projectiles: this.projectiles }));
         // Создание своих зданий из initialBuildings
         for (const building of initialBuildings) {

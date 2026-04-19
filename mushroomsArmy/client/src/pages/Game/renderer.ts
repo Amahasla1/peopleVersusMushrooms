@@ -21,10 +21,37 @@ import {
   stepVzryvomorAnimation,
   VZRYVOMOR_FRAME_MS,
 } from './vzryvomorAnimation';
+import champignebExplFrame0 from '../../assets/units/champigneb_explosion/frame_0.png';
+import champignebExplFrame1 from '../../assets/units/champigneb_explosion/frame_1.png';
+import champignebExplFrame2 from '../../assets/units/champigneb_explosion/frame_2.png';
+import champignebExplFrame3 from '../../assets/units/champigneb_explosion/frame_3.png';
+import champignebExplFrame4 from '../../assets/units/champigneb_explosion/frame_4.png';
+
+const CHAMPIGNEB_EXPL_DURATION = 1000; // 1 секунда
+const CHAMPIGNEB_EXPLOSION_FRAME_COUNT = 5;
 
 
 const unitImages: Record<string, HTMLImageElement> = {};
 const activeProjectiles = new Map<string, Projectile & { duration: number }>();
+
+// ── Анимации взрывов шампиньебов ─────────────────────────────────────────────
+const CHAMPIGNEB_EXPL_FRAME_SRCS: string[] = [
+  champignebExplFrame0,
+  champignebExplFrame1,
+  champignebExplFrame2,
+  champignebExplFrame3,
+  champignebExplFrame4,
+];
+const champignebExplImages: HTMLImageElement[] = CHAMPIGNEB_EXPL_FRAME_SRCS.map(src => {
+  const img = new Image();
+  img.src = src;
+  return img;
+});
+
+/** guid → {x, y, startTime} — активные взрывы шампиньебов */
+const champignebExplosions = new Map<string, { x: number; y: number; startTime: number }>();
+/** guid → последнее hp, чтобы поймать момент смерти */
+const prevChampignebHp = new Map<string, number>();
 
 const buildingImages: Record<string, HTMLImageElement> = {};
 
@@ -334,6 +361,47 @@ export function drawGame(
     ctx.arc(px, py, 4, 0, Math.PI * 2);
     ctx.fillStyle = getProjectileColor(projectile.type);
     ctx.fill();
+  }
+
+  // 4a. Ловим смерть шампиньебов и запускаем взрыв на 1 секунду
+  const now2 = Date.now();
+  state.units.forEach(unit => {
+    if (unit.type !== 'champigneb') return;
+    const prevHp = prevChampignebHp.get(unit.guid) ?? unit.hp;
+    if (unit.hp <= 0 && prevHp > 0 && !champignebExplosions.has(unit.guid)) {
+      champignebExplosions.set(unit.guid, { x: unit.x, y: unit.y, startTime: now2 });
+    }
+    prevChampignebHp.set(unit.guid, unit.hp);
+  });
+
+  // 4b. Рисуем активные взрывы
+  for (const [guid, entry] of champignebExplosions.entries()) {
+    const elapsed = now2 - entry.startTime;
+    if (elapsed >= CHAMPIGNEB_EXPL_DURATION) {
+      champignebExplosions.delete(guid);
+      prevChampignebHp.delete(guid);
+      continue;
+    }
+    const fi = Math.min(
+      Math.floor((elapsed / CHAMPIGNEB_EXPL_DURATION) * CHAMPIGNEB_EXPLOSION_FRAME_COUNT),
+      CHAMPIGNEB_EXPLOSION_FRAME_COUNT - 1
+    );
+    const cx = entry.x * cellW + cellW / 2;
+    const cy = entry.y * cellH + cellH / 2;
+    const size = 20 * Math.min(cellW, cellH);
+    const img = champignebExplImages[fi];
+    if (isImageDrawable(img)) {
+      tryDrawImageScaled(ctx, img, cx - size / 2, cy - size / 2, size, size);
+    } else {
+      const alpha = 1 - elapsed / CHAMPIGNEB_EXPL_DURATION;
+      ctx.beginPath();
+      ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,152,0,${alpha * 0.85})`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(255,80,0,${alpha})`;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
   }
 
   // 4. Отрисовка юнитов (только живых)

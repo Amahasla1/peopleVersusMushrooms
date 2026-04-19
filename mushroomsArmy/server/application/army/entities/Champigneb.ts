@@ -44,6 +44,7 @@ class Champigneb extends Unit {
         };
         
         this.hasExploded = true;
+        this.hp = 0; // Клиент определяет смерть по hp === 0, поэтому обнуляем явно
         this.die();
     }
 
