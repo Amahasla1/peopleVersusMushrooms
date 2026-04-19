@@ -79,6 +79,20 @@ export class Army {
         
         console.log(`[Army] Создано ${this.buildings.length} зданий: ${this.buildings.map(b => b.type).join(', ')}`);
 
+        // Тестовые здания грибов (для проверки анимаций пока нет данных с сервера карты)
+        if (this.buildings.length === 0) {
+            this.buildings.push(new SporovayaBashnya({
+                guid: common.guid(), type: 'sporovaya_bashnya',
+                x: 30, y: 30, hp: 200, maxHp: 200
+            }));
+            this.buildings.push(new Vzryvomor({
+                guid: common.guid(), x: 35, y: 35, hp: 100, maxHp: 100, attackRange: 6
+            }));
+            this.buildings.push(new Vzryvomor({
+                guid: common.guid(), x: 38, y: 32, hp: 100, maxHp: 100, attackRange: 6
+            }));
+        }
+
         // Вражеские здания (house, barracks, tower) — в прокси-цели для юнитов
         this.enemyBuildings = initialBuildings.filter(b => b.type !== 'sporovaya_bashnya' && b.type !== 'vzryvomor') as IBuilding<any>[];
         this.updateEnemyEntities(this.enemyBuildings);
