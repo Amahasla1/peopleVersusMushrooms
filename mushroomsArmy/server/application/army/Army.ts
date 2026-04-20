@@ -112,7 +112,6 @@ export class Army {
         this.updateEnemyEntities(this.enemyBuildings);
     }
 
-    /** Обновляет список целей армии из данных видимости (здания и юниты врага) */
     /** Синхронизирует урон по proxy-цели с локальным списком зданий врага */
     private syncBuildingDamage(guid: string, hp: number): void {
         const buildingIndex = this.enemyBuildings.findIndex(building => building.guid === guid);
