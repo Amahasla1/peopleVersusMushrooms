@@ -12,8 +12,22 @@
 3. Список запросов
    * 3.1. Общие ошибки
 4. Подробно
-   * 4.1. //Тут будут названия запросов REST
-   * 
+   * 4.1 **ЛОББИ**
+   * * 4.1.1 GET_LOBBIES 
+   * * 4.1.2 CREATE_LOBBY
+   * * 4.1.3 JOIN_TO_LOBBY
+   * * 4.1.4 LEAVE_LOBBY
+   * * 4.1.5 DROP_FROM_LOBBY
+   * * 4.1.6 SET_READY
+   * * 4.1.7 START_GAME
+   * 4.2 **КАРТА**
+   * * 4.2.1 GET_RELIEF 
+   * * 4.2.2 GET_VISIBILITY
+   * * 4.2.3 GET_RESOURSE_VISIBILITY
+   * * 4.2.4 UPDATE_UNITS
+   * * 4.2.5 UPDATE_BUILDINGS
+
+
 
 ## 1. Общее
 
