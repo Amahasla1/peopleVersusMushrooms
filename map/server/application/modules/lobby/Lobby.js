@@ -9,16 +9,16 @@ class Lobby {
             spectator: null,
             peopleArmy: null,
             peopleEconomy: null,
-            mushroomArmy: null,
-            mushroomEconomy: null,
+            mushroomsArmy: null,
+            mushroomsEconomy: null,
         }
 
         this.playersIsReady = {
             spectator: false,
             peopleArmy: false,
             peopleEconomy: false,
-            mushroomArmy: false,
-            mushroomEconomy: false
+            mushroomsArmy: false,
+            mushroomsEconomy: false
         }
 
         this.playersGuids[role] = lobbyGuid;
@@ -76,9 +76,11 @@ class Lobby {
     }
 
     canStarted() {
+        // Чтобы можно было запустить без готовности всех сервисов, временно отключаю проверку
         for (const isReady of Object.values(this.playersIsReady)) {
             if (!isReady) {
-                return false;
+                console.log("ALARM: Отключена проверка на готовность всех сервисов для начала игры!");
+                //return false;
             }
         }
         return true;
