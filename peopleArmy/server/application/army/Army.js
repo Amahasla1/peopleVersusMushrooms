@@ -37,8 +37,6 @@ class Army {
     get() {
         return {
             units: this.units,
-            enemyUnits: this.enemyUnits,
-            enemyBuildings: this.enemyBuildings,
         }
     }
 
