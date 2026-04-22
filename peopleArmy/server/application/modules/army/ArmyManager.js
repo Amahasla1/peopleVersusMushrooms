@@ -1,5 +1,6 @@
 const CONFIG = require('../../../config');
 const BaseManager = require('../../../../../global/modules/BaseManager');
+const { URLS, MAP } = require('../../../../../global/globalConfig');
 const Army = require('../../army/Army');
 const { UPDATE_ARMY } = CONFIG.SOCKETS;
 
@@ -26,7 +27,7 @@ class ArmyManager extends BaseManager {
     }
 
     /* PRIVATE */
-    updateArmyCallback(guid, data) {
+    async updateArmyCallback(guid, data) {
         const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid);
         if (user) {
             this.io.to(user.socketId).emit(
@@ -34,6 +35,20 @@ class ArmyManager extends BaseManager {
                 this.answer.good(data)
             )
         }
+
+        const army = this.army[guid];
+        if (!army?.mapGuid) {
+            return;
+        }
+
+        const visibility = await this.fetchVisibilityFromMap({ guid, mapGuid: army.mapGuid });
+        if (visibility) {
+            army.setVisibility(visibility);
+        }
+    }
+
+    fetchVisibilityFromMap({ guid, mapGuid }) {
+        return this.send(`${MAP.URL}${URLS.GET_VISIBILITY}/${mapGuid}/${guid}`, null, 'GET');
     }
 
     /* TRIGGERS */
@@ -103,10 +118,11 @@ class ArmyManager extends BaseManager {
     }
 
     /* EVENTS */
-    eventStartGame({ guid, map, buildings }) {
+    eventStartGame({ guid, map, buildings, mapGuid = null }) {
         const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid);
         if (user) {
             this.army[guid] = new Army({
+                mapGuid,
                 map,
                 buildings,
                 common: this.common,

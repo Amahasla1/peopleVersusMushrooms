@@ -5,8 +5,9 @@ const BMP = require("./entities/BMP");
 const { INTERVAL } = CONFIG.ARMY;
 
 class Army {
-    constructor({ map, buildings, common, callbacks = {}, guid, db }) {
+    constructor({ map, buildings, common, callbacks = {}, guid, db, mapGuid = null }) {
         this.guid = guid;
+        this.mapGuid = mapGuid;
         this.common = common;
         this.callbacks = callbacks;
 
@@ -36,8 +37,13 @@ class Army {
     get() {
         return {
             units: this.units,
-            //...
         }
+    }
+
+    setVisibility({ units = [], buildings = [] } = {}) {
+        this.enemyUnits = Array.isArray(units) ? units : [];
+        this.enemyBuildings = Array.isArray(buildings) ? buildings : [];
+        this.updated = true;
     }
 
     /**
