@@ -120,18 +120,10 @@ class ArmyManager extends BaseManager {
         const guid = guids.peopleArmy;
         const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid);
         if (user) {
-            this.army[guid] = new Army({
-                guids,
-                startPoint,
-                //mapGuid,
-                //map,
-                //buildings,
-                common: this.common,
-                guid,
-                db: this.db,
-                callbacks: {
+            this.army[guid] = new Army({guids, startPoint, mapGuid, common: this.common, guid, db: this.db,
+            callbacks: {
                     update: (guid, data) => this.updateArmyCallback(guid, data)
-                }
+            }
             });
         }
     }
