@@ -6,6 +6,14 @@ import { ILobby, TUser } from "../../services/server/types";
 import './Lobby.css';
 
 type TLobbyRole = keyof ILobby['playersGuids'];
+const LOBBY_ROLES: TLobbyRole[] = ['spectator', 'mushroomsArmy', 'mushroomsEconomy', 'peopleArmy', 'peopleEconomy'];
+const ROLE_LABELS: Record<TLobbyRole, string> = {
+    spectator: 'Наблюдатель',
+    mushroomsArmy: 'Армия грибов',
+    mushroomsEconomy: 'Экономика грибов',
+    peopleArmy: 'Армия людей',
+    peopleEconomy: 'Экономика людей',
+};
 
 const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
     const server = useContext(ServerContext);
@@ -22,6 +30,7 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
         LEAVE_LOBBY,
         SET_READY,
         DROP_FROM_LOBBY,
+        ERROR,
     } = mediator.getEventTypes();
 
     const user = mediator.get(GET_STORE, 'user') as TUser | null;
@@ -29,7 +38,7 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
     const [lobbies, setLobbies] = useState<ILobby[]>([]);
     const [currentLobby, setCurrentLobby] = useState<ILobby | null>(null);
     const [isReady, setIsReady] = useState(false);
-    const [selectedRole, setSelectedRole] = useState<TLobbyRole>('spectator');
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [newLobbyName, setNewLobbyName] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -104,7 +113,6 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
             const myRole = roles.find((role) => lobby.playersGuids[role] === myGuid);
             if (!myRole) return;
 
-            setSelectedRole(myRole);
             setIsReady(Boolean(lobby.playersIsReady?.[myRole]));
         };
 
@@ -140,6 +148,13 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
             await syncLobbyFromList();
         };
 
+        const handleError = (data?: unknown) => {
+            const err = data as { code?: number; message?: string } | null | undefined;
+            const msg = err?.message ?? `Ошибка сервера (код ${err?.code ?? '?'})`;
+            setErrorMsg(msg);
+            setTimeout(() => setErrorMsg(null), 4000);
+        };
+
         mediator.subscribe(USER_LOGGED_OUT, handleLoggedOut);
         mediator.subscribe(GAME_STARTED, handleGameStarted);
         mediator.subscribe(LOBBY_UPDATED, handleLobbyUpdated);
@@ -149,6 +164,7 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
         mediator.subscribe(LEAVE_LOBBY, handleLeaveLobby);
         mediator.subscribe(SET_READY, handleSetReady);
         mediator.subscribe(DROP_FROM_LOBBY, handleDropFromLobby);
+        mediator.subscribe(ERROR, handleError);
 
         return () => {
             isCancelled = true;
@@ -161,6 +177,7 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
             mediator.unsubscribe(LEAVE_LOBBY, handleLeaveLobby);
             mediator.unsubscribe(SET_READY, handleSetReady);
             mediator.unsubscribe(DROP_FROM_LOBBY, handleDropFromLobby);
+            mediator.unsubscribe(ERROR, handleError);
         };
     }, [
         mediator,
@@ -176,6 +193,7 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
         LEAVE_LOBBY,
         SET_READY,
         DROP_FROM_LOBBY,
+        ERROR,
     ]);
 
     const handleCreateLobby = () => {
@@ -186,13 +204,13 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
     const handleConfirmCreateLobby = () => {
         const lobbyName = newLobbyName.trim();
         if (!lobbyName) return;
-        server.createLobby({ lobbyName, role: selectedRole });
+        server.createLobby({ lobbyName, role: 'mushroomsArmy' });
         setIsCreateModalOpen(false);
         setNewLobbyName('');
     };
 
     const handleJoinLobby = (lobbyGuid: string) => {
-        server.joinToLobby({ lobbyGuid, role: selectedRole });
+        server.joinToLobby({ lobbyGuid, role: 'mushroomsArmy' });
     };
 
     const handleLeaveLobby = () => {
@@ -216,12 +234,161 @@ const Lobby: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
         server.logout();
     };
 
-    const handleStartGame = () => {
-        server.lobbyStart();
-    };
+    if (currentLobby) {
+        const myGuid = user?.guid ?? null;
+        const myRole = LOBBY_ROLES.find((role) => currentLobby.playersGuids[role] === myGuid) ?? null;
+
+        return (
+            <div className="lobby">
+                <div className="lobby__container">
+                    {errorMsg && <div className="lobby__errorToast">{errorMsg}</div>}
+                    <h2 className="lobby__title">Комната: {currentLobby.lobbyName}</h2>
+
+                    <div className="lobby__tableWrap">
+                        <table className="lobby__rolesTable">
+                            <thead>
+                                <tr>
+                                    <th>Роль</th>
+                                    <th>Игрок</th>
+                                    <th>Готовность</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {LOBBY_ROLES.map((role) => {
+                                    const playerGuid = currentLobby.playersGuids[role];
+                                    const ready = currentLobby.playersIsReady[role];
+                                    const canKick = Boolean(isCreator && playerGuid && playerGuid !== user?.guid);
+
+                                    return (
+                                        <tr key={role}>
+                                            <td>{ROLE_LABELS[role]}</td>
+                                            <td>{playerGuid ?? 'пусто'}</td>
+                                            <td>
+                                                <span className={ready ? 'lobby__readyBadge lobby__readyBadge--yes' : 'lobby__readyBadge'}>
+                                                    {playerGuid ? (ready ? 'готов' : 'не готов') : '-'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {canKick ? (
+                                                    <button
+                                                        className="lobby__dangerButton"
+                                                        onClick={() => handleKickPlayer(playerGuid!)}
+                                                    >
+                                                        Кикнуть
+                                                    </button>
+                                                ) : (
+                                                    '-'
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="lobby__roomActions">
+                        {!isReady && myRole && (
+                            <button className="lobby__primaryButton" onClick={handleToggleReady}>
+                                Готов
+                            </button>
+                        )}
+
+                        {isCreator && (
+                            <button className="lobby__primaryButton" disabled={!allReady} onClick={handleStart}>
+                                Старт
+                            </button>
+                        )}
+
+                        <button className="lobby__secondaryButton" onClick={handleLeaveLobby}>
+                            Покинуть комнату
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="lobby" />
+        <div className="lobby">
+            <div className="lobby__container">
+                    {errorMsg && <div className="lobby__errorToast">{errorMsg}</div>}
+                    <div className="lobby__topBar">
+                    <div className="lobby__userName">{user?.name ?? 'Игрок'}</div>
+                    <button className="lobby__dangerButton" onClick={handleLogout}>
+                        Выход
+                    </button>
+                </div>
+
+                <h1 className="lobby__title">Список комнат</h1>
+
+                <div className="lobby__list">
+                    {lobbies.length === 0 ? (
+                        <div className="lobby__empty">Пока нет комнат</div>
+                    ) : (
+                        lobbies.map((lobby) => {
+                            const takenSlotsCount = LOBBY_ROLES.filter((role) => lobby.playersGuids[role] !== null).length;
+                            const armySlotTaken = lobby.playersGuids['mushroomsArmy'] !== null
+                                && lobby.playersGuids['mushroomsArmy'] !== user?.guid;
+
+                            return (
+                                <div key={lobby.lobbyGuid} className="lobby__card">
+                                    <div className="lobby__cardHeader">
+                                        <h3 className="lobby__cardTitle">{lobby.lobbyName}</h3>
+                                        <span className="lobby__slots">{takenSlotsCount}/5</span>
+                                    </div>
+
+                                    <div className="lobby__cardActions">
+                                        <span className="lobby__roleLabel">Армия грибов</span>
+
+                                        <button
+                                            className="lobby__primaryButton"
+                                            disabled={armySlotTaken}
+                                            onClick={() => handleJoinLobby(lobby.lobbyGuid)}
+                                        >
+                                            Войти
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+
+                <button className="lobby__secondaryButton" onClick={handleCreateLobby}>
+                    Создать комнату
+                </button>
+
+                {isCreateModalOpen && (
+                    <div className="lobby__modalOverlay" onClick={() => setIsCreateModalOpen(false)}>
+                        <div className="lobby__modal" onClick={(event) => event.stopPropagation()}>
+                            <h3 className="lobby__modalTitle">Создать комнату</h3>
+
+                            <input
+                                className="lobby__input"
+                                placeholder="Название комнаты"
+                                value={newLobbyName}
+                                onChange={(event) => setNewLobbyName(event.target.value)}
+                            />
+
+                            <div className="lobby__modalActions">
+                                <button className="lobby__secondaryButton" onClick={() => setIsCreateModalOpen(false)}>
+                                    Отмена
+                                </button>
+                                <button
+                                    className="lobby__primaryButton"
+                                    disabled={!newLobbyName.trim()}
+                                    onClick={handleConfirmCreateLobby}
+                                >
+                                    Создать
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };
 
