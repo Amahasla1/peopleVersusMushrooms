@@ -7,8 +7,10 @@ const GLOBAL_CONFIG = require('../../../../../global/globalConfig');
 
 const { GAME_STATE, GAME_OVER, LOBBY_START } = CONFIG.SOCKET;
 
-type TStartGame = { guid: string; map: TMap; buildings: TBuildingInput[]; mapGuid: string };
+type TStartGame = { guid: string; map?: TMap; buildings: TBuildingInput[]; mapGuid: string };
 type TTakeDamage = { armyGuid: string; unitGuid: string; amount: number; type: string };
+type TMoveUnit = { armyGuid: string; unitGuid: string; x: number; y: number };
+type TGetArmy = string;
 type TUser = { guid: string; token: string; socketId: string; name: string };
 
 type TVisibleEntity = {
@@ -23,6 +25,8 @@ type TVisibleEntity = {
 type TVisibilityResponse = {
     entities: TVisibleEntity[];
 };
+
+type TReliefResponse = TMap;
 
 class ArmyManager extends BaseManager {
     private army: { [guid: string]: Army };
@@ -39,6 +43,14 @@ class ArmyManager extends BaseManager {
         );
 
         this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.DESTROY_ARMY, (data: unknown) => this.destroyArmy(data as string));
+
+        this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.MOVE_UNIT, (data: unknown) =>
+            this.triggerMoveUnit(data as TMoveUnit)
+        );
+
+        this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.GET_ARMY, (data: unknown) =>
+            this.triggerGetArmy(data as TGetArmy)
+        );
 
         if (!this.io) return;
         this.io.on('connection', (socket: Socket) => {
@@ -71,6 +83,26 @@ class ArmyManager extends BaseManager {
         }
 
         return false;
+    }
+
+    private triggerMoveUnit({ armyGuid, unitGuid, x, y }: TMoveUnit): boolean {
+        const army = this.army[armyGuid];
+        if (!army) return false;
+
+        const unit = army.units.find(u => u.guid === unitGuid);
+        if (!unit) return false;
+
+        (unit as any).targetX = x;
+        (unit as any).targetY = y;
+
+        return true;
+    }
+
+    private triggerGetArmy(armyGuid: TGetArmy): TArmyState | null {
+        const army = this.army[armyGuid];
+        if (!army) return null;
+
+        return army.getState();
     }
 
     private async updateArmyCallback(guid: string, armyState: TArmyState) {
@@ -130,17 +162,31 @@ class ArmyManager extends BaseManager {
         delete this.army[guid];
     }
 
-    private eventStartGame({ guid, map, buildings, mapGuid }: TStartGame): void {
+     private async eventStartGame({ guid, map, buildings, mapGuid }: TStartGame): Promise<void> {
         const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid);
         if (!user) return;
 
         if (this.army[guid]) {
             this.destroyArmy(guid);
         }
+        let resolvedMap = map;
+
+        if (!resolvedMap) {
+            const relief = await this.send<{ mapGuid: string; userGuid: string }, TReliefResponse>(
+                `${GLOBAL_CONFIG.MAP.URL}${GLOBAL_CONFIG.URLS.GET_RELIEF}`,
+                { mapGuid, userGuid: guid }
+            );
+
+            if (!relief || !Array.isArray(relief)) {
+                return;
+            }
+
+            resolvedMap = relief;
+        }
 
         this.army[guid] = new Army({
             mapGuid,
-            map,
+            map: resolvedMap,
             buildings,
             common: this.common,
             guid,
