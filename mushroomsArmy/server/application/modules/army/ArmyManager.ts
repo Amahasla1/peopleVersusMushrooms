@@ -11,6 +11,7 @@ type TStartGame = { guid: string; map?: TMap; buildings: TBuildingInput[]; mapGu
 type TTakeDamage = { armyGuid: string; unitGuid: string; amount: number; type: string };
 type TMoveUnit = { armyGuid: string; unitGuid: string; x: number; y: number };
 type TGetArmy = string;
+type TSpawnUnit = { armyGuid: string; type: 'sporomet' | 'champigneb' | 'eblekar'; x: number; y: number };
 type TUser = { guid: string; token: string; socketId: string; name: string };
 
 type TVisibleEntity = {
@@ -51,6 +52,10 @@ class ArmyManager extends BaseManager {
 
         this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.GET_ARMY, (data: unknown) =>
             this.triggerGetArmy(data as TGetArmy)
+        );
+
+        this.mediator.set(CONFIG.MEDIATOR.TRIGGERS.SPAWN_UNIT, (data: unknown) =>
+            this.triggerSpawnUnit(data as TSpawnUnit)
         );
 
         if (!this.io) return;
@@ -104,6 +109,13 @@ class ArmyManager extends BaseManager {
         if (!army) return null;
 
         return army.getState();
+    }
+
+    private triggerSpawnUnit({ armyGuid, type, x, y }: TSpawnUnit): { guid: string } | null {
+        const army = this.army[armyGuid];
+        if (!army) return null;
+
+        return army.spawnUnit(type, x, y, this.common);
     }
 
     private async updateArmyCallback(guid: string, armyState: TArmyState) {
@@ -217,7 +229,26 @@ class ArmyManager extends BaseManager {
         }
 
         user.socketId = socket.id;
+
+        const map: (number | null)[][] = Array.from({ length: 100 }, () =>
+            Array.from({ length: 100 }, (_, col) => (col === 10 ? 1 : 0))
+        );
+
+        const buildings: TBuildingInput[] = [
+            { guid: this.common.guid(), type: 'house', x: 50, y: 30, hp: 200, maxHp: 200 },
+            { guid: this.common.guid(), type: 'barracks', x: 60, y: 50, hp: 300, maxHp: 300 },
+            { guid: this.common.guid(), type: 'tower', x: 56, y: 70, hp: 150, maxHp: 150 },
+            { guid: this.common.guid(), type: 'sporovaya_bashnya', x: 40, y: 20, hp: 500, maxHp: 500, sizeX: 2, sizeY: 2 },
+            { guid: this.common.guid(), type: 'sporovaya_bashnya', x: 40, y: 60, hp: 500, maxHp: 500, sizeX: 2, sizeY: 2 },
+            { guid: this.common.guid(), type: 'vzryvomor', x: 80, y: 20, hp: 70, maxHp: 70, attackRange: 7 },
+            { guid: this.common.guid(), type: 'vzryvomor', x: 60, y: 60, hp: 70, maxHp: 70, attackRange: 7 },
+            { guid: this.common.guid(), type: 'vzryvomor', x: 40, y: 80, hp: 70, maxHp: 70, attackRange: 7 },
+        ];
+
+        const mapGuid = this.common.guid();
+
         socket.emit(LOBBY_START, this.answer.good(true));
+        this.mediator.call(this.EVENTS.START_GAME, { guid, map, buildings, mapGuid });
     }
 }
 
