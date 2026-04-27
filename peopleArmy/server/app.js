@@ -40,13 +40,13 @@ new UserManager({ mediator, db, io, common, answer });
 new ChatManager({ mediator, db, io, common, answer });
 new ArmyManager({ mediator, db, io, common, answer });
 new LobbyManager({ mediator, db, io, common, answer }, ROLE);
-io.on('connection', (socket) => {
-    console.log('connected:', socket.id);
+// io.on('connection', (socket) => {
+//     console.log('connected:', socket.id);
 
-    socket.onAny((event, ...args) => {
-        console.log('SERVER EVENT:', event, args);
-    });
-});
+//     socket.onAny((event, ...args) => {
+//         console.log('SERVER EVENT:', event, args);
+//     });
+// });
 app.use(CONFIG.CORS.middleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
