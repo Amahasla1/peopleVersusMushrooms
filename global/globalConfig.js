@@ -82,6 +82,11 @@ const GLOBAL_CONFIG = {
         GET_RESOURSE_VISIBILITY: '/getResourseVisibility',
         UPDATE_UNITS: '/updateUnits',
         UPDATE_BUILDINGS: '/updateBuldings',
+
+        //peopleEconomy
+        CREATE_BARRACKS: '/createBarracks',
+        CREATE_PIPELINE: '/createPipeline',
+        CREATE_PEOPLE_UNIT: '/createPeopleUnit'
     },
 
     ROLES: {
