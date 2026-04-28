@@ -16,7 +16,7 @@ class Economy {
     constructor({
         db,
         common,
-        callbacks: { updated },
+        callbacks: { updated, spawnArmyUnit },
         guid,
         guids,
         startPoint,
@@ -27,7 +27,7 @@ class Economy {
         this.guid = guid; // совпадает с guid игрока
         this.db = db;
         this.common = common;
-        this.callbacks = { updated };
+        this.callbacks = { updated, spawnArmyUnit };
         // данные экономики
         this.resourceMap; // массив известных ресурсов [{x, y, value}]
 
@@ -44,6 +44,7 @@ class Economy {
             larvae: [], //личинки
         };
 
+        this.myceliumGrid = null;
         // данные про врагов
         this.enemyBuildings = [];
 
@@ -62,6 +63,7 @@ class Economy {
         /**************/
 
         // start game proccess
+        this.spawnArmyUnit(GLOBAL_CONFIG.UNIT_TYPES.MUSHROOMS_ARMY.CHAMPIGNEB, 4, 4)
         this.updated = false;
         this.interval = setInterval(() => this.update(), INTERVAL);
     }
@@ -131,6 +133,7 @@ class Economy {
             guid: reactorGuid,
             x,
             y,
+            easyStar: this.easyStar,
         }));
     }
 
@@ -163,10 +166,16 @@ class Economy {
         }
     }
 
+    // 3. передать боевых юнитов в армию (callback)
+    spawnArmyUnit(unitType, x, y) { //Получаются из личинок
+        this.callbacks.spawnArmyUnit(unitType, x, y, this.guids.armyGuid);
+    }
+
     reactorsConsume() {
         this.buildings.smallReactors
             .forEach(reactor => {
-                reactor.getConsumable(this.buildings.mycelium).forEach(mc => mc.consume());
+                const reachableMycelium = this.buildings.mycelium.filter(mc => this.checkConnection(reactor, mc));
+                reactor.getConsumable(reachableMycelium).forEach(mc => mc.consume());
             });
     }
 
@@ -176,8 +185,16 @@ class Economy {
     }
 
     getAvailableEnergy() {
-        return this.buildings.smallReactors
-            .reduce((sum, reactor) => sum + reactor.energy, 0); // Дописать сюда дпроверку достигаемости
+       let totalEnergy = 0;
+        for (const reactor of this.buildings.smallReactors) {
+            for (const incubator of this.buildings.incubators) {
+                if (this.checkConnection(reactor, incubator)) {
+                    totalEnergy += reactor.energy;
+                    break;
+                }
+            }
+        }
+        return totalEnergy;
     }
 
     consumeEnergyFromReactors(amount) {
@@ -192,6 +209,21 @@ class Economy {
 
     updateLarvae() {
         this.units.larvae.forEach(larva => larva.update());
+    }
+
+    updateMyceliumGrid() {
+        this.myceliumGrid = Array(50).fill().map(() => Array(50).fill(0));
+
+        for (const mc of this.buildings.mycelium) {
+            if (mc.x >= 0 && mc.x < 50 && mc.y >= 0 && mc.y < 50) {
+                this.myceliumGrid[mc.y][mc.x] = 1;
+            }
+        }
+    }
+
+    async checkConnection(building1, building2) {
+        if (!this.myceliumGrid || !building1 || !building2) return false;
+        return await building1.hasPathTo(this.myceliumGrid, {x:building2.x, y:building2.y});
     }
 
 
@@ -236,6 +268,7 @@ class Economy {
     }
 
     update() {
+        this.updateMyceliumGrid();
         // 1. Мутировать юнита из личинки (потратить железо)
         // 2. Мутировать здание из рабочего (потратить железо)
         // 3. передать боевых юнитов в армию (callback)
