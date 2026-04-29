@@ -5,7 +5,7 @@ import { Socket } from 'socket.io';
 
 const GLOBAL_CONFIG = require('../../../../../global/globalConfig');
 
-const { GAME_STATE, GAME_OVER, LOBBY_START } = CONFIG.SOCKET;
+const { GAME_STATE, GAME_OVER, LOBBY_START, GAME_STARTED } = CONFIG.SOCKET;
 
 type TStartGame = { guid: string; map?: TMap; buildings: TBuildingInput[]; mapGuid: string };
 type TTakeDamage = { armyGuid: string; unitGuid: string; amount: number; type: string };
@@ -214,6 +214,11 @@ class ArmyManager extends BaseManager {
                 update: (guid: string, armyState: TArmyState) => this.updateArmyCallback(guid, armyState)
             }
         });
+
+        const userObj = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid) as TUser | null;
+        if (userObj?.socketId) {
+            this.io.to(userObj.socketId).emit(GAME_STARTED, this.answer.good(true));
+        }
     }
 
     private socketLobbyStart({ guid, token }: { guid?: string; token?: string }, socket: Socket): void {

@@ -46,7 +46,7 @@ const CONFIG = {
         START_GAME: 'START_GAME',
 
         LOBBY_START: 'lobby:start',
-        GAME_STARTED: 'GAME_STARTED',
+        GAME_STARTED: 'game:started',
         GAME_STATE: 'game:state',
         GAME_OVER: 'game:over',
     }

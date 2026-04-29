@@ -20,6 +20,7 @@ interface Config {
     };
     SOCKET: {
         LOBBY_START: string;
+        GAME_STARTED: string;
         GAME_STATE: string;
         GAME_OVER: string;
     };
@@ -49,6 +50,7 @@ const CONFIG: Config = {
 
     SOCKET: {
         LOBBY_START: 'lobby:start',
+        GAME_STARTED: 'game:started',
         GAME_STATE: 'game:state',
         GAME_OVER: 'game:over',
     },

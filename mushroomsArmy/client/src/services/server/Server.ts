@@ -336,6 +336,7 @@ class Server {
 
             authStorage.setAuth(response.data.token, response.data);
             this.mediator.call(USER_REGISTERED, response.data);
+            this.lobbyStart();
             return;
         }
 
@@ -354,6 +355,7 @@ class Server {
 
             authStorage.setAuth(response.data.token, response.data);
             this.mediator.call(LOGIN_EVENT, response.data);
+            this.lobbyStart();
         } else {
             this.mediator.call(this.mediator.getEventTypes().ERROR, response.error);
         }
@@ -368,12 +370,11 @@ class Server {
     }
 
     private handleLobbyStart(response: TResponse<boolean>) {
-        if (response?.result === 'ok' && response.data) {
-            const GAME_STARTED = this.mediator.getEventTypes().GAME_STARTED;
-            this.mediator.call(GAME_STARTED);
-        } else {
+        if (response?.result !== 'ok') {
             this.mediator.call(this.mediator.getEventTypes().ERROR, response.error);
         }
+        // socketId зарегистрирован на сервере — навигацию не делаем здесь,
+        // она произойдёт при получении 'game:started'
     }
 
     private handleGameStarted(response: TResponse<boolean>) {
