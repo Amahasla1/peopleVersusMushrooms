@@ -19,7 +19,7 @@ const CONFIG = {
         EVENTS: {
             START_GAME: 'START_GAME',
             LOBBY_UPDATED: 'LOBBY_UPDATED',
-            USER_DISCONNECT: 'USER_DISCONNECT',
+            DELETE_USER: 'DELETE_USER',
         },
         TRIGGERS: {
             GET_USER_BY_GUID: 'GET_USER_BY_GUID',
