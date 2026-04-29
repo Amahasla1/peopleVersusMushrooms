@@ -23,6 +23,7 @@ class ArmyManager extends BaseManager {
         // mediator trigger setters
         this.mediator.set(this.TRIGGERS.CREATE_UNIT, (data) => this.createUnit(data));
         this.mediator.set(this.TRIGGERS.UNIT_TAKE_DAMAGE, (data) => this.unitTakeDamage(data));
+        this.mediator.set(this.TRIGGERS.MOVE_UNIT, (data) => this.unitMove(data));
     }
 
     destructor() {
@@ -94,28 +95,60 @@ class ArmyManager extends BaseManager {
     }
 
     /**
-     * mediator.get(UNIT_TAKE_DAMAGE, { guid, damage })
-     * guid — guid юнита, которому наносится урон
+     * mediator.get(UNIT_TAKE_DAMAGE, { userGuid, unitGuid, damage })
+     * userGuid — guid пользователя (владельца армии)
+     * unitGuid — guid юнита, которому наносится урон
      * damage — количество урона
      */
     unitTakeDamage(data) {
-        const guid = data?.guid;
+        const userGuid = data?.userGuid;
+        const unitGuid = data?.unitGuid;
         const damage = Number(data?.damage);
 
-        if (!guid || !Number.isFinite(damage)) {
+        if (!userGuid || !unitGuid || !Number.isFinite(damage)) {
             return this.answer.bad(400);
         }
 
-        // Поиск юнита во всех армиях
-        for (const ownerGuid in this.army) {
-            const army = this.army[ownerGuid];
-            const result = army.unitTakeDamage({ guid, damage });
-            if (result?.ok) {
-                return this.answer.good(result.data);
-            }
+        const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, userGuid);
+        if (!user || !user?.isLogin()) {
+            return this.answer.bad(11);
         }
 
-        return this.answer.bad(404);
+        const army = this.army[userGuid];
+        if (!army) {
+            return this.answer.bad(400);
+        }
+
+        const result = army.unitTakeDamage({ guid: unitGuid, damage });
+        if (!result?.ok) {
+            return this.answer.bad(404);
+        }
+
+        return this.answer.good(result.data);
+    }
+
+    unitMove(data) {
+        const userGuid = data?.userGuid;
+        const unitGuid = data?.unitGuid;
+        const x = Number(data?.x);
+        const y = Number(data?.y);
+        if (!userGuid || !unitGuid || !Number.isFinite(x) || !Number.isFinite(y)) {
+            return this.answer.bad(400);
+        }
+        const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, userGuid);
+        if (!user || !user?.isLogin()) {
+            return this.answer.bad(11);
+        }
+        const army = this.army[userGuid];
+        if (!army) {
+            return this.answer.bad(400);
+        }
+        const unit = army.units.find(unit => unit.guid === unitGuid);
+        if (!unit) {
+            return this.answer.bad(400);
+        }
+        unit.setTarget(x, y);
+        return this.answer.good(true);
     }
 
     /* EVENTS */
