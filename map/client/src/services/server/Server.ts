@@ -211,7 +211,7 @@ class Server {
     }
 
     setGeneratedMap(data: TMap): void {
-        this.mediator.set(MEDIATOR.TRIGGERS.SET_GENERATED_MAP, () => data);
+        this.mediator.get(MEDIATOR.TRIGGERS.SET_GENERATED_MAP, data);
     }
 
     getGeneratedMap(): TMap | null {

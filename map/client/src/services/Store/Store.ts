@@ -1,4 +1,4 @@
-import { ILobby, IPlayer, TMap, TUser } from "../server/types";
+import { ILobby, TMap, TUser } from "../server/types";
 import Mediator from '../Mediator/Mediator';
 import { EMESSAGES, MEDIATOR } from "../../config";
 
@@ -10,7 +10,7 @@ class Store {
     currentLobby: ILobby | null = null;
     mediator: Mediator;
 
-    private generatedMap: TMap | null = null;
+    generatedMap: TMap | null = null;
 
     constructor(mediator: Mediator) {
         this.mediator = mediator;
@@ -165,9 +165,11 @@ class Store {
 
     setGeneratedMap(mapData: TMap): void {
         this.generatedMap = mapData;
+        console.log("КАРТА ЗАПИСАНА");
     }
 
     getGeneratedMap(): TMap | null {
+        console.log("КАРТА ОТДАНА");
         return this.generatedMap;
     }
 }

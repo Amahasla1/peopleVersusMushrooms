@@ -66,7 +66,7 @@ class Server {
             const result = this._validate(data);
             if (result) {
                 const { CREATE_LOBBY } = this.mediator.getEventTypes();
-                this.mediator.call(CREATE_LOBBY, result);
+                this.mediator.call(CREATE_LOBBY, result.data);
             }
         });
 
@@ -129,6 +129,7 @@ class Server {
 
     private _validate(data: any) {
         if (data.result === "ok") {
+            console.log("5 отличий", data, data.data, data.data.data)
             return data.data;
         }
         const { SHOW_ERROR } = this.mediator.getEventTypes();
@@ -212,7 +213,7 @@ class Server {
     }
 
     setGeneratedMap(data: TMap): void {
-        this.mediator.set(MEDIATOR.TRIGGERS.SET_GENERATED_MAP, () => data);
+        this.mediator.get(MEDIATOR.TRIGGERS.SET_GENERATED_MAP, data);
     }
 
     getGeneratedMap(): TMap | null {
