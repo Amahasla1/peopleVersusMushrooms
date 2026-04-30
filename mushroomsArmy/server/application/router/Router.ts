@@ -204,6 +204,30 @@ function Router({ answer, mediator }: TRouterOptions): ExpressRouter {
         }
     });
 
+    router.post('/spawnBuilding', (req: Request, res: Response) => {
+        const { armyGuid, type, x, y } = req.body as { armyGuid: string; type: 'vzryvomor' | 'sporovaya_bashnya'; x: number; y: number };
+
+        const validTypes = ['vzryvomor', 'sporovaya_bashnya'];
+        if (!armyGuid || Array.isArray(armyGuid) || !type || !validTypes.includes(type) || x === undefined || y === undefined) {
+            res.json(answer.bad(242));
+            return;
+        }
+
+        if (typeof x !== 'number' || typeof y !== 'number' || !isFinite(x) || !isFinite(y)) {
+            res.json(answer.bad(242));
+            return;
+        }
+
+        const SPAWN_BUILDING = CONFIG.MEDIATOR.TRIGGERS.SPAWN_BUILDING;
+        const result = mediator.get(SPAWN_BUILDING, { armyGuid, type, x, y });
+
+        if (result) {
+            res.json(answer.good(result));
+        } else {
+            res.json(answer.bad(242));
+        }
+    });
+    
     router.all('/*path', notFoundHandler);
     return router;
 }
