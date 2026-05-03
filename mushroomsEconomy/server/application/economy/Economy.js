@@ -302,6 +302,32 @@ class Economy {
             this.callbacks.updated(this.get());
         }
     }
+
+    findEntityByGuid(guid) {
+        for (const type of Object.values(this.units)) {
+            const found = type.find(u => u.guid === guid);
+            if (found) return found;
+        }
+
+        for (const type of Object.values(this.buildings)) {
+            const found = type.find(b => b.guid === guid);
+            if (found) return found;
+        }
+
+        return null;
+    }
+
+    applyDamage(guid, damage) {
+        const entity = this.findEntityByGuid(guid);
+
+        if (!entity) return false;
+
+        entity.takeDamage(damage);
+
+        this.updated = true;
+
+        return true;
+    }
 }
 
 module.exports = Economy;
