@@ -447,8 +447,7 @@ export function drawGame(ctx: CanvasRenderingContext2D,
 
   // --- НАЧАЛО ОТРИСОВКИ ОБЪЕКТОВ ---
 
-  // 1. Отрисовка карты (ландшафт)[cite: 1]
-  //[cite: 1] - Внутри цикла y/x
+  // 1. Отрисовка карты (ландшафт)
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const terrain = coerceTerrainCell(state.map[y]?.[x]);
@@ -494,7 +493,7 @@ export function drawGame(ctx: CanvasRenderingContext2D,
       }
 
       ctx.save();
-      //перемещение в центр ячейки[cite: 1]
+      //перемещение в центр ячейки
       ctx.translate(x * cellW + cellW / 2, y * cellH + cellH / 2);
             
       ctx.drawImage(currentImg, -cellW / 2, -cellH / 2, cellW, cellH);
@@ -788,7 +787,7 @@ export function drawGame(ctx: CanvasRenderingContext2D,
 }
 
 /**
- * Вспомогательная функция для отрисовки полосок HP[cite: 1]
+ * Вспомогательная функция для отрисовки полосок HP
  */
 function drawHealthBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, percent: number) {
   ctx.fillStyle = '#d32f2f';

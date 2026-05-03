@@ -52,20 +52,20 @@ const Footer: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [resources, setResources] = useState<FooterResource[]>(getFooterResources(null));
 
-  // Состояние для отрисовки камеры (синхронизация с глобальным объектом)[cite: 13]
+  // Состояние для отрисовки камеры (синхронизация с глобальным объектом)
   const [cameraState, setCameraState] = useState<TCamera>({ ...globalCamera });
 
   useEffect(() => {
     if (!mediator) return;
 
-    // Подписка на обновление состояния игры для ресурсов[cite: 13]
+    // Подписка на обновление состояния игры для ресурсов
     const handler = (newState: GameState) => {
       setGameState(newState);
       setResources(getFooterResources(newState));
     };
     mediator.subscribe(CONFIG.MEDIATOR.EVENTS.GAME_STATE_UPDATED, handler);
 
-    // Цикл обновления для плавного масштабирования миникарты[cite: 13]
+    // Цикл обновления для плавного масштабирования миникарты
     const interval = setInterval(() => {
       setCameraState({
         offsetX: globalCamera.offsetX,
@@ -85,15 +85,12 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="game-footer-wrapper">
-      {/* Контейнер для миникарты (фиксирован слева)[cite: 13] */}
       <div className="minimap-container">
         <Minimap gameState={gameState} camera={cameraState} />
       </div>
 
-      {/* Основная панель интерфейса */}
       <div className="game-footer-main-panel">
 
-        {/* Блок 1: Ресурсы (фиксированная ширина) */}
         <div className="game-economy-container">
           <span className="game-economy-resources-title">Ресурсы</span>
           <div className="game-economy-resources">
@@ -108,7 +105,6 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Блок 2: Армия (растягивается на всё свободное место) */}
         <div className="game-footer-stats-layout">
           <span className="game-economy-resources-title">Армия</span>
           <div className="game-footer-stats-container">
