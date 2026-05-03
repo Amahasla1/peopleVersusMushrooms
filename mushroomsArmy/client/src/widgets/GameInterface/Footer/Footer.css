@@ -16,7 +16,7 @@
   
   background-image:
     linear-gradient(rgba(25, 13, 1, 0.5), rgba(25, 13, 1, 0.5)),
-    url('../../../assets/map/interface/tree.webp');
+    url('../../../assets/ui/tree.webp');
   
   background-size: calc(150px * var(--scale)) calc(150px * var(--scale));
   background-repeat: repeat;

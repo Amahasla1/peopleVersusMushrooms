@@ -6,7 +6,7 @@
   width: var(--menu-width);
   height: var(--menu-height); 
 
-  background-image: url('../../../assets/map/interface/menu_background.webp');
+  background-image: url('../../../assets/ui/menu_background.webp');
   background-size: 100% 100%; 
   background-repeat: no-repeat;
   

@@ -1,7 +1,7 @@
 import { GameState, TCamera, MapTile, Projectile, TerrainType, Unit } from './types';
-import sporometSrc from '../../assets/units/Sporomet.png';
-import champignebSrc from '../../assets/units/Champigneb.png';
-import eblekarSrc from '../../assets/units/Eblekar.png';
+import sporometSrc from '../../assets/units/sporomet.png';
+import champignebSrc from '../../assets/units/champigneb.png';
+import eblekarSrc from '../../assets/units/eblekar.png';
 import vzryvomorFrame0 from '../../assets/buildings/vzryvomor/frame_0.png';
 import vzryvomorFrame1 from '../../assets/buildings/vzryvomor/frame_1.png';
 import vzryvomorFrame2 from '../../assets/buildings/vzryvomor/frame_2.png';
@@ -45,10 +45,10 @@ import lilyYellowSrc from '../../assets/map/water/water_lily_with_yellow_flowers
 import lilyBaseSrc from '../../assets/map/water/water_lily.webp'; 
 
 //ассеты гор
-import mountainsTextureSrc from '../../assets/map/mountains/moutains.webp';
-import tumanSrc from '../../assets/tuman/tuman.png';
-import tuman2Src from '../../assets/tuman/tuman2.png';
-import tuman3Src from '../../assets/tuman/tuman3.png';
+import mountainsTextureSrc from '../../assets/map/mountains/mountains.webp';
+import tumanSrc from '../../assets/map/fog/tuman.png';
+import tuman2Src from '../../assets/map/fog/tuman2.png';
+import tuman3Src from '../../assets/map/fog/tuman3.png';
 
 //трава
 const grass1Img: HTMLImageElement = new Image();
