@@ -3,9 +3,9 @@ import CONFIG from '../../../config';
 
 export const useTakeDamageHandler = (mediator: any, answer: any) =>
     (req: Request, res: Response): void => {
-        const { armyGuid, unitGuid, amount, type } = req.body;
+        const { armyGuid, unitGuid, amount } = req.body;
 
-        if (!armyGuid || Array.isArray(armyGuid) || !unitGuid || amount === undefined || !type) {
+        if (!armyGuid || Array.isArray(armyGuid) || !unitGuid || amount === undefined) {
             res.json(answer.bad(242));
             return;
         }
@@ -15,6 +15,6 @@ export const useTakeDamageHandler = (mediator: any, answer: any) =>
             return;
         }
 
-        const result = mediator.get(CONFIG.MEDIATOR.TRIGGERS.TAKE_DAMAGE_HANDLER, { armyGuid, unitGuid, amount, type });
+        const result = mediator.get(CONFIG.MEDIATOR.TRIGGERS.TAKE_DAMAGE_HANDLER, { armyGuid, unitGuid, amount });
         res.json(result ? answer.good(true) : answer.bad(242));
     };

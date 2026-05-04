@@ -6,8 +6,6 @@ type TSporovayaBashnyaOptions = {
     guid: string;
     x: number;
     y: number;
-    hp?: number;
-    maxHp?: number;
     projectiles?: TProjectile[];
 };
 
@@ -17,7 +15,6 @@ type TSporovayaBashnyaState = {
     x: number;
     y: number;
     hp: number;
-    maxHp: number;
     sizeX: number;
     sizeY: number;
     isAlive: boolean;
@@ -30,7 +27,6 @@ class SporovayaBashnya implements IBuilding<TSporovayaBashnyaState> {
     public x: number;
     public y: number;
     public hp: number;
-    public maxHp: number;
     public readonly sizeX: number = 2;
     public readonly sizeY: number = 2;
 
@@ -48,8 +44,7 @@ class SporovayaBashnya implements IBuilding<TSporovayaBashnyaState> {
         this.guid = options.guid;
         this.x = options.x;
         this.y = options.y;
-        this.hp = options.hp ?? 160;
-        this.maxHp = options.maxHp ?? 160;
+        this.hp = 160;
         this.projectiles = options.projectiles ?? [];
     }
 
@@ -98,11 +93,11 @@ class SporovayaBashnya implements IBuilding<TSporovayaBashnyaState> {
                 toY: nearestEnemy.y,
                 createdAt: Date.now(),
             });
-            nearestEnemy.takeDamage(this.attackDamage, 'physical');
+            nearestEnemy.takeDamage(this.attackDamage);
         }
     }
 
-    public takeDamage(amount: number, type: string = 'physical'): void {
+    public takeDamage(amount: number): void {
         if (!this.isAlive) return;
         const finalAmount = Math.max(0, amount);
         this.hp -= finalAmount;
@@ -119,7 +114,6 @@ class SporovayaBashnya implements IBuilding<TSporovayaBashnyaState> {
         x: this.x,
         y: this.y,
         hp: this.hp,
-        maxHp: this.maxHp,
         sizeX: this.sizeX,
         sizeY: this.sizeY,
         isAlive: this.isAlive,

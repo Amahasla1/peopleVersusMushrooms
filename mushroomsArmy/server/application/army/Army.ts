@@ -14,7 +14,6 @@ export type TBuildingInput = {
     x: number;
     y: number;
     hp?: number;
-    maxHp?: number;
     attackRange?: number;
     sizeX?: number;
     sizeY?: number;
@@ -26,7 +25,6 @@ export type TBuildingState = {
     x: number;
     y: number;
     hp: number;
-    maxHp: number;
     isAlive?: boolean;
     isExploding?: boolean;
     isAttacking?: boolean;
@@ -94,8 +92,6 @@ export class Army {
                     guid: building.guid,
                     x: building.x,
                     y: building.y,
-                    hp: building.hp,
-                    maxHp: building.maxHp,
                     projectiles: this.projectiles,
                 }));
             } else if (building.type === 'vzryvomor') {
@@ -103,8 +99,6 @@ export class Army {
                     guid: building.guid,
                     x: building.x,
                     y: building.y,
-                    hp: building.hp,
-                    maxHp: building.maxHp,
                     attackRange: building.attackRange || 7
                 }));
             }
@@ -137,15 +131,14 @@ export class Army {
             x: entity.x,
             y: entity.y,
             hp: entity.hp ?? 1,
-            maxHp: entity.maxHp ?? 1,
             speed: 0,
             attackRange: 0,
         });
 
         const baseTakeDamage = proxy.takeDamage.bind(proxy);
 
-        proxy.takeDamage = (amount: number, type: string): void => {
-            baseTakeDamage(amount, type);
+        proxy.takeDamage = (amount: number): void => {
+            baseTakeDamage(amount);
             this.syncBuildingDamage(proxy.guid, proxy.hp);
         };
 
@@ -241,8 +234,8 @@ export class Army {
     private applySlimePuddleDamage(deltaTime: number): void {
         const SLIME_DAMAGE_PER_SECOND = 5;
         const activePuddles = this.units
-            .filter(u => u.type === 'champigneb' && !u.isAlive && (u as Champigneb).slimePuddle.ttl > 0)
-            .map(u => (u as Champigneb).slimePuddle);
+            .filter(u => u.type === 'champigneb' && !u.isAlive && (u as unknown as Champigneb).slimePuddle.ttl > 0)
+            .map(u => (u as unknown as Champigneb).slimePuddle);
 
         if (activePuddles.length === 0) return;
 
@@ -253,7 +246,7 @@ export class Army {
                 const dy = enemy.y - puddle.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 if (distance <= puddle.radius) {
-                    enemy.takeDamage(SLIME_DAMAGE_PER_SECOND * deltaTime, 'poison');
+                    enemy.takeDamage(SLIME_DAMAGE_PER_SECOND * deltaTime);
                     break; // Не стакаем урон от нескольких луж за один тик
                 }
             }
@@ -274,7 +267,7 @@ export class Army {
                     unit.update(this.enemyUnits, this.map, deltaTime);
                 }
             } else if (unit.type === 'champigneb') {
-                (unit as Champigneb).slimePuddle.ttl -= deltaTime;
+                (unit as unknown as Champigneb).slimePuddle.ttl -= deltaTime;
             }
         }
 
@@ -296,7 +289,7 @@ export class Army {
         
         this.units = this.units.filter(unit => {
             if (unit.type === 'champigneb' && !unit.isAlive) {
-                return (unit as Champigneb).slimePuddle.ttl > 0;
+                return (unit as unknown as Champigneb).slimePuddle.ttl > 0;
             }
             return true;
         });
@@ -310,11 +303,11 @@ export class Army {
             units: this.units.map(u => u.getState()),
             buildings: [
                 ...this.buildings.map(b => b.getState()),
-                ...this.enemyBuildings.map(b => ({ ...b, hp: b.hp ?? 0, maxHp: b.maxHp ?? 0 })),
+                ...this.enemyBuildings.map(b => ({ ...b, hp: b.hp ?? 0 })),
             ],
             slimePuddles: this.units
                 .filter(u => u.type === 'champigneb' && !u.isAlive)
-                .map(u => (u as Champigneb).slimePuddle),
+                .map(u => (u as unknown as Champigneb).slimePuddle),
             projectiles: this.projectiles,
         };
     }
@@ -347,11 +340,11 @@ export class Army {
         const guid = common.guid();
 
         if (type === 'sporomet') {
-            this.units.push(new Sporomet({ guid, type, x, y, hp: 8, maxHp: 8, speed: 1, attackRange: 12, projectiles: this.projectiles }));
+            this.units.push(new Sporomet({ guid, type, x, y, speed: 1, attackRange: 12, projectiles: this.projectiles }));
         } else if (type === 'champigneb') {
-            this.units.push(new Champigneb({ guid, type, x, y, hp: 35, maxHp: 35, speed: 3, attackRange: 6 }));
+            this.units.push(new Champigneb({ guid, type, x, y, speed: 3, attackRange: 6 }));
         } else if (type === 'eblekar') {
-            this.units.push(new Eblekar({ guid, type, x, y, hp: 40, maxHp: 40, speed: 1, attackRange: 1, projectiles: this.projectiles }));
+            this.units.push(new Eblekar({ guid, type, x, y, speed: 1, attackRange: 1, projectiles: this.projectiles }));
         }
 
         return { guid };
@@ -380,10 +373,10 @@ export class Army {
         if (isOk) {
             let guid = common.guid();
             if (type === 'vzryvomor') {
-                this.buildings.push(new Vzryvomor({ guid: guid, x: x, y: y, hp: 8, maxHp: 8, attackRange: 12 }));
+                this.buildings.push(new Vzryvomor({ guid: guid, x: x, y: y, attackRange: 12 }));
             }
             else if (type === 'sporovaya_bashnya') {
-                this.buildings.push(new SporovayaBashnya({ guid: guid, x: x, y: y, hp: 8, maxHp: 8, projectiles: this.projectiles }));
+                this.buildings.push(new SporovayaBashnya({ guid: guid, x: x, y: y, projectiles: this.projectiles }));
             }
             else {
                 return null;

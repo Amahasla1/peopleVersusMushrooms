@@ -16,8 +16,8 @@ class Sporomet extends Unit {
 
     constructor(options: TUnitOptions) {
         super(options);
-        this.hp = options.hp ?? 8;
-        this.maxHp = options.maxHp ?? 8;
+        this.hp = 8;
+        this.maxHp = 8;
         this.speed = options.speed ?? 1;
         this.attackRange = options.attackRange ?? 12;
         this.lastShotTime = -this.cooldown;
@@ -36,7 +36,7 @@ class Sporomet extends Unit {
             createdAt: Date.now(),
         });
         
-        enemy.takeDamage(this.attackDamage, 'physical');
+        enemy.takeDamage(this.attackDamage);
         
         this.applyPoisonEffect(enemy, {
             duration: this.poisonDuration,
@@ -64,7 +64,7 @@ class Sporomet extends Unit {
                 
                 const damage = effect.damagePerSecond * deltaTime;
                 if (damage > 0) {
-                    enemy.takeDamage(damage, 'poison');
+                    enemy.takeDamage(damage);
                 }
                 
                 if (effect.duration <= 0) {

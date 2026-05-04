@@ -8,7 +8,7 @@ const GLOBAL_CONFIG = require('../../../../../global/globalConfig');
 const { GAME_STATE, GAME_OVER, LOBBY_START, GAME_STARTED } = CONFIG.SOCKET;
 
 type TStartGame = { guid: string; map?: TMap; buildings: TBuildingInput[]; mapGuid: string };
-type TTakeDamage = { armyGuid: string; unitGuid: string; amount: number; type: string };
+type TTakeDamage = { armyGuid: string; unitGuid: string; amount: number };
 type TMoveUnit = { armyGuid: string; unitGuid: string; x: number; y: number };
 type TGetArmy = string;
 type TSpawnUnit = { armyGuid: string; type: 'sporomet' | 'champigneb' | 'eblekar'; x: number; y: number };
@@ -21,7 +21,6 @@ type TVisibleEntity = {
     x: number;
     y: number;
     hp: number;
-    maxHp: number;
 };
 
 type TVisibilityResponse = {
@@ -70,7 +69,7 @@ class ArmyManager extends BaseManager {
         });
     }
 
-    private triggerTakeDamage({ armyGuid, unitGuid, amount, type }: TTakeDamage): boolean {
+    private triggerTakeDamage({ armyGuid, unitGuid, amount }: TTakeDamage): boolean {
         const army = this.army[armyGuid];
         if (!army) return false;
 
@@ -79,8 +78,8 @@ class ArmyManager extends BaseManager {
         // Ищем цель среди юнитов
         const unit = army.units.find(u => u.guid === unitGuid);
         if (unit) {
-            unit.takeDamage(sanitizedAmount, type);
-            this.sendToMushroomsEconomy('/takeDamage', { armyGuid, unitGuid, amount: sanitizedAmount, type });
+            unit.takeDamage(sanitizedAmount);
+            this.sendToMushroomsEconomy('/takeDamage', { armyGuid, unitGuid, amount: sanitizedAmount });
             return true;
         }
 
@@ -88,9 +87,9 @@ class ArmyManager extends BaseManager {
         const building = army.buildings.find(b => b.guid === unitGuid);
         if (building) {
             if ('takeDamage' in building && typeof building.takeDamage === 'function') {
-                building.takeDamage(sanitizedAmount, type);
+                building.takeDamage(sanitizedAmount);
             }
-            this.sendToMushroomsEconomy('/takeDamage', { armyGuid, unitGuid, amount: sanitizedAmount, type });
+            this.sendToMushroomsEconomy('/takeDamage', { armyGuid, unitGuid, amount: sanitizedAmount });
             return true;
         }
 
@@ -216,7 +215,6 @@ class ArmyManager extends BaseManager {
                 x: entity.x,
                 y: entity.y,
                 hp: entity.hp,
-                maxHp: entity.maxHp,
             }));
             army.updateEnemyEntities(enemyEntities);
         }

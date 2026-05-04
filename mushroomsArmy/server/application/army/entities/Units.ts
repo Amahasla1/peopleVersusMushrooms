@@ -10,12 +10,10 @@ export type TUnitOptions = {
     guid: string;
     type: string;
     hp?: number;
-    maxHp?: number;
     speed?: number;
     x: number;
     y: number;
     attackRange?: number;
-    fireDamageMultiplier?: number;
     projectiles?: TProjectile[];
 };
 
@@ -25,7 +23,6 @@ export type TUnitState = {
   x: number;
   y: number;
   hp: number;
-  maxHp: number;
   isHealing?: boolean;
 };
 
@@ -55,7 +52,7 @@ class Unit {
     public guid: string;
     public type: string;
     public hp: number;
-    public maxHp: number;
+    public maxHp: number = 0;
     public speed: number;
     public x: number;
     public y: number;
@@ -63,7 +60,6 @@ class Unit {
     public targetY: number;
     public isAlive: boolean;
     public attackRange: number;
-    public fireDamageMultiplier: number = 2;
     public poisonEffects: TPoisonEffect[] = [];
     public projectiles: TProjectile[] = [];
     protected enemies: Unit [] = [];
@@ -76,16 +72,14 @@ class Unit {
     private decisionAccumulator: number = 0;
     private readonly DECISION_INTERVAL: number = 0.5; 
 
-    constructor({guid, type, x, y, hp, maxHp, speed, attackRange, fireDamageMultiplier = 2, projectiles = []}: TUnitOptions) {
+    constructor({guid, type, x, y, hp, speed, attackRange, projectiles = []}: TUnitOptions) {
         this.guid = guid;
         this.type = type;
         this.x = x;
         this.y = y;
         this.hp = hp ?? 0;
-        this.maxHp = maxHp ?? 0;
         this.speed = speed ?? 0;
         this.attackRange = attackRange ?? 0;
-        this.fireDamageMultiplier = fireDamageMultiplier;
         this.projectiles = projectiles;
         this.targetX = x;
         this.targetY = y;
@@ -282,20 +276,12 @@ class Unit {
         this.path = p.slice(1);
     }
 
-    takeDamage(amount: number, type: string): void {
+    takeDamage(amount: number): void {
         if (!this.isAlive) return;
 
-        const sanitizedAmount = Math.max(0, amount);
-
-        // Огонь снимает яд с отравленного юнита
-        if (type === 'fire') {
-            this.poisonEffects = [];
-        }
-
-        const finalAmount = type === 'fire' ? sanitizedAmount * this.fireDamageMultiplier : sanitizedAmount;
-
+        const finalAmount = Math.max(0, amount);
         this.hp -= finalAmount;
-        
+
         if (this.hp <= 0) {
             this.hp = 0;
             this.die();
@@ -314,7 +300,6 @@ class Unit {
             x: Math.floor(this.x),
             y: Math.floor(this.y),
             hp: this.hp,
-            maxHp: this.maxHp,
         };
     }
 

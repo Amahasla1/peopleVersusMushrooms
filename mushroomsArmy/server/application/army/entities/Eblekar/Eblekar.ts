@@ -19,8 +19,8 @@ class Eblekar extends Unit {
 
     constructor(options: TUnitOptions) {
         super(options);
-        this.hp = options.hp ?? 40;
-        this.maxHp = options.maxHp ?? 40;
+        this.hp = 40;
+        this.maxHp = 40;
         this.speed = options.speed ?? 1;
         this.attackRange = options.attackRange ?? 0;
         this.lastHealTime = -this.healCooldown;
