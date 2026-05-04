@@ -173,11 +173,12 @@ class ArmyManager extends BaseManager {
         const fogMap = army ? this.buildFogMap(armyState, army.map) : armyState.map;
         this.io.to(user.socketId).emit(GAME_STATE, this.answer.good({ ...armyState, map: fogMap }));
 
-        if (army && army.getAliveUnits().length === 0) {
-            this.io.to(user.socketId).emit(GAME_OVER, this.answer.good({ message: 'Все юниты погибли' }));
-            this.destroyArmy(guid);
-            return;
-        }
+        // Закомментирована система проигрыша при старте если нет никого кроме нас
+        // if (army && army.getAliveUnits().length === 0) {
+        //     this.io.to(user.socketId).emit(GAME_OVER, this.answer.good({ message: 'Все юниты погибли' }));
+        //     this.destroyArmy(guid);
+        //     return;
+        // }
         
         // if (army && army.buildings.length === 0) {
         //     this.io.to(user.socketId).emit(GAME_OVER, this.answer.good({ message: 'Все здания разрушены' }));
