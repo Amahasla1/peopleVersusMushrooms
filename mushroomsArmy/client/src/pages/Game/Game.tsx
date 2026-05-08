@@ -229,12 +229,12 @@ const Game: React.FC<{ setPage: (page: PAGES) => void }> = ({ setPage }) => {
 
       <Footer />
 
-      {isGameOver && (
+      {/* isGameOver && (
         <GameOver 
           onRestart={handleRestartGame} 
           onExit={handleExitToLobby} 
         />
-      )}
+      ) */}
     </div>
   );
 };
