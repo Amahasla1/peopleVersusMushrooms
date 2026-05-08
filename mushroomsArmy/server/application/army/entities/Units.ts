@@ -54,7 +54,7 @@ class Unit {
     public guid: string;
     public type: string;
     public hp: number;
-    public maxHp: number = 0;
+    public baseHp: number;
     public speed: number;
     public x: number;
     public y: number;
@@ -81,6 +81,7 @@ class Unit {
         this.x = x;
         this.y = y;
         this.hp = hp ?? 0;
+        this.baseHp = hp ?? 0;
         this.speed = speed ?? 0;
         this.attackRange = attackRange ?? 0;
         this.visibility = visibility ?? 1;

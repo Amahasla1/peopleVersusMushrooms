@@ -18,7 +18,7 @@ class Sporomet extends Unit {
         super(options);
         this.visibility = options.visibility ?? 15;
         this.hp = 8;
-        this.maxHp = 8;
+        this.baseHp = 8;
         this.speed = options.speed ?? 1;
         this.attackRange = options.attackRange ?? 12;
         this.lastShotTime = -this.cooldown;

@@ -76,7 +76,6 @@ export type TUnit = {
     x: number;
     y: number;
     hp: number;
-    maxHp: number;
     visibility?: number;
     isHealing?: boolean;
 }
@@ -88,7 +87,6 @@ export type TBuilding = {
     x: number;
     y: number;
     hp: number;
-    maxHp: number;
     sizeX?: number;
     sizeY?: number;
     isAlive?: boolean;

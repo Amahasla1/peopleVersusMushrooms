@@ -71,7 +71,7 @@ export type GameState = {
   projectiles: Projectile[];
 };
 
-export type TCamera {
+export type TCamera = {
   scale: number;
   offsetX: number;
   offsetY: number;

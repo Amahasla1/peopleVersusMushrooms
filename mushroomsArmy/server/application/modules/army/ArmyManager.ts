@@ -180,12 +180,6 @@ class ArmyManager extends BaseManager {
             this.destroyArmy(guid);
             return;
         }
-        
-        // if (army && army.buildings.length === 0) {
-        //     this.io.to(user.socketId).emit(GAME_OVER, this.answer.good({ message: 'Все здания разрушены' }));
-        //     this.destroyArmy(guid);
-        //     return;
-        // }
 
         const { units, buildings } = armyState;
 
