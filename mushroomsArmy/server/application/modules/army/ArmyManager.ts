@@ -7,7 +7,7 @@ const GLOBAL_CONFIG = require('../../../../../global/globalConfig');
 
 const { GAME_STATE, LOBBY_START, GAME_STARTED } = CONFIG.SOCKET;
 
-type TStartGame = { guid: string; map?: TMap; buildings: TBuildingInput[]; mapGuid: string };
+type TStartGame = { guid: string; map?: TMap; buildings: TBuildingInput[]; mapGuid: string; peopleArmyGuid?: string | null };
 type TTakeDamage = { armyGuid: string; unitGuid: string; amount: number };
 type TMoveUnit = { armyGuid: string; unitGuid: string; x: number; y: number };
 type TGetArmy = string;
@@ -33,11 +33,13 @@ type TReliefResponse = TMap;
 
 class ArmyManager extends BaseManager {
     private army: { [guid: string]: Army };
+    private armyGuids: Record<string, { peopleArmyGuid: string | null }>;
 
     constructor(options: TManagerOptions) {
         super(options);
 
         this.army = {};
+        this.armyGuids = {};
 
         this.mediator.subscribe(this.EVENTS.START_GAME, (data: unknown) => this.eventStartGame(data as TStartGame));
 
@@ -236,15 +238,25 @@ class ArmyManager extends BaseManager {
         }
     }
 
+    private async damagePeopleUnit(armyGuid: string, unitGuid: string, amount: number): Promise<void> {
+        const guids = this.armyGuids[armyGuid];
+        if (!guids?.peopleArmyGuid) return;
+        await this.send(
+            `${GLOBAL_CONFIG.PEOPLE_ARMY.URL}${GLOBAL_CONFIG.URLS.TAKE_DAMAGE_PEOPLE_ARMY}`,
+            { userGuid: guids.peopleArmyGuid, unitGuid, damage: amount }
+        );
+    }
+
     private destroyArmy(guid: string): void {
         const army = this.army[guid];
         if (army) {
             army.destructor();
         }
         delete this.army[guid];
+        delete this.armyGuids[guid];
     }
 
-     private async eventStartGame({ guid, map, buildings, mapGuid }: TStartGame): Promise<void> {
+     private async eventStartGame({ guid, map, buildings, mapGuid, peopleArmyGuid }: TStartGame): Promise<void> {
         const user = this.mediator.get(this.TRIGGERS.GET_USER_BY_GUID, guid);
         if (!user) return;
 
@@ -271,6 +283,7 @@ class ArmyManager extends BaseManager {
             finalBuildings = Army.generateDefensiveLayout(resolvedMap, this.common);
         }
 
+        this.armyGuids[guid] = { peopleArmyGuid: peopleArmyGuid ?? null };
         this.army[guid] = new Army({
             mapGuid,
             map: resolvedMap,
@@ -278,7 +291,8 @@ class ArmyManager extends BaseManager {
             common: this.common,
             guid,
             callbacks: {
-                update: (guid: string, armyState: TArmyState) => this.updateArmyCallback(guid, armyState)
+                update: (guid: string, armyState: TArmyState) => this.updateArmyCallback(guid, armyState),
+                takeDamage: (unitGuid: string, amount: number) => this.damagePeopleUnit(guid, unitGuid, amount),
             }
         });
 

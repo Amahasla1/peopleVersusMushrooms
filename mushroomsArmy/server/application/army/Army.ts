@@ -43,7 +43,7 @@ export type TArmyOptions = {
     buildings: TBuildingInput[];
     guid: string;
     common: Common;
-    callbacks: { update: (guid: string, data: TArmyState) => void };
+    callbacks: { update: (guid: string, data: TArmyState) => void; takeDamage?: (unitGuid: string, amount: number) => void };
 };
 
 export type TArmyState = {
@@ -64,7 +64,7 @@ export class Army {
     public enemyBuildings: TBuildingInput[] = [];
     public economyBuildings: TBuildingInput[] = [];
     public projectiles: TProjectile[] = [];
-    public callbacks: { update: (guid: string, data: TArmyState) => void };
+    public callbacks: { update: (guid: string, data: TArmyState) => void; takeDamage?: (unitGuid: string, amount: number) => void };
     private intervalId: NodeJS.Timeout;
 
     constructor(options: TArmyOptions) {
@@ -140,6 +140,7 @@ export class Army {
         proxy.takeDamage = (amount: number): void => {
             baseTakeDamage(amount);
             this.syncBuildingDamage(proxy.guid, proxy.hp);
+            this.callbacks.takeDamage?.(proxy.guid, amount);
         };
 
         return proxy;
