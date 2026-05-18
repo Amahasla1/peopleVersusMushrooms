@@ -111,6 +111,7 @@ class Army {
                 return { ok: false, error: 'UNKNOWN_UNIT_TYPE' };
         }
         unit.type = unitType;
+        unit.maxHp = unit.hp;
         unit.damage = Number(stats.DAMAGE) || 1;
 
         this.units.push(unit);
@@ -309,6 +310,7 @@ class Army {
     moveUnits() {
         this.units.forEach((unit) => {
             if (unit.move(this.map, this.buildings, this.units, this.enemyUnits, this.enemyBuildings)) {
+                console.log(unit.guid)
                 this.updated = true;
                 //console.log('Координаты юнита (guid: ', unit.guid, '): ', unit.x, unit.y);
             }
