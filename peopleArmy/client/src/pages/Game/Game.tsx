@@ -20,9 +20,25 @@ import partizan2Src from '../../assets/units/partizan/partizan2.png';
 import sniper1Src from '../../assets/units/sniper/sniper1.png';
 import sniper2Src from '../../assets/units/sniper/sniper2.png';
 import sniper3Src from '../../assets/units/sniper/sniper3.png';
+import sporomet1Src from '../../assets/units/sporomet/sporomet1.png';
+import sporomet2Src from '../../assets/units/sporomet/sporomet2.png';
+import sporomet3Src from '../../assets/units/sporomet/sporomet3.png';
+import champigneb1Src from '../../assets/units/champigneb/champigneb1.png';
+import champigneb2Src from '../../assets/units/champigneb/champigneb2.png';
+import eblekar1Src from '../../assets/units/eblekar/eblekar1.png';
+import eblekar2Src from '../../assets/units/eblekar/eblekar2.png';
+import eblekar3Src from '../../assets/units/eblekar/eblekar3.png';
+import eblekar4Src from '../../assets/units/eblekar/eblekar4.png';
+import eblekar5Src from '../../assets/units/eblekar/eblekar5.png';
+import eblekar6Src from '../../assets/units/eblekar/eblekar6.png';
+import pizdoglyad1Src from '../../assets/units/pizdoglyad/pizdoglyad1.png';
+import pizdoglyad2Src from '../../assets/units/pizdoglyad/pizdoglyad2.png';
+import vzryvomorSrc from '../../assets/units/vzryvomor/frame_0.png';
 
-/** Максимальный размер клетки при полном зуме */
-const MAX_CELL_PX = 20;
+/** Базовый размер клетки (карта скроллится, если не влезает) */
+const MIN_CELL_PX = 40;
+/** Максимум клетки при зуме */
+const MAX_CELL_PX = 72;
 /** Запас под padding обёртки (см. Game.css .game-canvas-wrap) */
 const CANVAS_WRAP_PAD_PX = 40;
 const ZOOM_DEFAULT = 1;
@@ -63,10 +79,15 @@ const COLOR = {
 // --- Спрайты юнитов ---
 
 const UNIT_FRAME_SRCS: Record<string, string[]> = {
-    soldier:  [soldier1Src, soldier2Src, soldier3Src, soldier4Src],
-    bmp:      [bmp1Src, bmp2Src, bmp3Src, bmp4Src, bmp5Src, bmp6Src, bmp7Src, bmp8Src],
-    partizan: [partizan1Src, partizan2Src],
-    sniper:   [sniper1Src, sniper2Src, sniper3Src],
+    soldier:    [soldier1Src, soldier2Src, soldier3Src, soldier4Src],
+    bmp:        [bmp1Src, bmp2Src, bmp3Src, bmp4Src, bmp5Src, bmp6Src, bmp7Src, bmp8Src],
+    partizan:   [partizan1Src, partizan2Src],
+    sniper:     [sniper1Src, sniper2Src, sniper3Src],
+    sporomet:   [sporomet1Src, sporomet2Src, sporomet3Src],
+    champigneb: [champigneb1Src, champigneb2Src],
+    eblekar:    [eblekar1Src, eblekar2Src, eblekar3Src, eblekar4Src, eblekar5Src, eblekar6Src],
+    pizdoglyad: [pizdoglyad2Src, pizdoglyad1Src],
+    vzryvomor:  [vzryvomorSrc],
 };
 
 const WALK_FRAME_MS = 150;
@@ -225,7 +246,7 @@ function drawUnit(ctx: CanvasRenderingContext2D, unit: UnitData, cell: number) {
     const cx = unit.x * cell + cell / 2;
     const cy = unit.y * cell + cell / 2;
     const isBmp = unit.type === 'bmp' || unit.speed >= 3;
-    const r = isBmp ? cell * 0.42 : cell * 0.35;
+    const r = isBmp ? cell * 0.48 : cell * 0.44;
     const size = r * 2;
 
     // Линия к цели
@@ -297,32 +318,29 @@ function drawUnit(ctx: CanvasRenderingContext2D, unit: UnitData, cell: number) {
 }
 
 function drawEnemyUnit(ctx: CanvasRenderingContext2D, unit: EnemyUnitData, cell: number) {
-    if (!unit.isAlive || unit.hp <= 0) {
-        return;
-    }
+    if (!unit.isAlive || unit.hp <= 0) return;
+
     const cx = unit.x * cell + cell / 2;
     const cy = unit.y * cell + cell / 2;
-    const r = cell * 0.38;
+    const isLarge = unit.type === 'vzryvomor';
+    const r = isLarge ? cell * 0.48 : cell * 0.44;
+    const size = r * 2;
 
-    ctx.fillStyle = COLOR.enemyMushroom;
-    ctx.strokeStyle = COLOR.enemyMushroomBorder;
-    ctx.lineWidth = Math.max(1, cell * 0.1);
-    ctx.beginPath();
-    ctx.roundRect(cx - r, cy - r, r * 2, r * 2, Math.max(2, cell * 0.2));
-    ctx.fill();
-    ctx.stroke();
+    const img = getUnitImage(unit);
+    if (!isImageDrawable(img) || !tryDrawImageScaled(ctx, img, cx - size / 2, cy - size / 2, size, size)) {
+        ctx.fillStyle = COLOR.enemyMushroom;
+        ctx.strokeStyle = COLOR.enemyMushroomBorder;
+        ctx.lineWidth = Math.max(1, cell * 0.1);
+        ctx.beginPath();
+        ctx.roundRect(cx - r, cy - r, size, size, Math.max(2, cell * 0.2));
+        ctx.fill();
+        ctx.stroke();
+    }
 
-    // простая «головка» гриба
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.beginPath();
-    ctx.arc(cx, cy - r * 0.35, r * 0.35, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Полоска HP
     const hpPct = Math.max(0, Math.min(1, unit.hp / (unit.maxHp || unit.hp)));
-    const barW = r * 2;
+    const barW = size;
     const barH = Math.max(3, cell * 0.07);
-    const barX = cx - r;
+    const barX = cx - barW / 2;
     const barY = cy - r - barH - 2;
     ctx.fillStyle = '#d32f2f';
     ctx.fillRect(barX, barY, barW, barH);
@@ -344,20 +362,20 @@ function getMapSize(map: number[][]): { cols: number; rows: number } {
 }
 
 function fitCellToWrap(wrap: HTMLElement, cols: number, rows: number): number {
-    if (cols <= 0 || rows <= 0) return MAX_CELL_PX;
+    if (cols <= 0 || rows <= 0) return MIN_CELL_PX;
     const { width, height } = wrap.getBoundingClientRect();
     const aw = Math.max(1, width - CANVAS_WRAP_PAD_PX);
     const ah = Math.max(1, height - CANVAS_WRAP_PAD_PX);
     const fit = Math.min(aw / cols, ah / rows);
-    return Math.min(Math.max(fit, 0.25), MAX_CELL_PX);
+    return Math.min(Math.max(fit, MIN_CELL_PX), MAX_CELL_PX);
 }
 
 const Game: React.FC<IBasePage> = ({ mediator, setPage, server: _server }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const canvasWrapRef = useRef<HTMLDivElement>(null);
     const pendingScrollRef = useRef<{ ratio: number; sl: number; st: number } | null>(null);
-    const cellPxRef = useRef(MAX_CELL_PX);
-    const baseCellRef = useRef(MAX_CELL_PX);
+    const cellPxRef = useRef(MIN_CELL_PX);
+    const baseCellRef = useRef(MIN_CELL_PX);
     const zoomRef = useRef(ZOOM_DEFAULT);
     const mapRef = useRef<number[][]>([]);
     const unitsRef = useRef<UnitData[]>([]);
