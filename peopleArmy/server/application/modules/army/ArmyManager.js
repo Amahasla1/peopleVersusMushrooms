@@ -143,7 +143,7 @@ class ArmyManager extends BaseManager {
         return this.answer.good(result.data);
     }
 
-    async damageMushroomsUnit({ armyGuid="123efthgfrds", economyGuid, unitGuid, amount, targetKind }) {
+    async damageMushroomsUnit({ armyGuid, economyGuid, unitGuid, amount, targetKind }) {
         if (!unitGuid || !Number.isFinite(Number(amount))) {
             return null;
         }
