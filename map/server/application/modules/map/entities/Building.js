@@ -3,7 +3,6 @@ const Unit = require("./Unit");
 class Building extends Unit {
     constructor({ x, y, type, guid, role, size = 1, visibility = 1 }) {
         super({ x, y, type, guid, role, visibility });
-
         this.size = size;
     }
 
