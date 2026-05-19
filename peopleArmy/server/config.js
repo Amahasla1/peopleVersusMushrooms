@@ -39,10 +39,6 @@ const CONFIG = {
 
         UPDATE_ARMY: 'UPDATE_ARMY',
     },
-
-    ARMY: {
-        INTERVAL: 100, //ms
-    }
 }
 
 module.exports = CONFIG;
