@@ -143,19 +143,33 @@ class ArmyManager extends BaseManager {
         return this.answer.good(result.data);
     }
 
-    async damageMushroomsUnit({ armyGuid, economyGuid, unitGuid, amount, targetKind }) {
+    async damageMushroomsUnit({ armyGuid, economyGuid, unitGuid, amount, targetKind, type }) {
         if (!unitGuid || !Number.isFinite(Number(amount))) {
             return null;
         }
 
+        const sanitizedAmount = Number(amount);
+
         if (targetKind === 'building') {
+            const buildingType = String(type || '').toLowerCase();
+            // башня и взрывомор — здания mushroomsArmy, не economy
+            if (buildingType === 'sporovaya_bashnya' || buildingType === 'vzryvomor') {
+                if (!armyGuid) {
+                    return null;
+                }
+                return this.sendToMushroomsArmy('/takeDamage', {
+                    armyGuid,
+                    unitGuid,
+                    amount: sanitizedAmount,
+                });
+            }
             if (!economyGuid) {
                 return null;
             }
             return this.sendToMushroomsEconomy(URLS.APPLY_DAMAGE, {
                 economyGuid,
                 guid: unitGuid,
-                damage: Number(amount),
+                damage: sanitizedAmount,
             });
         }
 
@@ -166,7 +180,7 @@ class ArmyManager extends BaseManager {
         return this.sendToMushroomsArmy('/takeDamage', {
             armyGuid,
             unitGuid,
-            amount: Number(amount),
+            amount: sanitizedAmount,
         });
     }
 
