@@ -49,6 +49,7 @@ class Army {
             units: this.units.map((u) => (typeof u.get === 'function' ? u.get() : u)),
             enemyUnits: this.enemyUnits,
             enemyBuildings: this.enemyBuildings.filter((b) => Army._isBuildingAlive(b)),
+            destroyedEnemyBuildingGuids: [...this.destroyedEnemyBuildingGuids],
         };
     }
 

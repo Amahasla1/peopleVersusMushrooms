@@ -156,6 +156,8 @@ interface ArmyData {
     units: UnitData[];
     enemyUnits?: EnemyUnitData[];
     enemyBuildings?: EnemyBuildingData[];
+    /** guid зданий, уничтоженных нашей армией — клиент убирает с карты */
+    destroyedEnemyBuildingGuids?: string[];
 }
 
 function getBuildingSize(b: EnemyBuildingData): number {
@@ -585,14 +587,22 @@ const Game: React.FC<IBasePage> = ({ mediator, setPage, server: _server }) => {
             if (Array.isArray(data.enemyUnits)) {
                 enemyUnitsRef.current = data.enemyUnits;
             }
-            if (Array.isArray(data.enemyBuildings)) {
-                // Синхронизация с сервером: уничтоженные и пропавшие из видимости — убираем
-                const next = new Map<string, EnemyBuildingData>();
-                data.enemyBuildings.forEach((b: EnemyBuildingData) => {
-                    if (!b?.guid || !isEnemyBuildingAlive(b)) return;
-                    next.set(b.guid, b);
+            if (Array.isArray(data.destroyedEnemyBuildingGuids)) {
+                data.destroyedEnemyBuildingGuids.forEach((guid) => {
+                    if (guid) enemyBuildingsRef.current.delete(guid);
                 });
-                enemyBuildingsRef.current = next;
+            }
+            if (Array.isArray(data.enemyBuildings)) {
+                // Накапливаем увиденные здания: пустой тик с карты не стирает уже показанные.
+                // Убираем только мёртвые (hp) или guid из destroyedEnemyBuildingGuids (выше).
+                data.enemyBuildings.forEach((b: EnemyBuildingData) => {
+                    if (!b?.guid) return;
+                    if (!isEnemyBuildingAlive(b)) {
+                        enemyBuildingsRef.current.delete(b.guid);
+                        return;
+                    }
+                    enemyBuildingsRef.current.set(b.guid, b);
+                });
             }
         };
 

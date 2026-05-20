@@ -337,6 +337,19 @@ describe('уничтоженные здания', () => {
         });
         expect(army.enemyBuildings).toHaveLength(0);
     });
+
+    test('get() отдаёт destroyedEnemyBuildingGuids для клиента', async () => {
+        army.units = [makeUnit({ type: 'partizan', x: 0, y: 0, range: 5, damage: 200 })];
+        army.enemyBuildings = [makeBuilding({
+            guid: 'tower-1',
+            type: 'sporovaya_bashnya',
+            x: 1,
+            y: 0,
+            hp: 160,
+        })];
+        await army.shotUnits();
+        expect(army.get().destroyedEnemyBuildingGuids).toEqual(['tower-1']);
+    });
 });
 
 describe('shotUnits — параметры takeDamage', () => {
