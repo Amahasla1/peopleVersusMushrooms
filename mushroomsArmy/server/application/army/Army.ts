@@ -18,6 +18,7 @@ export type TBuildingInput = {
     x: number;
     y: number;
     hp?: number;
+    level?: number;
     attackRange?: number;
     sizeX?: number;
     sizeY?: number;
@@ -62,6 +63,7 @@ export type TArmyState = {
     units: TUnitState[];
     enemyUnits: TUnitState[];
     buildings: TBuildingState[];
+    economyUnits: TBuildingInput[];
     slimePuddles: TSlimePuddle[];
     projectiles: TProjectile[];
     formation: TFormationState | null;
@@ -76,6 +78,8 @@ export class Army {
     public enemyUnits: Unit[] = [];
     public enemyBuildings: TBuildingInput[] = [];
     public economyBuildings: TBuildingInput[] = [];
+    public economyUnits: TBuildingInput[] = [];
+    public sentBuildingGuids: Set<string> = new Set();
     public projectiles: TProjectile[] = [];
     public callbacks: { 
         update: (guid: string, data: TArmyState) => void; 
@@ -147,10 +151,6 @@ export class Army {
         // Вражеские здания (house, barracks, tower) — в прокси-цели для юнитов
         this.enemyBuildings = initialBuildings.filter(b => b.type !== 'sporovaya_bashnya' && b.type !== 'vzryvomor');
         this.updateEnemyEntities(this.enemyBuildings);
-    }
-
-    public setEconomyBuildings(buildings: TBuildingInput[]): void {
-        this.economyBuildings = [...buildings];
     }
 
     /** Синхронизирует урон по proxy-цели с локальным списком зданий врага */
@@ -355,6 +355,7 @@ export class Army {
                 ...this.enemyBuildings.map(b => ({ ...b, hp: b.hp ?? 0 })),
                 ...this.economyBuildings.map(b => ({ ...b, hp: b.hp ?? 0 })),
             ],
+            economyUnits: this.economyUnits,
             slimePuddles: this.units
                 .filter(u => u.type === 'champigneb' && !u.isAlive)
                 .map(u => (u as unknown as Champigneb).slimePuddle),
