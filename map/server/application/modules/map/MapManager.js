@@ -68,6 +68,7 @@ class MapManager extends BaseManager {
         const role = this._getRoleByGuid(map, userGuid);
         if (!role) return this.answer.bad(3003);
 
+        console.log("jopa", data)
         entities.forEach(entity => map[method]({ ...entity, role }));
         this._emit(MESSAGES.UPDATE_MAP, map, map.get());
         return true;
