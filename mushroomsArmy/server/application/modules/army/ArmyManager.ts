@@ -80,14 +80,12 @@ class ArmyManager extends BaseManager {
 
         const sanitizedAmount = Math.max(0, amount);
 
-        // Ищем цель среди юнитов
         const unit = army.units.find(u => u.guid === unitGuid);
         if (unit) {
             unit.takeDamage(sanitizedAmount);
             return true;
         }
 
-        // Ищем цель среди зданий
         const building = army.buildings.find(b => b.guid === unitGuid);
         if (building) {
             if ('takeDamage' in building && typeof building.takeDamage === 'function') {
@@ -189,15 +187,15 @@ class ArmyManager extends BaseManager {
         const army = this.army[guid];
         if (!army) return;
 
-        const { units } = armyState;
         const ownBuildings = army.buildings.map(building => building.getState());
 
-        // Отправляем юниты и здания на карту
-        // карта читает поля units / buildings (см. useUpdateUnitsHandler.js / useUpdateBuildingsHandler.js)
-        await this.send<{ mapGuid: string; userGuid: string; entities: TArmyState['units'] }>(
-            `${GLOBAL_CONFIG.MAP.URL}${GLOBAL_CONFIG.URLS.UPDATE_UNITS}`,
-            { mapGuid: army.mapGuid, userGuid: army.guid, entities: units }
-        );
+        const unitEntities = army.buildMapUnitUpdateEntities();
+        if (unitEntities.length > 0) {
+            await this.send<{ mapGuid: string; userGuid: string; entities: typeof unitEntities }>(
+                `${GLOBAL_CONFIG.MAP.URL}${GLOBAL_CONFIG.URLS.UPDATE_UNITS}`,
+                { mapGuid: army.mapGuid, userGuid: army.guid, entities: unitEntities }
+            );
+        }
 
         // Здания отправляем только новые (map использует toggle: повторная отправка удаляет с карты)
         const newBuildings = ownBuildings.filter(b => !army.sentBuildingGuids.has(b.guid));
