@@ -22,8 +22,8 @@ class GameManager extends BaseManager {
 		this.mediator.subscribe(this.EVENTS.LOAD_GAME, (data) => this.eventLoadGame(data));
 		this.mediator.subscribe(this.EVENTS.DAMAGE, (data) => this.eventApplyDamage(data));
 		this.mediator.subscribe(this.EVENTS.MOVE_UNIT, (data) => this.eventMoveUnit(data));
-		this.mediator.subscribe(this.REQUEST_UNITS, (data) => this.eventRequestUnits(data));
-		this.mediator.subscribe(this.REQUEST_BUILDINGS, (data) => this.eventRequestBuildings(data));
+		this.mediator.subscribe(this.EVENTS.REQUEST_UNITS, (data) => this.eventRequestUnits(data));
+		this.mediator.subscribe(this.EVENTS.REQUEST_BUILDINGS, (data) => this.eventRequestBuildings(data));
 		// mediator triggers setters
 		//...
 	}
@@ -90,7 +90,7 @@ class GameManager extends BaseManager {
 				
 				this.io.to(user.socketId).emit(
 					GLOBAL_CONFIG.SOCKET.START_GAME,
-					sceneData
+					this.answer.good(sceneData)
 				);
 				//this.getResources(guid, mapGuid);
 				console.log("Экономика создана");
